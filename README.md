@@ -1,6 +1,6 @@
-# Flex CapEx Intelligence Platform
+# Flex Competitive Intelligence Platform - AI Powered
 
-> A comprehensive competitive intelligence platform for analyzing CapEx strategies of contract manufacturers using RAG, NLP, and automated data ingestion.
+> An AI-powered competitive intelligence platform for analyzing CapEx strategies of contract manufacturers using RAG, NLP, and automated data ingestion.
 
 ## Overview
 

@@ -1,0 +1,633 @@
+[00:00.0 - 00:06.5] Good morning ladies and gentlemen and welcome to the Celestica Q3 2022
+[00:06.5 - 00:12.1] earnings conference call. At this time all lines are in a listen-only mode.
+[00:12.1 - 00:16.9] Following the presentation we will conduct a question and answer session. If
+[00:16.9 - 00:22.2] at any time during this call you require immediate assistance please press star
+[00:22.2 - 00:29.3] zero for the operator. This call is being recorded today Tuesday October the 25th
+[00:29.3 - 00:35.8] 2022. I would now like to turn the conference over to Craig Oberg. Please go
+[00:35.8 - 00:41.6] ahead. Good morning and thank you for joining us on Celestica's third quarter
+[00:41.6 - 00:46.3] 2022 earnings conference call. On the call today are Rob Maiones, President and
+[00:46.3 - 00:51.5] Chief Executive Officer and Mandy Chawla, Chief Financial Officer. As a reminder
+[00:51.5 - 00:54.2] during this call we will make forward-looking statements within the
+[00:54.2 - 00:58.4] meetings of the U.S. Private Securities Litigation Reform Act of 1995 and
+[00:58.4 - 01:03.0] applicable Canadian securities laws. Such forward-looking statements are
+[01:03.0 - 01:06.9] based on management's current expectations, forecasts, and assumptions
+[01:06.9 - 01:10.7] which are subject to risks, uncertainties, and other factors that
+[01:10.7 - 01:14.7] could cause actual outcomes and results to differ materially from conclusions,
+[01:14.7 - 01:20.4] forecasts, or projections expressed in such statements. For identification and
+[01:20.4 - 01:23.4] discussion of such factors and assumptions as well as further
+[01:23.4 - 01:27.3] information concerning forward-looking statements please refer to yesterday's
+[01:27.3 - 01:30.6] press release including the cautionary note regarding forward-looking
+[01:30.6 - 01:35.3] statements therein, our most recent annual report on Form 20-F, and our other
+[01:35.3 - 01:41.4] public filings which can be accessed at SEC.gov and CDAR.com. We assume no
+[01:41.4 - 01:47.2] obligation to update any forward-looking statement except as required by law. In
+[01:47.2 - 01:51.0] addition during this call we will refer to various non-IFRS financial measures
+[01:51.0 - 01:55.6] including ratios based on non-IFRS financial measures consisting of
+[01:55.6 - 02:01.3] non-IFRS operating earnings, non-IFRS operating margin, adjusted gross margin,
+[02:01.3 - 02:07.0] adjusted return on invested capital or adjusted ROIC, adjusted free cash flow,
+[02:07.0 - 02:12.8] gross debt to non-IFRS trailing 12-month adjusted EBITDA leverage ratio, adjusted
+[02:12.8 - 02:17.6] net earnings, adjusted earnings per share or adjusted EPS, adjusted SG&A
+[02:17.6 - 02:23.5] expense, lifecycle solutions revenue, and adjusted effective tax rate. Listeners
+[02:23.5 - 02:26.5] should be cautioned that references to any of the foregoing measures during
+[02:26.5 - 02:30.6] this call denote non-IFRS financial measures whether or not specifically
+[02:30.6 - 02:35.3] designated as such. These non-IFRS financial measures do not have any
+[02:35.3 - 02:39.7] standardized meanings prescribed by IFRS and may not be comparable to similar
+[02:39.7 - 02:44.0] measures presented by other public companies that report under IFRS or who
+[02:44.0 - 02:48.3] report under US GAAP and use non-GAAP financial measures to describe similar
+[02:48.3 - 02:53.5] operating metrics. We refer you to yesterday's press release and our Q3
+[02:53.5 - 02:58.1] 2022 earnings presentation which are available at Celestica.com under the
+[02:58.1 - 03:01.9] investor relations tab for more information about these and certain
+[03:01.9 - 03:06.4] other non-IFRS financial measures including a reconciliation of historical
+[03:06.4 - 03:10.9] non-IFRS financial measures to the most directly comparable IFRS financial
+[03:10.9 - 03:15.0] measures from our financial statements. Unless otherwise specified all
+[03:15.0 - 03:19.6] references to dollars on this call are to US dollars and per share information
+[03:19.6 - 03:25.1] is based on diluted shares outstanding. Let me now turn the call over to Rob.
+[03:25.1 - 03:29.6] Thank you Craig. Good morning everyone and thank you for joining us on today's
+[03:29.6 - 03:35.3] conference call. In the third quarter Celestica achieved revenue of 1.92
+[03:35.3 - 03:39.5] billion dollars above the high end of our guidance range on the back of strong
+[03:39.5 - 03:43.9] demand across the majority of our businesses combined with solid execution
+[03:43.9 - 03:48.8] by our team. Our ability to deliver on this demand in the face of continued
+[03:48.8 - 03:55.0] macroeconomic challenges resulted in our highest ever non-IFRS operating margin
+[03:55.0 - 04:02.5] of 5.1 percent and our quarterly non-IFRS adjusted EPS of 52 cents was our
+[04:02.5 - 04:09.7] highest result in more than 20 years. Our strong third quarter results reflect
+[04:09.8 - 04:15.2] Celestica's continued execution of a long-term strategic plan. Because of our
+[04:15.2 - 04:19.2] strong performance and the momentum we are seeing continue into the fourth
+[04:19.2 - 04:26.1] quarter we are pleased to raise our full year 2022 revenue and non-IFRS adjusted
+[04:26.1 - 04:33.1] EPS guidance ranges. At the midpoint our revenue guidance of 7.16 billion dollars
+[04:33.1 - 04:39.5] would represent an increase of 27 percent year-over-year if achieved. Also
+[04:39.5 - 04:46.6] our non-IFRS adjusted EPS guidance of $1.86 at the midpoint would represent an
+[04:46.6 - 04:53.0] increase of 43 percent year-over-year if achieved. The new Celestica marked by
+[04:53.0 - 04:58.4] nearly 70 percent of our revenue concentrated in high value markets is
+[04:58.4 - 05:02.9] providing us with the foundation to navigate through ongoing macroeconomic
+[05:02.9 - 05:08.0] challenges. We continue to execute on the many growth opportunities we see in
+[05:08.0 - 05:13.8] front of us supported by strong bookings, customer backlogs, and enabled by our
+[05:13.8 - 05:20.6] diversified portfolio. On the back of a strong 2022 we are also taking this
+[05:20.6 - 05:27.4] opportunity to provide a full year 2023 outlook. For the coming fiscal year we
+[05:27.4 - 05:32.6] expect to achieve revenues of at least 7.5 billion dollars and our
+[05:32.6 - 05:39.7] outlook for non-IFRS adjusted EPS is $1.95 to $2.05 which if
+[05:39.7 - 05:45.6] achieved would mark another record high for our company. Additionally we are
+[05:45.6 - 05:50.6] pleased to increase our company's target non-IFRS operating margin range by 50
+[05:50.6 - 05:56.1] basis points to four and a half to five and a half percent. Before I provide
+[05:56.1 - 06:00.5] further color on the outlook for each of our businesses I would like to turn the
+[06:00.5 - 06:04.3] call over to Mandeep who will provide a detailed overview of our financial
+[06:04.3 - 06:08.4] performance in the third quarter as well as our guidance for the fourth quarter.
+[06:08.4 - 06:14.5] Thank you Rob and good morning everyone. Third quarter 2022 revenue came in at
+[06:14.5 - 06:19.5] 1.92 billion dollars exceeding the high end of our guidance range. Revenue was
+[06:19.5 - 06:24.5] up 31 percent year-over-year and up 12 percent sequentially fueled by double
+[06:24.5 - 06:30.0] digit revenue growth across the majority of our businesses. We achieved non-IFRS
+[06:30.0 - 06:34.6] operating margin of 5.1 percent 30 basis points higher than the midpoint of our
+[06:34.6 - 06:39.7] guidance ranges driven by strong profitability in both our ATS and CCS
+[06:39.7 - 06:46.1] segments. Non-IFRS operating margin was up 90 basis points year-over-year and up
+[06:46.1 - 06:50.6] 30 basis points sequentially. This represents the first time Celestica has
+[06:50.6 - 06:57.3] achieved non-IFRS operating margin above 5 percent. Non-IFRS adjusted earnings per
+[06:57.3 - 07:02.1] share were 52 cents well above the high end of our guidance range and up 17
+[07:02.1 - 07:07.9] cents year-over-year and up 8 cents sequentially. ATS segment revenue was up
+[07:07.9 - 07:11.4] 30 percent year-over-year in the third quarter meaningfully higher than our
+[07:11.4 - 07:16.2] expectations of a high teen percentage year-over-year increase. The year-over-year
+[07:16.2 - 07:20.5] growth in ATS segment revenue was driven by the continued strong performance of
+[07:20.5 - 07:26.3] our capital equipment industrial and AMD businesses supported by solid demand new
+[07:26.3 - 07:32.1] program ramps and improved material availability. Sequentially ATS segment
+[07:32.1 - 07:37.2] revenue was up 10 percent. ATS segment revenues accounted for 40 percent of
+[07:37.2 - 07:43.0] total revenues in the third quarter. Our CCS segment delivered another quarter of
+[07:43.0 - 07:47.4] strong growth with revenue up 32 percent year-over-year driven by strength in our
+[07:47.4 - 07:51.5] communications and market primarily due to the strong performance in our HPS
+[07:51.5 - 07:57.8] business. CCS segment revenue was 13 percent higher sequentially. Our HPS
+[07:57.8 - 08:02.6] business continues to exhibit very strong growth delivering revenue of 517
+[08:02.6 - 08:07.9] million dollars in the third quarter up 72 percent year-over-year. The growth in
+[08:07.9 - 08:11.8] HPS was driven by strong demand from service providers as they continue to
+[08:11.8 - 08:16.6] invest in data center expansion. We are pleased that our HPS business continues
+[08:16.6 - 08:20.9] to gain market share helping us outpace anticipated underlying market growth
+[08:20.9 - 08:26.6] rates. HPS revenue were 27 percent of total company revenues in the third
+[08:26.6 - 08:32.1] quarter. Communications revenue was up 42 percent year-over-year ahead of our
+[08:32.1 - 08:36.0] expectations of a mid-team percentage increase and was up 22 percent
+[08:36.0 - 08:41.0] sequentially. As noted the year-over-year and sequential growth was driven by our
+[08:41.0 - 08:46.6] HPS business and improved material availability. Enterprise revenue in the
+[08:46.6 - 08:50.9] quarter was up 13 percent year-over-year close to our mid-team percentage
+[08:50.9 - 08:55.5] expectations driven by increased customer demand and new program ramps.
+[08:55.5 - 09:03.2] Sequentially enterprise revenue was 3 percent lower. Turning to segment margin.
+[09:03.2 - 09:08.5] HPS segment margin was 5.0 percent in the third quarter up 70 basis points
+[09:08.5 - 09:12.9] year-over-year and up 50 basis points sequentially. The year-over-year margin
+[09:12.9 - 09:16.6] increase was driven by improved profitability across the segment as a
+[09:16.6 - 09:23.6] result of stronger demand and maturing program ramps. TCS segment margin of 5.2
+[09:23.6 - 09:29.2] percent the highest CCS segment margin ever reported was up 110 basis points
+[09:29.2 - 09:34.1] year-over-year and up 20 basis points sequentially. The year-over-year margin
+[09:34.1 - 09:39.9] increase was driven by volume leverage and improved mix within our HPS business.
+[09:39.9 - 09:44.8] Moving on to some additional financial metrics. IFRS net earnings for the
+[09:44.8 - 09:50.0] quarter were 46 million dollars or 37 cents per share compared to net earnings
+[09:50.0 - 09:55.1] of 35 million dollars or 28 cents per share in the same quarter last year and
+[09:55.1 - 10:01.7] net earnings of 36 million dollars or 29 cents per share last quarter. Adjusted
+[10:01.7 - 10:07.0] gross margin was 8.9 percent up 10 basis points year-over-year and down 10 basis
+[10:07.0 - 10:11.1] points sequentially. The year-over-year improvement was driven by the benefit of
+[10:11.1 - 10:17.6] operating leverage due to higher volumes in both ATS and CCS. Non-IFRS
+[10:17.6 - 10:21.6] operating earnings were 98 million dollars up 37 million dollars year-over-
+[10:21.6 - 10:28.0] year and up 15.5 million dollars sequentially. Our non-IFRS adjusted
+[10:28.0 - 10:32.7] effective tax rate for the third quarter was 21 percent 2 percent higher year-over-
+[10:32.7 - 10:38.8] year and 1 percent lower sequentially. For the third quarter non-IFRS adjusted
+[10:38.8 - 10:43.4] net earnings were 64 million dollars up 20 million dollars year-over-year and up
+[10:43.4 - 10:49.0] 9 million dollars sequentially. Third quarter non-IFRS adjusted ROIC of
+[10:49.0 - 10:53.7] 19.2 percent, the highest in over five years, was up 4 percent year-over-year
+[10:53.7 - 10:59.7] and up 3 percent sequentially. During the third quarter our top 10 customers
+[10:59.7 - 11:04.3] accounted for 67 percent of our total revenue compared to 68 percent in the
+[11:04.3 - 11:09.6] second quarter and 66 percent in the third quarter of 2021. We had two
+[11:09.6 - 11:13.5] customers that individually accounted for 10 percent or more of total revenue
+[11:13.5 - 11:18.4] compared with one customer in both of the second quarter of 2022 and third
+[11:18.4 - 11:23.2] quarter of 2021. Both customers individually comprising greater than 10
+[11:23.2 - 11:27.6] percent of our revenues are in our CCS segment and in aggregate operate across
+[11:27.6 - 11:31.4] 20 separate programs which is a testament to the breadth of our product
+[11:31.4 - 11:37.3] offering. Moving on to working capital. Our inventory at the end of the third
+[11:37.3 - 11:43.6] quarter was 2.3 billion dollars up 218 million dollars sequentially and up 920
+[11:43.6 - 11:48.1] million dollars year-over-year. Higher inventory balances have been a focus
+[11:48.1 - 11:51.8] within our industry in recent quarters driven by the persistent challenges in
+[11:51.8 - 11:55.7] the supply chain environment. Celestica's higher inventory levels, the
+[11:55.7 - 11:59.8] result of longer lead times and strong demand, which are partially mitigated by
+[11:59.8 - 12:04.5] customer cash advances, have enabled us to grow at exceptional rates while
+[12:04.5 - 12:10.1] generating strong non-IFRS adjusted ROIC. As the material environment
+[12:10.1 - 12:16.6] improves we expect inventory balances to reduce over time. Cash cycle days were 63
+[12:16.6 - 12:20.3] during the third quarter, nine days lower than the prior year period and the
+[12:20.3 - 12:25.2] lowest since the third quarter of 2020. Our team continues to work diligently to
+[12:25.2 - 12:28.5] manage our working capital balances including working closely with our
+[12:28.5 - 12:33.7] customers and suppliers. Capital expenditures for the third quarter were
+[12:33.7 - 12:38.6] 39 million dollars or approximately 2% of revenue. As we noted in our previous
+[12:38.6 - 12:42.2] earnings call we expected capital expenditures to be higher during the
+[12:42.2 - 12:46.7] second half of 2022 after having lower levels of capex investment during the
+[12:46.7 - 12:50.9] first half of the year. The increased capital investment is primarily to
+[12:50.9 - 12:55.0] support program growth in our lifecycle solutions business including expansions
+[12:55.0 - 12:59.1] in our Southeast Asia and Mexico footprint to support a number of new
+[12:59.1 - 13:04.3] program wins. Non-IFRS adjusted free cash flow was 7 million dollars in the
+[13:04.3 - 13:09.5] third quarter compared to 27 million dollars in the prior year period and 43
+[13:09.5 - 13:14.3] million dollars last quarter. As of September 30th non-IFRS adjusted free
+[13:14.3 - 13:18.8] cash flow was 51 million dollars and our fiscal year outlook continues to be 75
+[13:18.8 - 13:24.0] million dollars as we make strategic working capital investments in 2022.
+[13:24.0 - 13:28.8] Moving on to some additional key metrics. Our cash balance at the end of
+[13:28.8 - 13:33.9] the third quarter was 363 million dollars down 114 million dollars year
+[13:33.9 - 13:38.1] over year and down 2 million dollars sequentially. Our cash balance in
+[13:38.1 - 13:42.1] combination with approximately 600 million dollars of borrowing capacity
+[13:42.1 - 13:46.5] under our revolver provide us with liquidity of approximately 1 billion
+[13:46.5 - 13:51.4] dollars which we believe is sufficient to meet our anticipated business needs.
+[13:51.4 - 13:57.1] We ended the quarter with gross debt of 647 million dollars down 4 million
+[13:57.1 - 14:00.7] dollars from the previous quarter leaving us with a net debt position of
+[14:00.7 - 14:07.1] 284 million dollars. Our third quarter gross debt to non-IFRS trailing 12 month
+[14:07.1 - 14:13.7] adjusted EBITDA leverage ratio was 1.5 times down 0.2 turns sequentially and up
+[14:13.7 - 14:20.9] 0.1 turns compared to the same quarter of last year. At September 30th 2022
+[14:20.9 - 14:25.8] we were compliant with all financial covenants under our credit agreement.
+[14:25.8 - 14:30.4] During the third quarter we repurchased approximately 500,000 shares for
+[14:30.4 - 14:35.0] cancellation at a cost of approximately 5 million dollars. We ended the quarter
+[14:35.0 - 14:40.0] with 122.6 million shares outstanding a reduction of approximately 2%
+[14:40.0 - 14:45.8] from the prior year period. During the fourth quarter we intend to launch a new
+[14:45.8 - 14:50.5] NCIB program subject to necessary approvals after our current program is
+[14:50.5 - 14:56.2] set to expire in early December. Return of capital to shareholders remain the
+[14:56.2 - 15:00.3] priority within our capital allocation strategies. We continue to aim to return
+[15:00.3 - 15:06.0] 50% of our non-IFRS adjusted free cash flow to shareholders and reinvest 50%
+[15:06.0 - 15:11.4] into the business over the long term. However as noted in previous earnings
+[15:11.4 - 15:16.1] calls our short-term priority is to focus on reducing our net debt while
+[15:16.1 - 15:21.7] remaining opportunistic with our share repurchases under our NCIB. We currently
+[15:21.7 - 15:25.5] believe our share price is trading at a material discount when considering our
+[15:25.5 - 15:29.9] strong operating performance and as such we have recently been active in the
+[15:29.9 - 15:36.1] market. Now turning to our guidance for the fourth quarter of 2022. Our fourth
+[15:36.1 - 15:41.5] quarter revenue is expected to be in the range of 1.875 billion to 2.025
+[15:41.5 - 15:46.1] billion dollars. If the midpoint of this range is achieved revenue would be
+[15:46.1 - 15:52.9] up 29% year-over-year and up 1% sequentially. Fourth quarter non-IFRS
+[15:52.9 - 15:57.9] adjusted earnings per share are expected to be in the range of 49 cents to 55
+[15:57.9 - 16:03.7] cents per share. If the midpoint of this range is achieved non-IFRS adjusted
+[16:03.7 - 16:09.3] earnings per share would be up 18% year-over-year. If the midpoint of our
+[16:09.3 - 16:14.3] revenue and non-IFRS adjusted EPS guidance ranges are achieved non-IFRS
+[16:14.3 - 16:19.1] operating margin would be approximately 5.1% which would represent an increase of
+[16:19.1 - 16:24.9] 20 basis points over the prior year period and flat sequentially. Non-IFRS
+[16:24.9 - 16:28.2] adjusted SG&E expense for the fourth quarter is expected to be in the range
+[16:28.2 - 16:34.6] of 64 to 66 million dollars. We anticipate our non-IFRS adjusted
+[16:34.6 - 16:40.7] effective tax rate to be approximately 21% for the fourth quarter. Now turning
+[16:40.7 - 16:45.3] to our end market outlook for the fourth quarter of 2022. In our ATS end
+[16:45.3 - 16:49.4] market we anticipate revenue to be up in the mid 20 percentage range year-over-year
+[16:49.4 - 16:55.1] driven by double-digit growth in all of our ATS businesses.
+[16:53.4 - 16:58.5] In our CCS segment, we anticipate revenues in our communications end market to be up
+[16:58.5 - 17:03.8] in the low 30s percentage range year-over-year, driven by new ramps and continued strong demand
+[17:03.8 - 17:08.8] from service provider customers supported by our HPS offering.
+[17:08.8 - 17:13.9] In our enterprise end market, we anticipate revenue growth in the mid-20s percentage range
+[17:13.9 - 17:19.4] year-over-year, supported by new program ramps in storage and strong demand in compute.
+[17:20.4 - 17:24.3] I'll now turn the call back over to Rob to provide additional color on our end market
+[17:24.3 - 17:30.8] and overall business outlook. Thank you, Mandeep. Before I move on to our end market outlook,
+[17:30.8 - 17:36.2] I want to take a step back and provide some commentary on the sustainability of our ongoing
+[17:36.2 - 17:44.0] success, given the current macroeconomic backdrop. As we noted, our non-IFRS operating margin in the
+[17:44.0 - 17:51.7] third quarter surpassed 5% for the first time in our company's history, as we recorded our 11th
+[17:51.7 - 17:58.9] consecutive quarter of year-over-year non-IFRS operating margin improvement. We are also poised
+[17:58.9 - 18:06.9] to achieve a new record high in non-IFRS adjusted EPS in 2022, and if the outlook we provided is
+[18:06.9 - 18:15.2] achieved, surpass that mark in 2023. While Celestica is by no means immune to the impacts
+[18:15.2 - 18:21.4] of cyclical changes in demand, we believe that we have made some important structural changes to our
+[18:21.4 - 18:28.3] company, as well as key strategic decisions which have helped us evolve into a more diversified,
+[18:28.3 - 18:35.7] resilient, and profitable business. 67% of our revenues are now coming from more diversified
+[18:35.7 - 18:42.5] markets with higher barriers to entry, what we call a life cycle solutions business. As we
+[18:42.5 - 18:48.4] continue to grow life cycle solutions, we expect benefits from both volume leverage and mix,
+[18:49.0 - 18:56.0] providing additional support to our already strong margins. Moreover, our exposure to consumer
+[18:56.0 - 19:02.1] markets is minimal, and our fixed cost structure is lean, and does not require significant
+[19:02.1 - 19:08.1] investments. Therefore, we believe we will outgrow the broader market in 2023
+[19:08.7 - 19:13.8] due to our end market exposure, new program wins, and market share gains.
+[19:15.3 - 19:19.4] Now, I would like to turn to our outlook for our businesses.
+[19:22.4 - 19:27.4] Starting with our ATS segment, our capital equipment business continues to exhibit strong
+[19:27.4 - 19:34.5] growth driven by secular demand, new program ramps, and market share gains. We anticipate
+[19:34.5 - 19:39.5] this change will continue through the fourth quarter as the short-term impacts of China
+[19:39.5 - 19:47.5] export controls are mitigated by our existing backlog. The wafer fabrication equipment market
+[19:47.5 - 19:53.9] has experienced significant growth over the past three years, and market estimates are calling for
+[19:53.9 - 20:01.7] a moderation in spending in 2023. Our business, however, is primarily focused on pockets of the
+[20:01.7 - 20:07.7] wafer fab equipment market where we anticipate demand remaining strong, such as investments in
+[20:07.7 - 20:13.6] new capacity to support onshoring and our focus on leading-edge technologies of less than seven
+[20:13.6 - 20:20.8] nanometers. Based on our strong order backlog, new wins, and market share gains, we expect to
+[20:20.8 - 20:25.7] continue to outperform the broader wafer fab equipment market expectations in the coming
+[20:25.7 - 20:32.3] quarter. New program ramps and robust demand in our industrial business continue to be supported
+[20:32.3 - 20:38.4] by favorable long-term secular trends. Investment in green technologies, such as energy storage and
+[20:38.4 - 20:44.7] generation, and growth in the electrical vehicle market supporting demand for EV charging projects
+[20:44.7 - 20:50.7] are expected to sustain growth in demand for the next several years. Our industrial business has
+[20:50.7 - 20:56.7] grown 18 percent organically in the first nine months of the year, and we expect these trends to
+[20:56.7 - 21:04.7] support double-digit organic revenue growth into 2023. Now turning to A&D, we continue to see
+[21:04.7 - 21:10.9] improvements in commercial aerospace highlighted by new program wins. Commercial aerospace demand
+[21:10.9 - 21:16.4] driven by business jet and single-aisle aircrafts is projected to continue to strengthen through
+[21:16.4 - 21:22.8] 2023. Market estimates now suggest that commercial air traffic should return to near
+[21:22.8 - 21:28.9] pre-COVID levels in 2023, which we believe should support further demand for new deliveries.
+[21:30.4 - 21:36.5] Our defense business is also anticipated to continue its solid growth track as governments
+[21:36.5 - 21:42.8] continue to strengthen their militaries, particularly in the EU. In our health tech
+[21:42.8 - 21:49.6] business, new project ramps in surgical devices and sports medicine are expected to drive sequential
+[21:49.6 - 21:54.8] and year-over-year revenue growth. We are also seeing solid demand for imaging and patient
+[21:54.8 - 22:02.0] monitoring devices and anticipate contribution from new projects beginning next year. Strong demand
+[22:02.0 - 22:07.6] and new wins in imaging and patient monitoring are expected to more than offset an anticipated
+[22:07.6 - 22:14.8] softening in COVID-related demand for diagnostic equipment. Now turning to our CCS segment,
+[22:15.5 - 22:20.9] our HPS business remains the primary driver of the strong results in our CCS segment,
+[22:20.9 - 22:27.1] recording $1.34 billion in revenue for the first nine months of the year,
+[22:27.1 - 22:34.1] a 67% growth rate compared to that of the prior year period. The remarkable growth we are seeing
+[22:34.1 - 22:40.0] in our HPS business is supported by significant capital investments from our service provider
+[22:40.0 - 22:46.5] customers as they scale their data center capacity, coupled with our gains in market share from ODMs.
+[22:47.7 - 22:53.6] As we have noted in prior calls, it is our view that this trend is likely to continue for at least
+[22:53.6 - 23:00.9] the near term, though we expect growth rates will moderate into 2023 as comps become tougher with
+[23:00.9 - 23:08.0] each subsequent quarter. New ramps and strong demand from existing programs continue to support
+[23:08.0 - 23:13.2] growth in our communications end market with a significant portion of that demand strength
+[23:13.2 - 23:20.0] coming from hyperscaler customers for our HPS offering. We anticipate demand to remain healthy
+[23:20.0 - 23:28.4] into 2023 as we ramp new wins. And finally, in our enterprise end market, continued growth in
+[23:28.4 - 23:34.1] storage demand is supported by new program ramps, which we anticipate will continue through the end
+[23:34.1 - 23:39.8] of the year. Demand for compute is also expected to remain strong into the end of the year.
+[23:40.4 - 23:45.5] Across enterprise, despite double-digit year-to-year growth during 2022,
+[23:46.1 - 23:52.0] we remain cautious in our outlook as potential signs of slowing demand in the broader economy
+[23:52.0 - 23:57.4] have typically had a more pronounced impact on demand from our enterprise customers.
+[23:59.1 - 24:05.3] I am incredibly pleased with what Celestica has accomplished thus far in 2022. Despite a
+[24:05.3 - 24:10.6] challenging environment, our team has done an admirable job of managing the factors within
+[24:10.6 - 24:17.0] our control. This is reflected in our results this quarter and our strong outlook for the year ahead.
+[24:17.6 - 24:24.4] We are confident that our focus on our strategic plan and consistent execution will drive value
+[24:24.5 - 24:27.5] for our shareholders over the long term. With that,
+[24:28.2 - 24:32.8] I would now like to turn the call over to the operator for questions. Thank you.
+[24:35.9 - 24:41.1] Thank you, sir. Ladies and gentlemen, we will now begin the question and answer session.
+[24:42.0 - 24:46.7] If you would like to ask a question, please press star followed by the number one on your
+[24:46.7 - 24:53.1] telephone keypad. If you would like to withdraw your question, please press star followed by the
+[24:53.1 - 25:01.8] number two. One moment, please, for your first question. Your first question comes from
+[25:01.8 - 25:06.6] Sanis Mouskopoulos of BMO Capital Markets. Please go ahead.
+[25:08.1 - 25:14.4] Hi, good morning. Rob, if we look at the upside in the quarter relative to your prior expectations,
+[25:14.4 - 25:18.9] you said it was a combination of both stronger demand and better component availability.
+[25:19.6 - 25:24.1] Just qualitatively, if we think about the relative weighting of those two factors,
+[25:24.1 - 25:28.8] was it more weighted towards demand upside or more towards supply chain doing better than you thought?
+[25:30.4 - 25:36.4] Hi, Sanis. I would say it was more along the lines of supply chain constraints improving.
+[25:36.4 - 25:42.7] Our clear to build was better than original expectations, so it was enabling us to convert
+[25:42.7 - 25:49.3] our backlog and fulfill our strong demand, if you will. Demand did really not moderate in the
+[25:49.3 - 25:54.3] quarter, but our fill rates, our ability to convert it was actually better than anticipated.
+[25:56.8 - 26:03.9] Now, as far as 2023, you're introducing fiscal 23 guidance before 22 is even over. Presumably,
+[26:03.9 - 26:08.3] does that speak to the strong level of visibility in the backlog that you currently have?
+[26:09.1 - 26:18.5] Correct. As we look forward to 2023, we continue to see strong growth coming from many of our
+[26:18.5 - 26:25.2] verticals. We do see a little bit light demand in some areas, as in China and in our enterprise
+[26:25.2 - 26:32.6] business. But net-net, we feel confident that we're able to provide good, I think,
+[26:32.6 - 26:37.2] given the macroeconomic backup, good growth going into 2023.
+[26:38.7 - 26:44.6] Great. Finally, for Mandeep, how should you think about cash flow and CapEx over the next year?
+[26:45.2 - 26:48.8] We did see a bit of a reduction in inventories. Sounds like you think that might continue.
+[26:49.6 - 26:52.2] So presumably, that should drive some cash generation in 2023?
+[26:53.2 - 26:57.2] Yeah. Good morning, Thanos. I would say that we're pleased with the cash generation we've
+[26:57.2 - 27:01.6] had so far this year, but we always want to do more. Our outlook for this year is $75 million
+[27:01.6 - 27:05.0] because we have decided to make a number of investments in working capital, as you've
+[27:05.0 - 27:09.9] highlighted. As we go through 2023, we do anticipate that there is going to be improved
+[27:09.9 - 27:15.9] clear-to-build on the materials side. That should help us unwind some of the working capital. And so
+[27:15.9 - 27:22.8] our goal continues to be over $100 million, and we think that that's a safe floor for next year.
+[27:25.1 - 27:27.2] Great. Thanks, guys. Congrats on the quarter, and I'll pass the line.
+[27:28.0 - 27:28.8] Thanks, Thanos.
+[27:32.4 - 27:37.6] Your next question comes from Rob Young of Canaccord Genuity. Please go ahead.
+[27:38.7 - 27:42.7] Hi. Good morning. You already talked a little bit about visibility on the semi-cap space,
+[27:42.7 - 27:49.0] so I wanted to dig in a little deeper there. You highlighted your exposure to leading process node
+[27:49.0 - 27:54.0] is probably a little safer, but I'm just curious if you could talk a little bit about the visibility
+[27:54.1 - 27:58.1] over the next 12 months. How much of that is covered by ramps that are already in progress,
+[27:58.1 - 28:03.4] or how much of that is business that's locked in? Maybe just give it a sense of the level
+[28:03.4 - 28:11.4] of visibility there. Sure, Rob. So just to take a step back, in 2022, we're on track to grow much
+[28:11.4 - 28:16.8] faster than the market. We should be growing north of about 20%. And to your comment, that's on the
+[28:16.8 - 28:23.1] back of new program wins and expanding market share. We have a very competitive footprint,
+[28:23.1 - 28:27.1] that being in North America, Malaysia, and Korea, and we also have some fantastic
+[28:27.7 - 28:31.2] vertical integration capabilities. That's a large reason for our growth.
+[28:32.4 - 28:38.4] As we look into 2023, the broad market is certainly seeing some headwinds. Some of the
+[28:38.4 - 28:45.2] more pessimistic analysts are predicting as much as 15% to 20% decline in wafer fab equipment
+[28:45.2 - 28:51.6] spending. On top of that, we've all seen the news on this China export controls that could have up
+[28:51.6 - 28:58.1] to an 8% additional impact if that is not resolved. That all being said, we should fare
+[28:58.1 - 29:04.7] fairly well relative to the market for a couple of reasons. The first reason is mix. From a
+[29:06.7 - 29:11.8] mixed perspective, we are focused in on the high-end node, so that less than 7 nanometers
+[29:11.8 - 29:16.9] is 80% of our business. Demand is more robust there. Exposure to China is typically limited.
+[29:17.7 - 29:22.8] Second is we have less exposure to memory, and memory is kind of under pressure right now from
+[29:22.8 - 29:28.2] a growth perspective. And lastly, a good portion of our growth is coming from our vertical integration
+[29:28.2 - 29:32.2] capabilities supporting the aftermarket and using our mechanical capabilities.
+[29:33.0 - 29:36.9] And the second reason we feel confident that we'll perform better than the market is really
+[29:36.9 - 29:42.8] new program growth. A lot of those programs started to ramp this year and will extend into
+[29:42.8 - 29:49.7] next year. So net-net, we feel pretty confident that we'll perform better than the market,
+[29:49.7 - 29:58.0] and we should be flat to up as we go into 2023. Okay. Thanks for all that color.
+[29:58.0 - 30:05.1] And the margin guidance is very impressive. If I think back to past comments, I think that you've
+[30:05.1 - 30:11.6] said that in order to get above 5%, it would require recovery in commercial aerospace. I was
+[30:11.6 - 30:20.7] wondering, does the guidance for 2023 anticipate that business becoming a contributor to operating
+[30:20.7 - 30:25.6] margins? Or maybe you could just give us an update on where the margin contribution for
+[30:25.6 - 30:32.7] AMD is and where it's likely to go over the next year. Yeah. Good morning, Rob. So we're pleased
+[30:32.7 - 30:37.2] with the trajectory that the company is seeing right now from a margin perspective. And some
+[30:37.2 - 30:41.6] of the things that we highlighted, 5.1% this quarter, and that's our guide for Q4, highest
+[30:41.6 - 30:47.2] margin in the company's history. If you take the midpoint of the Q4 guidance, it implies 4.9% for
+[30:47.2 - 30:51.6] this year. That's the highest in the company's history. And then what we're doing now is we're
+[30:51.6 - 30:58.2] raising the range for next year by 50 basis points to between 4.5% and 5.5%. Really, there's two main
+[30:58.2 - 31:03.5] things that are driving that. Number one is continuing benefits from mix. So as lifecycle
+[31:03.5 - 31:07.7] solutions revenue, which is two-thirds of the company's revenue, continues to grow and the
+[31:07.7 - 31:13.2] margin profile for lifecycle solutions combined is accretive to the company, you will see benefits
+[31:13.2 - 31:17.4] from a mixed perspective. The second is we are starting to see the benefits of volume leverage.
+[31:18.1 - 31:22.8] While we were going through the transformation over a number of years ago, we made the strategic
+[31:22.8 - 31:28.8] decision to maintain our investments functionally in the factories. We didn't take cuts everywhere
+[31:28.8 - 31:34.9] that maybe we could have been asked to do so because we knew that we could maintain that
+[31:34.9 - 31:38.8] structure when we were growing. And so our SG&A right now is not growing nearly as fast as the
+[31:38.8 - 31:43.8] top line, so we're seeing volume benefits there as well. To your point specifically on A and D,
+[31:43.8 - 31:48.0] so there's some puts and takes within the markets themselves. CCS, as you can see,
+[31:48.0 - 31:52.5] is performing incredibly well. There are some mixed benefits happening right now,
+[31:52.5 - 31:57.1] which will probably moderate, but we expect that CCS margins will still be strong going into next
+[31:57.1 - 32:04.3] year. And then ATS, ATS coming back at 5%. So we're pleased with the margin profile in a couple
+[32:04.3 - 32:08.4] of the businesses. Capital Equipment is performing very well. Health Tech is performing very well.
+[32:08.4 - 32:13.6] But A and D's demand is still not where it was pre-COVID. And we are seeing improving profitability
+[32:13.6 - 32:19.4] sequentially, but it's still more opportunity to be had in A and D as volume comes back.
+[32:19.4 - 32:23.4] We're seeing the same thing in industrial. A significant part of our top line growth is coming
+[32:23.4 - 32:29.6] from industrial, but those programs aren't yet at full profitability. And then lastly, as you know
+[32:29.6 - 32:34.6] from last quarter, the PCI business, which is an excellent business for us and is a profitable
+[32:34.6 - 32:40.8] business still, despite the fire that they had, is not operating at their peak levels either.
+[32:40.8 - 32:46.0] So there's still some tailwinds, if you will, within ATS to help improve margins as we go into
+[32:46.0 - 32:51.6] next year. Great. And that's beyond the four and a half, four and a half to five and a half percent
+[32:51.6 - 32:56.4] operating margins? No, we've taken all of that into account. So while CCS may moderate a little
+[32:56.4 - 33:02.7] bit going into next year, ATS has an opportunity to probably pick up any moderation. And then again,
+[33:02.7 - 33:06.3] as we grow over our lifecycle solutions, it'll help us hopefully get to the higher end of that
+[33:06.3 - 33:11.5] range as we go through next year. And just the last little one, the midpoint of EPS
+[33:12.2 - 33:17.6] guidance is below that double digit long-term guidance you gave last year. I wasn't able to
+[33:17.6 - 33:22.4] find that reiterated anywhere. Is that still the expectation? And I'll pass the line.
+[33:23.2 - 33:27.9] Yeah. I mean, so what we're very pleased with is, as you know, the EPS growth that we're showing
+[33:27.9 - 33:33.6] this year, the midpoint of the Q4 guidance calls for $1.86. The highest EPS that we had as a
+[33:33.6 - 33:43.0] company, I believe, is $1.44 back in 2000. So significant increase in overall EPS. Now that's
+[33:43.0 - 33:47.2] up 43 percent, I think, on a year-over-year basis. When you look at the dollar...
+[33:46.8 - 33:53.7] $1.95 to $2.05 next year, the $1.95 implies 5% and the $2.05 implies 10%.
+[33:53.7 - 33:56.8] And so we are, of course, working towards the higher end of the range.
+[33:56.8 - 34:01.4] We do believe that 10% EPS growth is still the right number over the medium to long term.
+[34:01.4 - 34:04.0] There will be some years, obviously, that are going to be a bit higher and there's some
+[34:04.0 - 34:08.8] years that will be a bit lower, but we are targeting 5% to 10% right now, given the visibility
+[34:08.8 - 34:09.8] we have today.
+[34:09.8 - 34:10.8] Okay, thanks.
+[34:10.8 - 34:11.8] Congrats on the quarter.
+[34:11.8 - 34:12.3] You're welcome.
+[34:17.4 - 34:23.4] Your next question comes from Ruplu Bhattacharya of Bank of America.
+[34:23.4 - 34:24.4] Please go ahead.
+[34:24.4 - 34:29.6] Thank you for taking my questions and congrats on the strong results in the quarter.
+[34:29.6 - 34:32.1] My first question is on margins.
+[34:32.1 - 34:37.6] You're guiding a 23 operating margin to 4.5% to 5.5%.
+[34:37.6 - 34:42.6] What needs to happen for you to get to the top end of the range versus the midpoint versus
+[34:42.6 - 34:43.6] the low end?
+[34:43.8 - 34:50.4] And specifically, you said that the CCS segment, obviously, has been performing much above
+[34:50.4 - 34:51.8] the long-term range.
+[34:51.8 - 34:55.6] So how should we think about margins in that segment in fiscal 2023?
+[34:59.6 - 35:05.1] The margins of 4.5% to 5%, I would say, is also tied to how the revenue profile is going
+[35:05.1 - 35:06.1] to turn out.
+[35:06.1 - 35:08.5] We set, again, at least $7.5 billion.
+[35:08.5 - 35:13.1] If we come in just at $7.5 billion, we won't be at the higher end of that range.
+[35:13.7 - 35:16.5] We would be somewhere between probably around 5%.
+[35:16.5 - 35:20.8] But as we continue to grow revenue because of the strong backlog that we already have,
+[35:20.8 - 35:24.6] we do expect to see some additional volume leverage, which will help us get to the higher
+[35:24.6 - 35:26.0] end of that range.
+[35:26.0 - 35:30.8] When you look at the segment specifically, so again, since we started posting segment
+[35:30.8 - 35:35.2] margins back from the beginning of 2018, what we just posted for CCS is the highest they've
+[35:35.2 - 35:37.0] ever posted.
+[35:37.0 - 35:41.9] We don't expect that CCS will necessarily be above 5% next year, but at the same time,
+[35:41.9 - 35:46.0] we don't expect them to go back to historical rates because it's just a very different mix
+[35:46.0 - 35:47.6] now with HPS.
+[35:47.6 - 35:52.0] And on the ATS side, we do continue to have opportunities to grow that margin.
+[35:52.0 - 35:55.7] It's at 5.0% this past quarter, but there are opportunities.
+[35:55.7 - 35:57.3] We talked a little bit about A&D already.
+[35:57.3 - 36:02.9] There continues to be a recovery, which gives us cost leverage because that's a heavy fixed-cost business.
+[36:03.9 - 36:09.9] PCI is not where it was expected to be this quarter based on both revenue and margin.
+[36:10.0 - 36:16.0] And as that production comes back on to full equipment and is being utilized by the end
+[36:16.0 - 36:19.3] of the year, we do expect benefits in PCI as well.
+[36:19.3 - 36:23.0] And then just overall, it's the maturity of the ramping programs that we have.
+[36:23.0 - 36:28.4] So we are ramping a significant amount of business, specifically in our industrial business.
+[36:28.4 - 36:32.9] And as those programs continue to mature, there is improved profitability that we would expect.
+[36:33.9 - 36:36.8] Okay, thanks for all the details there.
+[36:36.8 - 36:39.9] My next question is on revenue growth.
+[36:40.8 - 36:47.6] What is the expected contribution from PCI to Fiscal 22 revenue growth?
+[36:47.6 - 36:54.1] And you said HPS in the first nine months is contributing, or it was up 67% year-on-year.
+[36:54.1 - 36:58.6] How should we think about the contribution from HPS in Fiscal 23?
+[36:58.6 - 37:04.4] I think you're guiding 5% year-on-year growth at the midpoint of the Fiscal 23 revenue guidance.
+[37:04.4 - 37:08.9] So how much of that would be from the HPS revenue growth?
+[37:09.9 - 37:16.9] Yeah, so Rupal, we don't break out PCI specifically, but I will go back to some previous public
+[37:16.9 - 37:17.9] remarks.
+[37:17.9 - 37:20.1] When we bought the business, it was around a $300 million business.
+[37:20.1 - 37:21.3] That business has been growing.
+[37:21.3 - 37:24.4] We've been seeing good commercial synergies as well.
+[37:24.4 - 37:29.6] There could be up to $100 million of additional revenue contribution next year from the PCI
+[37:29.6 - 37:33.2] business relative to 2022.
+[37:33.2 - 37:39.2] On HPS specifically, I mean, this is just outsized growth, 72% year-over-year in the
+[37:39.2 - 37:42.1] third quarter, 67% on a year-to-date basis.
+[37:42.1 - 37:43.6] Obviously, that is not sustainable.
+[37:43.6 - 37:47.8] Based on the trajectory of where the business is going right now, that business may be up
+[37:47.8 - 37:53.6] anywhere from $700 million to $800 million year-over-year for Fiscal Year 2022.
+[37:53.6 - 37:58.9] As we go into next year, we're expecting that growth rates are now going to probably normalize,
+[37:58.9 - 38:00.3] maybe back down to market rates.
+[38:00.3 - 38:04.2] So there will be a moderation in overall growth within HPS.
+[38:04.2 - 38:08.0] But we do expect that the margin profile will continue to be very strong and continue to
+[38:08.0 - 38:09.0] be accretive to the company.
+[38:09.0 - 38:10.0] Got it.
+[38:10.0 - 38:16.1] And maybe for my last question, if I can ask you on the capital allocation priorities for
+[38:16.1 - 38:23.9] Fiscal Year 2023, specifically as you look at uses of cash for M&A versus returning cash
+[38:23.9 - 38:28.3] to shareholders, how do you prioritize that versus reducing that?
+[38:28.3 - 38:29.3] Yes.
+[38:29.3 - 38:32.9] So our number one priority right now is strong cash generation.
+[38:32.9 - 38:35.2] We're very happy with the strength of the balance sheet.
+[38:35.2 - 38:41.8] As you know, $1 billion in overall liquidity, only 1.5 times gross leverage overall.
+[38:41.8 - 38:44.8] So we do have a healthy balance sheet.
+[38:44.8 - 38:47.3] We're going to continue to invest in the business in areas like CapEx.
+[38:47.3 - 38:52.0] You saw strong CapEx this quarter because we are directly investing in new program wins
+[38:52.0 - 38:53.0] that we have.
+[38:53.0 - 38:55.4] So we're pleased about that as well.
+[38:55.4 - 38:58.8] But when you go beyond that strong free cash flow generation and continue to invest in
+[38:58.8 - 39:03.3] the business, I would say in the immediate short term is to continue to reduce our net
+[39:03.4 - 39:08.7] debt, likely by building up a little bit more of a cash balance that allows us to tap our
+[39:08.7 - 39:12.6] credit lines a little bit less intra-quarter, reduces our interest expense.
+[39:12.6 - 39:16.0] We're going to have the NCIB program open until December 5th, and then our intention
+[39:16.0 - 39:19.6] as we mentioned is to open up a new one so we can always have one open.
+[39:19.6 - 39:24.0] We will opportunistically buy shares when there is severe depression on the share price.
+[39:24.0 - 39:28.2] As an example, we've already said we bought back $5 million of shares last quarter.
+[39:28.2 - 39:33.0] I can tell you that we actually bought back $5 million of shares in October already because
+[39:33.0 - 39:35.8] of the severely depressed share price.
+[39:35.8 - 39:39.8] And with a price around where it is right now, there actually probably isn't a better
+[39:39.8 - 39:40.8] use of cash.
+[39:40.8 - 39:44.2] It's a good way to return value to shareholders.
+[39:44.2 - 39:49.4] That being said, we continue to have a long-term view on growing the business strategically.
+[39:49.4 - 39:55.9] And M&A, when it's the right M&A, either adding capabilities that we need to accelerate our
+[39:55.9 - 40:00.6] strategic roadmaps or to give us the added capacity which we can find synergies with
+[40:00.6 - 40:04.6] our existing customer base, we won't hesitate to invest.
+[40:04.6 - 40:06.7] We have a robust M&A funnel.
+[40:06.7 - 40:07.7] We're very disciplined.
+[40:07.7 - 40:10.6] As you know, we're blue and we look at a lot of targets that we don't pull the trigger
+[40:10.6 - 40:12.8] on the vast majority of them.
+[40:12.8 - 40:16.2] But we do believe that with the balance sheet that we have, the cash outlook that we have
+[40:16.2 - 40:22.0] going into next year, the healthy balance sheet that we can pivot whether it's on the
+[40:22.0 - 40:24.3] share buyback front or on the M&A front.
+[40:24.3 - 40:25.3] Got it.
+[40:25.3 - 40:28.2] Thanks for all the details and congrats again on the quarter.
+[40:28.2 - 40:29.8] Thanks, Rupul.
+[40:31.6 - 40:37.2] Your next question comes from Jim Suva of Citigroup.
+[40:37.2 - 40:39.5] Please go ahead.
+[40:39.5 - 40:40.5] Thank you.
+[40:40.5 - 40:45.3] And your outlook and your current growth trajectory is very impressive in margins.
+[40:45.3 - 40:50.1] Just curious about the impact and how we should be thinking about CapEx and maybe working
+[40:50.1 - 40:51.4] capital like inventory.
+[40:51.4 - 40:56.1] You mentioned supply chains getting better as far as component availability, but I think
+[40:56.1 - 41:00.9] your inventory went up, but I'm sure it has to do with growing the business.
+[41:00.9 - 41:07.1] But can you help us know about CapEx and inventory, your expectations going forward a little bit?
+[41:07.1 - 41:08.1] Yeah, absolutely.
+[41:08.1 - 41:09.1] Good morning, Jim.
+[41:09.1 - 41:14.9] So, you know, on the CapEx side, we have traditionally said that our target range is between 1.5%
+[41:14.9 - 41:16.8] and 2% of revenue.
+[41:16.8 - 41:21.3] In the first half of the year, we were quite light, frankly, around 1%.
+[41:21.3 - 41:26.0] But now that we're seeing the world come back to normal, restrictions being lifted
+[41:26.0 - 41:29.8] in various countries and on the back of a number of new wins, we are seeing a higher
+[41:29.8 - 41:32.1] level of CapEx investment.
+[41:32.1 - 41:35.6] In the third quarter, we did 2% of revenue.
+[41:35.6 - 41:38.7] In the fourth quarter, we'll probably be again at around 2% or even slightly higher than
+[41:38.7 - 41:39.7] that.
+[41:39.7 - 41:44.1] But as you look into 2023, I think the 1.5% to 2% range continues to be the right range.
+[41:44.1 - 41:48.1] We may operate at the higher end of that range, but we have a good track record of being very
+[41:48.1 - 41:51.4] disciplined on the CapEx investments we make.
+[41:51.4 - 42:00.3] Overall, I would say that the working capital opportunity is there for us in 2023.
+[42:00.3 - 42:03.9] As we had talked about, when Clear2Build is starting to improve, meaning we're getting
+[42:03.9 - 42:09.1] more materials in than maybe we would have in the past, it gives us an opportunity to
+[42:09.1 - 42:10.5] build less inventory.
+[42:10.5 - 42:14.8] As you talked about, probably the primary reason that inventory has been building is
+[42:14.8 - 42:17.9] because we're growing revenue close to 30% year over year.
+[42:18.0 - 42:21.4] With the revenue guidance that we're providing next year, getting back into the single digits,
+[42:21.4 - 42:25.5] the level of inventory is just not required as much as before.
+[42:25.5 - 42:28.4] And as material constraints continue to improve, it gives us an opportunity to start reducing
+[42:28.4 - 42:29.4] inventory as well.
+[42:29.4 - 42:35.2] And so, we do expect some working capital unwind in 2023, which should provide us with
+[42:35.2 - 42:38.3] a good opportunity on free cash flow.
+[42:38.3 - 42:42.7] Thank you and congratulations to you and your teams.
+[42:42.7 - 42:46.6] Thanks, Jim.
+[42:46.6 - 42:51.4] Our next question comes from Paul Treiber, RBC Capital Markets.
+[42:51.4 - 42:52.4] Please go ahead.
+[42:52.4 - 42:54.8] Thanks very much and good morning.
+[42:54.8 - 43:01.7] I just had a couple of questions on your outlook for 2023, which is obviously quite a bit stronger
+[43:01.7 - 43:04.9] than the street was expecting.
+[43:04.9 - 43:11.2] In terms of the macroeconomic environment, to what degree are you factoring in a slowdown
+[43:11.2 - 43:12.8] in the environment?
+[43:12.8 - 43:18.2] Or maybe, in other words, what do you see as driving upside to your guidance if that
+[43:18.2 - 43:19.2] would occur?
+[43:19.2 - 43:22.9] And then conversely, what would lead to downside to your outlook?
+[43:22.9 - 43:26.7] All right, Paul.
+[43:26.7 - 43:33.7] We have a pretty in-depth planning process when we do our strategic plan, but more importantly,
+[43:33.7 - 43:36.5] our annual operating plan.
+[43:36.5 - 43:43.4] We do a bottoms-up interlock with all our sites and all our key customers.
+[43:43.4 - 43:48.5] So, the guidance and the outlook we provided, we feel pretty good about it.
+[43:48.5 - 43:54.9] To answer your questions directly, what would provide upside to the outlook?
+[43:54.9 - 44:02.0] It would be continued strength in our HPS business, our data center expansion growth,
+[44:02.0 - 44:06.1] a little higher than we anticipated.
+[44:06.1 - 44:14.5] Perhaps not as much as a down cycle in wafer fab equipment spending as we currently anticipated.
+[44:14.5 - 44:20.0] Faster recovery in our aerospace markets would also help give us a boost.
+[44:20.0 - 44:27.6] And our industrial business is going through a number of ramps, and should those be able
+[44:27.6 - 44:31.8] to ramp a little bit more quickly and market adoption for those products that we're ramping
+[44:32.8 - 44:37.4] improve, that would also give us some more upside.
+[44:37.4 - 44:42.6] On the downside pressure, I would say everything that I just mentioned, but obviously the inverse
+[44:42.6 - 44:45.4] of it would put us at that pressure.
+[44:45.4 - 44:54.1] But that being said, again, we have a pretty balanced view of 2023, and we've taken the
+[44:54.1 - 44:59.3] pluses and the minuses, and we hope to be able to improve upon the numbers that we provided
+[44:59.5 - 45:02.2] as the year gets long, just like we have done in 2022.
+[45:04.1 - 45:06.2] That's helpful. A couple of follow-on questions.
+[45:06.2 - 45:10.9] Just, you didn't mention supply chain as a variable for 23.
+[45:10.9 - 45:13.3] It looks like things are improving here.
+[45:14.1 - 45:20.4] Is your outlook for 23, in terms of supply chain, does the potential slowdown on the
+[45:20.4 - 45:25.8] consumer side, does that become a net positive or a strong net positive for you in 23 in
+[45:25.8 - 45:26.9] regards to supply chain?
+[45:27.7 - 45:29.3] Yeah, it's a good point, Paul.
+[45:29.3 - 45:30.3] I probably should have mentioned that.
+[45:30.3 - 45:32.2] It is a net positive.
+[45:32.2 - 45:37.0] We're assuming a gradual recovery, nothing instant, but a gradual recovery.
+[45:37.7 - 45:40.8] Right now, our clear-to-builds have gotten better.
+[45:40.8 - 45:43.4] The decommits from our suppliers are less frequent.
+[45:44.1 - 45:49.2] That being said, lead times for semiconductors in specific are still long.
+[45:49.2 - 45:51.4] We need them to get shorter.
+[45:51.4 - 45:54.7] That would certainly improve things.
+[45:54.9 - 46:00.9] There are still certain technologies and certain suppliers that will remain constrained, I
+[46:00.9 - 46:07.7] think, all through 23, because on the older node technologies where a lot of the suppliers
+[46:07.7 - 46:09.0] are not building capacity out there.
+[46:09.7 - 46:15.7] We're assuming all gradual improvement in our outlook as we get into 2023, but nothing
+[46:16.5 - 46:18.9] demonstrous in terms of major improvements.
+[46:21.0 - 46:22.1] Thank you, Al-Paswan.
+[46:22.1 - 46:23.7] Congrats on the quarter and the outlook.
+[46:25.0 - 46:25.4] Thank you.
+[46:28.9 - 46:33.3] Ladies and gentlemen, as a reminder, if you would like to ask a question, please press
+[46:33.3 - 46:34.2] star 1 now.
+[46:41.6 - 46:45.9] Your next question comes from Daniel Chan of TD Securities.
+[46:45.9 - 46:46.6] Please go ahead.
+[46:47.3 - 46:47.6] Hi.
+[46:47.6 - 46:48.5] Good morning, guys.
+[46:48.5 - 46:51.8] So you mentioned that the component supplies are helping with performance.
+[46:52.6 - 46:57.2] Does improving component supplies have an impact on your margins, or is it neutral,
+[46:57.2 - 46:59.8] given your ability to pass those costs through to your customers?
+[47:02.5 - 47:08.3] To some extent, improved component supply improves the efficiency of our factories,
+[47:09.7 - 47:11.9] so it does help our margins.
+[47:11.9 - 47:21.2] In terms of pricing, through this cycle of price increases, for the overwhelming
+[47:21.3 - 47:26.2] majority, we've been passing on those price increases in terms of forward pricing to our
+[47:26.2 - 47:26.7] customers.
+[47:26.7 - 47:30.2] So we'll rise and contract with the tide on that.
+[47:32.1 - 47:32.4] Okay.
+[47:32.4 - 47:33.3] Thanks for that.
+[47:33.3 - 47:39.3] And to what extent is there a risk that your customers ordered more than they needed during
+[47:39.3 - 47:41.7] supply issues, much like we saw in the retail sector?
+[47:42.4 - 47:46.1] And with component supplies normalizing and you working through the backlog, that there'll
+[47:46.1 - 47:48.5] be excess inventory in the channel in the near future?
+[47:48.7 - 47:49.2] Yeah.
+[47:49.2 - 47:50.0] Good morning, Dan.
+[47:50.5 - 47:52.0] It's always a risk.
+[47:52.0 - 47:56.1] Anytime you have a constrained environment where customers are going to start wanting
+[47:56.1 - 48:00.2] to hoard product, I would say that that is always something that's out there, but it
+[48:00.2 - 48:03.4] is something that we believe has been manageable overall.
+[48:04.0 - 48:08.4] One of the things that, as you know, is we've been building a lot of deposits from our customers
+[48:08.4 - 48:09.7] in order to build inventory.
+[48:09.7 - 48:12.1] We have almost $600 million on the balance sheet.
+[48:12.1 - 48:17.3] And so when we are being asked by customers to build inventory relative to what we're
+[48:17.4 - 48:22.3] building inventory relative to a forecast that's there, often they're putting their
+[48:22.3 - 48:25.9] money down to confirm that the demand is real.
+[48:26.9 - 48:30.0] The other thing, and I know you know this about our business, the vast majority of the
+[48:30.0 - 48:34.7] working capital that we have, our inventory specifically, is the liability of the customer.
+[48:34.7 - 48:38.5] And so we are doing orders relative to a forecast.
+[48:39.0 - 48:43.6] But customers also know that if they overorder or provide a forecast that doesn't really
+[48:43.6 - 48:46.7] materialize, that that inventory is going to get pushed back to them and it's going
+[48:46.7 - 48:48.1] to become their liability.
+[48:48.1 - 48:51.7] So I'd say that there's a rationality right now in the overall marketplace.
+[48:51.7 - 48:56.6] We are mindful of pockets of maybe buffering that's been happening, but we don't expect
+[48:56.6 - 48:58.1] right now that it's going to be overly material.
+[48:59.0 - 49:06.5] And I would also add, Dan, today we've either seen demand tempering or growth, demand
+[49:06.5 - 49:11.4] decreasing or growth tempering, but we haven't seen customers cancel or push things out.
+[49:11.4 - 49:17.0] Customers have been asking us to fulfill the backlog and maybe reducing the outlook
+[49:17.0 - 49:19.9] a little bit, whether it's lower growth or lower demand.
+[49:21.2 - 49:25.1] But we've been converting our backlog, so it hasn't been a material issue to date.
+[49:27.2 - 49:27.5] Great.
+[49:27.5 - 49:28.0] Thank you.
+[49:30.0 - 49:30.5] Thanks, Dan.
+[49:33.1 - 49:35.3] There are no further questions on the phone lines.
+[49:35.3 - 49:39.9] I would now like to turn the conference back to Rob Mijones for closing remarks.
+[49:40.1 - 49:40.9] Thank you.
+[49:40.9 - 49:44.5] You know, we continued our strong start to the year by posting another solid quarter
+[49:44.5 - 49:49.0] of results, and we continue to execute well through a difficult supply chain and macro
+[49:49.0 - 49:50.1] environment.
+[49:50.1 - 49:54.2] I'm pleased that we're able to raise our financial outlook for the full year and feel
+[49:54.2 - 49:57.7] confident in our customers' demand and profile in order to do so.
+[49:58.4 - 50:04.0] And given the current macroeconomic backdrop, I'm also pleased we're able to provide our
+[50:04.0 - 50:09.2] initial outlook for 2023, and we will continue to work to diligently raise our projections
+[50:09.5 - 50:10.9] as we progress throughout the year.
+[50:11.4 - 50:16.1] Lastly, we are well-skilled at managing our business through economic cycles and feel
+[50:16.1 - 50:20.7] confident in our ability to continue to navigate through any potential choppy waters ahead.
+[50:21.5 - 50:25.3] Thank you all for joining today's call, and I look forward to updating you as we progress
+[50:25.3 - 50:26.1] throughout the year.
+[50:29.1 - 50:33.3] Ladies and gentlemen, this concludes your conference call for this morning.
+[50:33.3 - 50:35.7] We would like to thank you all for participating.
+[50:35.7 - 50:38.0] You may now disconnect your lines.
+[50:39.2 - 50:40.1] Thank you.

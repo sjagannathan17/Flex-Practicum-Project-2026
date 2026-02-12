@@ -1,0 +1,289 @@
+"""
+Anomaly detection for CapEx and investment pattern changes.
+Detects unusual spikes or drops in spending, sentiment shifts, and strategic pivots.
+"""
+import re
+from typing import Optional
+from collections import defaultdict
+from statistics import mean, stdev
+
+from backend.rag.retriever import search_documents, get_company_documents
+from backend.core.config import ANOMALY_THRESHOLD
+
+
+def extract_dollar_amounts(text: str) -> list[float]:
+    """
+    Extract dollar amounts from text.
+    Handles formats like: $1.5 billion, $500 million, $1,234,567
+    """
+    amounts = []
+    
+    # Pattern for billions
+    billion_pattern = r'\$?([\d,.]+)\s*billion'
+    for match in re.finditer(billion_pattern, text.lower()):
+        try:
+            value = float(match.group(1).replace(',', '')) * 1_000_000_000
+            amounts.append(value)
+        except ValueError:
+            pass
+    
+    # Pattern for millions
+    million_pattern = r'\$?([\d,.]+)\s*million'
+    for match in re.finditer(million_pattern, text.lower()):
+        try:
+            value = float(match.group(1).replace(',', '')) * 1_000_000
+            amounts.append(value)
+        except ValueError:
+            pass
+    
+    # Pattern for direct dollar amounts
+    dollar_pattern = r'\$([\d,]+(?:\.\d+)?)'
+    for match in re.finditer(dollar_pattern, text):
+        try:
+            value = float(match.group(1).replace(',', ''))
+            if value > 10000:  # Only significant amounts
+                amounts.append(value)
+        except ValueError:
+            pass
+    
+    return amounts
+
+
+def detect_capex_anomalies(company: str, threshold: float = ANOMALY_THRESHOLD) -> dict:
+    """
+    Detect anomalies in CapEx mentions for a company.
+    
+    Args:
+        company: Company name
+        threshold: Percentage change threshold for anomaly (default 20%)
+        
+    Returns:
+        Dict with anomaly information
+    """
+    # Search for CapEx-related content
+    docs = search_documents(
+        query=f"{company} capital expenditure CapEx spending investment million billion",
+        company_filter=company,
+        n_results=50,
+    )
+    
+    if not docs:
+        return {"company": company, "error": "No documents found"}
+    
+    # Group by fiscal year/quarter
+    amounts_by_period = defaultdict(list)
+    mentions_by_period = defaultdict(int)
+    
+    for doc in docs:
+        fiscal_year = doc.get("fiscal_year", "Unknown")
+        quarter = doc.get("quarter", "")
+        period = f"{fiscal_year} {quarter}".strip()
+        
+        # Extract amounts from content
+        amounts = extract_dollar_amounts(doc["content"])
+        amounts_by_period[period].extend(amounts)
+        mentions_by_period[period] += 1
+    
+    # Calculate average amounts per period
+    period_averages = {}
+    for period, amounts in amounts_by_period.items():
+        if amounts:
+            period_averages[period] = mean(amounts)
+    
+    # Detect anomalies
+    anomalies = []
+    if len(period_averages) >= 2:
+        all_averages = list(period_averages.values())
+        overall_mean = mean(all_averages)
+        
+        if len(all_averages) > 2:
+            overall_std = stdev(all_averages)
+        else:
+            overall_std = overall_mean * 0.3  # Assume 30% standard deviation
+        
+        for period, avg in period_averages.items():
+            if overall_std > 0:
+                z_score = (avg - overall_mean) / overall_std
+                pct_change = (avg - overall_mean) / overall_mean if overall_mean > 0 else 0
+                
+                if abs(z_score) > 1.5 or abs(pct_change) > threshold:
+                    anomalies.append({
+                        "period": period,
+                        "average_amount": avg,
+                        "z_score": round(z_score, 2),
+                        "pct_change_from_mean": round(pct_change * 100, 1),
+                        "direction": "spike" if z_score > 0 else "drop",
+                        "severity": "high" if abs(z_score) > 2 else "medium",
+                    })
+    
+    return {
+        "company": company,
+        "periods_analyzed": len(period_averages),
+        "anomalies": sorted(anomalies, key=lambda x: abs(x["z_score"]), reverse=True),
+        "has_anomalies": len(anomalies) > 0,
+        "period_data": {k: round(v, 0) for k, v in period_averages.items()},
+    }
+
+
+def detect_sentiment_shifts(company: str) -> dict:
+    """
+    Detect significant shifts in sentiment over time.
+    """
+    from backend.analytics.sentiment import analyze_lexicon_sentiment
+    
+    docs = get_company_documents(company, limit=100)
+    
+    if len(docs) < 10:
+        return {"company": company, "error": "Not enough documents for analysis"}
+    
+    # Group documents by fiscal year
+    docs_by_year = defaultdict(list)
+    for doc in docs:
+        year = doc.get("metadata", {}).get("fiscal_year", "Unknown")
+        docs_by_year[year].append(doc["content"])
+    
+    # Calculate sentiment per year
+    sentiment_by_year = {}
+    for year, contents in docs_by_year.items():
+        combined = " ".join(contents)
+        analysis = analyze_lexicon_sentiment(combined)
+        sentiment_by_year[year] = analysis["sentiment_score"]
+    
+    # Detect shifts
+    shifts = []
+    sorted_years = sorted([y for y in sentiment_by_year.keys() if y != "Unknown"])
+    
+    for i in range(1, len(sorted_years)):
+        prev_year = sorted_years[i-1]
+        curr_year = sorted_years[i]
+        
+        prev_sentiment = sentiment_by_year[prev_year]
+        curr_sentiment = sentiment_by_year[curr_year]
+        
+        change = curr_sentiment - prev_sentiment
+        
+        if abs(change) > 0.15:  # 15% shift threshold
+            shifts.append({
+                "from_period": prev_year,
+                "to_period": curr_year,
+                "from_sentiment": round(prev_sentiment, 3),
+                "to_sentiment": round(curr_sentiment, 3),
+                "change": round(change, 3),
+                "direction": "improving" if change > 0 else "declining",
+                "severity": "high" if abs(change) > 0.3 else "medium",
+            })
+    
+    return {
+        "company": company,
+        "years_analyzed": len(sorted_years),
+        "sentiment_by_year": {k: round(v, 3) for k, v in sentiment_by_year.items()},
+        "shifts": shifts,
+        "has_significant_shifts": len(shifts) > 0,
+    }
+
+
+def detect_ai_investment_changes(company: str) -> dict:
+    """
+    Detect changes in AI and data center investment focus.
+    """
+    # Search for AI-related content
+    docs = search_documents(
+        query=f"{company} AI artificial intelligence data center GPU machine learning",
+        company_filter=company,
+        n_results=100,
+    )
+    
+    # Group by fiscal year
+    ai_mentions_by_year = defaultdict(int)
+    total_docs_by_year = defaultdict(int)
+    
+    ai_keywords = ["ai", "artificial intelligence", "machine learning", "gpu", 
+                   "neural", "deep learning", "data center", "hyperscale"]
+    
+    for doc in docs:
+        year = doc.get("fiscal_year", "Unknown")
+        content_lower = doc["content"].lower()
+        
+        total_docs_by_year[year] += 1
+        
+        for keyword in ai_keywords:
+            ai_mentions_by_year[year] += content_lower.count(keyword)
+    
+    # Calculate AI focus intensity per year
+    ai_focus_by_year = {}
+    for year in total_docs_by_year:
+        if total_docs_by_year[year] > 0:
+            ai_focus_by_year[year] = ai_mentions_by_year[year] / total_docs_by_year[year]
+    
+    # Detect changes
+    changes = []
+    sorted_years = sorted([y for y in ai_focus_by_year.keys() if y != "Unknown"])
+    
+    for i in range(1, len(sorted_years)):
+        prev_year = sorted_years[i-1]
+        curr_year = sorted_years[i]
+        
+        prev_focus = ai_focus_by_year[prev_year]
+        curr_focus = ai_focus_by_year[curr_year]
+        
+        if prev_focus > 0:
+            pct_change = (curr_focus - prev_focus) / prev_focus
+        else:
+            pct_change = 1.0 if curr_focus > 0 else 0
+        
+        if abs(pct_change) > 0.25:  # 25% change threshold
+            changes.append({
+                "from_period": prev_year,
+                "to_period": curr_year,
+                "from_intensity": round(prev_focus, 2),
+                "to_intensity": round(curr_focus, 2),
+                "pct_change": round(pct_change * 100, 1),
+                "direction": "increasing" if pct_change > 0 else "decreasing",
+            })
+    
+    return {
+        "company": company,
+        "years_analyzed": len(sorted_years),
+        "ai_focus_by_year": {k: round(v, 2) for k, v in ai_focus_by_year.items()},
+        "changes": changes,
+        "trend": "increasing" if len(changes) > 0 and changes[-1]["direction"] == "increasing" else "stable",
+    }
+
+
+def get_all_anomalies() -> dict:
+    """
+    Detect anomalies across all tracked companies.
+    """
+    companies = ["Flex", "Jabil", "Celestica", "Benchmark", "Sanmina"]
+    
+    results = {
+        "capex_anomalies": [],
+        "sentiment_shifts": [],
+        "ai_investment_changes": [],
+        "summary": {
+            "companies_with_capex_anomalies": [],
+            "companies_with_sentiment_shifts": [],
+            "companies_increasing_ai_focus": [],
+        }
+    }
+    
+    for company in companies:
+        # CapEx anomalies
+        capex = detect_capex_anomalies(company)
+        if capex.get("has_anomalies"):
+            results["capex_anomalies"].append(capex)
+            results["summary"]["companies_with_capex_anomalies"].append(company)
+        
+        # Sentiment shifts
+        sentiment = detect_sentiment_shifts(company)
+        if sentiment.get("has_significant_shifts"):
+            results["sentiment_shifts"].append(sentiment)
+            results["summary"]["companies_with_sentiment_shifts"].append(company)
+        
+        # AI investment changes
+        ai_changes = detect_ai_investment_changes(company)
+        if ai_changes.get("trend") == "increasing":
+            results["ai_investment_changes"].append(ai_changes)
+            results["summary"]["companies_increasing_ai_focus"].append(company)
+    
+    return results

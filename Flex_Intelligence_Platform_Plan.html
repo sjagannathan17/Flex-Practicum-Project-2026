@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flex CapEx Intelligence Platform - Project Plan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            color: #1e3a5f;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            font-size: 1.5em;
+            color: #1e3a5f;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        h3 {
+            font-size: 1.2em;
+            color: #374151;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+        
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 10px 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+            color: #1e3a5f;
+        }
+        
+        tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        .highlight {
+            background: #dbeafe;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .cost-box {
+            background: #dcfce7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #22c55e;
+        }
+        
+        .warning-box {
+            background: #fef3c7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        ul, ol {
+            margin: 10px 0 15px 25px;
+        }
+        
+        li {
+            margin: 5px 0;
+        }
+        
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.85em;
+            margin: 15px 0;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        .toc {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .toc ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .toc li {
+            padding: 5px 0;
+            border-bottom: 1px dotted #d1d5db;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .badge-free {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge-paid {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .team-card {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .team-card h4 {
+            color: #3b82f6;
+            margin-bottom: 5px;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Flex CapEx Intelligence Platform</h1>
+<p><strong>Project Plan</strong> | Version 1.0 | February 2026</p>
+
+<div class="highlight">
+    <strong>Overview:</strong> Build a comprehensive competitive intelligence platform with RAG + web search, auto-download SEC filings, earnings transcripts, patent tracking, job postings, sentiment analysis, anomaly detection, smart alerts, and multi-format exports.
+</div>
+
+<div class="toc">
+    <h3>Table of Contents</h3>
+    <ul>
+        <li>1. Executive Summary</li>
+        <li>2. Team Structure & Timeline</li>
+        <li>3. Week-by-Week Execution Plan</li>
+        <li>4. Technology Stack</li>
+        <li>5. Project Structure</li>
+        <li>6. Key Features</li>
+        <li>7. Cost Summary</li>
+    </ul>
+</div>
+
+<h2>1. Executive Summary</h2>
+
+<table>
+    <tr>
+        <th>Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>Target Companies</td>
+        <td>Flex, Jabil, Celestica, Benchmark, Sanmina</td>
+    </tr>
+    <tr>
+        <td>Total Documents</td>
+        <td>~405 files (10-K, 10-Q, earnings calls, etc.)</td>
+    </tr>
+    <tr>
+        <td>Team Size</td>
+        <td>4 developers</td>
+    </tr>
+    <tr>
+        <td>Weekly Capacity</td>
+        <td>40 hours (10 hrs/person)</td>
+    </tr>
+    <tr>
+        <td>Timeline</td>
+        <td>12 weeks</td>
+    </tr>
+    <tr>
+        <td>Monthly Cost</td>
+        <td>~$20-50 (Claude API only)</td>
+    </tr>
+</table>
+
+<h2>2. Team Structure</h2>
+
+<div class="team-grid">
+    <div class="team-card">
+        <h4>Dev A - Backend Core</h4>
+        <p>Python, FastAPI, ChromaDB</p>
+    </div>
+    <div class="team-card">
+        <h4>Dev B - Data & NLP</h4>
+        <p>Scraping, Processing, Analytics</p>
+    </div>
+    <div class="team-card">
+        <h4>Dev C - Frontend</h4>
+        <p>TypeScript, React, Next.js</p>
+    </div>
+    <div class="team-card">
+        <h4>Dev D - Integration</h4>
+        <p>Full-stack, APIs, Testing</p>
+    </div>
+</div>
+
+<h2>3. 12-Week Execution Plan</h2>
+
+<h3>Weekly Milestones Overview</h3>
+
+<table>
+    <tr>
+        <th>Week</th>
+        <th>Focus</th>
+        <th>Key Deliverable</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Foundation</td>
+        <td>Project structure + ChromaDB populated</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>RAG Chat</td>
+        <td>Working Q&A with citations</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Hybrid Search</td>
+        <td>RAG + Web + Memory</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>Auto-Ingest</td>
+        <td>SEC filings auto-download</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>Analytics</td>
+        <td>Sentiment + Anomaly detection</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td>Dashboard</td>
+        <td>Charts with real data</td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td>Geographic</td>
+        <td>Heatmap + Company list</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td>Deep-Dive</td>
+        <td>Company pages + Comparison</td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td>Alerts</td>
+        <td>Email + Slack notifications</td>
+    </tr>
+    <tr>
+        <td>10</td>
+        <td>Exports</td>
+        <td>PDF/Excel/PPTX</td>
+    </tr>
+    <tr>
+        <td>11</td>
+        <td>Data Sources</td>
+        <td>Patents, Jobs, News</td>
+    </tr>
+    <tr>
+        <td>12</td>
+        <td>Polish</td>
+        <td>Auto-reports + Calendar sync</td>
+    </tr>
+</table>
+
+<div class="page-break"></div>
+
+<h3>Week 1: Foundation (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Set up backend structure, FastAPI, ChromaDB client</td>
+        <td>10</td>
+        <td>backend/ folder with working FastAPI</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Fix build_chromadb.py, process all 5 companies</td>
+        <td>10</td>
+        <td>ChromaDB populated with ~405 docs</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Initialize Next.js, Tailwind, shadcn/ui, layout</td>
+        <td>10</td>
+        <td>frontend/ with sidebar + routing</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Set up .env files, API keys, documentation</td>
+        <td>10</td>
+        <td>All configs ready, README updated</td>
+    </tr>
+</table>
+
+<h3>Week 2: RAG Chat (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Build retriever.py (embed + search ChromaDB)</td>
+        <td>10</td>
+        <td>Vector search working</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Build generator.py (Claude API + citations)</td>
+        <td>10</td>
+        <td>Claude returns answers with sources</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Build chat page UI (messages, input, send)</td>
+        <td>10</td>
+        <td>/chat page with message bubbles</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Connect frontend to backend, test end-to-end</td>
+        <td>10</td>
+        <td>Full chat flow working</td>
+    </tr>
+</table>
+
+<h3>Week 3: Web Search + Memory (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Build web_search.py (Brave API integration)</td>
+        <td>10</td>
+        <td>Web search returns results</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Build hybrid pipeline (RAG + Web + merge)</td>
+        <td>10</td>
+        <td>Mode toggle: RAG/Web/Hybrid</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Add mode toggle UI, memory indicator</td>
+        <td>10</td>
+        <td>UI shows search mode, context</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Build conversation memory (in-memory)</td>
+        <td>10</td>
+        <td>Multi-turn conversations work</td>
+    </tr>
+</table>
+
+<h3>Week 4: SEC Auto-Download (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Build sec_scraper.py (EDGAR API)</td>
+        <td>10</td>
+        <td>Can fetch filing metadata</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Build downloader.py + processor.py</td>
+        <td>10</td>
+        <td>Downloads and embeds new docs</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Build settings page (ingestion controls)</td>
+        <td>10</td>
+        <td>/settings with status display</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Build scheduler.py (APScheduler)</td>
+        <td>10</td>
+        <td>Daily 4PM check running</td>
+    </tr>
+</table>
+
+<h3>Week 5: Analytics Engine (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Build sentiment.py (sentiment analysis)</td>
+        <td>10</td>
+        <td>Sentiment scores per document</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Build anomaly.py (detect CapEx spikes)</td>
+        <td>10</td>
+        <td>Anomaly detection working</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Build dashboard layout with metric cards</td>
+        <td>10</td>
+        <td>/dashboard with placeholders</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Build analysis API endpoints</td>
+        <td>10</td>
+        <td>/api/analysis/* endpoints</td>
+    </tr>
+</table>
+
+<h3>Week 6: Dashboard Charts (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Build trends.py (forecasting)</td>
+        <td>10</td>
+        <td>Trend predictions working</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Build classifier.py (AI vs Traditional)</td>
+        <td>10</td>
+        <td>Investment classification</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Build Recharts components (pie, bar, line)</td>
+        <td>10</td>
+        <td>Charts rendering real data</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Connect dashboard to analysis endpoints</td>
+        <td>10</td>
+        <td>Live data in dashboard</td>
+    </tr>
+</table>
+
+<div class="page-break"></div>
+
+<h3>Week 7: Geographic + Company Pages (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Build geographic.py (location extraction)</td>
+        <td>10</td>
+        <td>Facility locations extracted</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Build table_extractor.py (PDF tables)</td>
+        <td>10</td>
+        <td>Financial tables parsed</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Build geographic heatmap (Leaflet)</td>
+        <td>10</td>
+        <td>/heatmap with markers</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Build company list page</td>
+        <td>10</td>
+        <td>/companies with cards</td>
+    </tr>
+</table>
+
+<h3>Week 8: Company Deep-Dive (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Build company detail API endpoints</td>
+        <td>10</td>
+        <td>/api/companies/{symbol}/*</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Build earnings_scraper.py</td>
+        <td>10</td>
+        <td>Earnings transcripts scraped</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Build company detail page with tabs</td>
+        <td>10</td>
+        <td>/companies/[symbol] page</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Build comparison page</td>
+        <td>10</td>
+        <td>/companies/compare working</td>
+    </tr>
+</table>
+
+<h3>Week 9: Alerts System (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Build detector.py (alert triggers)</td>
+        <td>10</td>
+        <td>Alerts triggered on events</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Build email_sender.py (SendGrid)</td>
+        <td>10</td>
+        <td>Email alerts sent</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Build alerts page UI</td>
+        <td>10</td>
+        <td>/alerts with history</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Build slack_client.py</td>
+        <td>10</td>
+        <td>Slack alerts working</td>
+    </tr>
+</table>
+
+<h3>Week 10: Export Features (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Build excel.py (openpyxl export)</td>
+        <td>10</td>
+        <td>Excel/CSV download working</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Build powerpoint.py (python-pptx)</td>
+        <td>10</td>
+        <td>PPTX export working</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Build reports page + preview</td>
+        <td>10</td>
+        <td>/reports with builder</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Build pdf.py (WeasyPrint)</td>
+        <td>10</td>
+        <td>PDF reports generated</td>
+    </tr>
+</table>
+
+<h3>Week 11: Advanced Data Sources (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Build patent_scraper.py (USPTO)</td>
+        <td>10</td>
+        <td>Patent tracking working</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Build job_scraper.py</td>
+        <td>10</td>
+        <td>Job posting analysis</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Add patent/hiring tabs to company pages</td>
+        <td>10</td>
+        <td>New data in UI</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Build news_aggregator.py (RSS)</td>
+        <td>10</td>
+        <td>News feeds integrated</td>
+    </tr>
+</table>
+
+<h3>Week 12: Polish + Auto Reports (40 hrs)</h3>
+<table>
+    <tr>
+        <th>Dev</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Deliverable</th>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Build auto-summarizer for new filings</td>
+        <td>10</td>
+        <td>Auto-summaries generated</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Build calendar.py (Google Calendar sync)</td>
+        <td>10</td>
+        <td>Earnings auto-synced</td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td>Build calendar page UI</td>
+        <td>10</td>
+        <td>/calendar view</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Build auto-report scheduler</td>
+        <td>10</td>
+        <td>Weekly/monthly reports</td>
+    </tr>
+</table>
+
+<div class="page-break"></div>
+
+<h2>4. Technology Stack</h2>
+
+<table>
+    <tr>
+        <th>Layer</th>
+        <th>Technology</th>
+        <th>Purpose</th>
+        <th>Cost</th>
+    </tr>
+    <tr>
+        <td>Vector DB</td>
+        <td>ChromaDB</td>
+        <td>Document embeddings and semantic search</td>
+        <td><span class="badge badge-free">FREE</span></td>
+    </tr>
+    <tr>
+        <td>Relational DB</td>
+        <td>SQLite</td>
+        <td>Structured data, analytics, alerts</td>
+        <td><span class="badge badge-free">FREE</span></td>
+    </tr>
+    <tr>
+        <td>Embeddings</td>
+        <td>all-mpnet-base-v2</td>
+        <td>768-dim sentence embeddings</td>
+        <td><span class="badge badge-free">FREE</span></td>
+    </tr>
+    <tr>
+        <td>LLM</td>
+        <td>Claude API</td>
+        <td>Response generation, summarization</td>
+        <td><span class="badge badge-paid">~$20-50/mo</span></td>
+    </tr>
+    <tr>
+        <td>Web Search</td>
+        <td>Brave Search API</td>
+        <td>Real-time web information</td>
+        <td><span class="badge badge-free">FREE tier</span></td>
+    </tr>
+    <tr>
+        <td>SEC Data</td>
+        <td>SEC EDGAR API</td>
+        <td>Auto-download filings</td>
+        <td><span class="badge badge-free">FREE</span></td>
+    </tr>
+    <tr>
+        <td>Patents</td>
+        <td>USPTO PatentsView</td>
+        <td>Patent tracking</td>
+        <td><span class="badge badge-free">FREE</span></td>
+    </tr>
+    <tr>
+        <td>Backend</td>
+        <td>FastAPI</td>
+        <td>REST API with async support</td>
+        <td><span class="badge badge-free">FREE</span></td>
+    </tr>
+    <tr>
+        <td>Frontend</td>
+        <td>Next.js 14</td>
+        <td>React framework with App Router</td>
+        <td><span class="badge badge-free">FREE</span></td>
+    </tr>
+    <tr>
+        <td>UI Components</td>
+        <td>shadcn/ui</td>
+        <td>Accessible UI components</td>
+        <td><span class="badge badge-free">FREE</span></td>
+    </tr>
+    <tr>
+        <td>Charts</td>
+        <td>Recharts</td>
+        <td>Composable React charts</td>
+        <td><span class="badge badge-free">FREE</span></td>
+    </tr>
+    <tr>
+        <td>Maps</td>
+        <td>Leaflet + OSM</td>
+        <td>Geographic heatmap</td>
+        <td><span class="badge badge-free">FREE</span></td>
+    </tr>
+    <tr>
+        <td>Email</td>
+        <td>SendGrid</td>
+        <td>Email notifications</td>
+        <td><span class="badge badge-free">FREE tier</span></td>
+    </tr>
+    <tr>
+        <td>Chat Integration</td>
+        <td>Slack Bot</td>
+        <td>Slack integration</td>
+        <td><span class="badge badge-free">FREE</span></td>
+    </tr>
+</table>
+
+<h2>5. Project Structure</h2>
+
+<pre>
+SCU Flex Practicum 2026/
+├── backend/                     # FastAPI Backend
+│   ├── main.py                  # FastAPI app entry
+│   ├── requirements.txt         # Python dependencies
+│   ├── .env                     # API keys
+│   ├── core/                    # Config, database, scheduler
+│   ├── ingestion/               # SEC, patents, jobs, news scrapers
+│   ├── rag/                     # Retriever, generator, memory
+│   ├── analytics/               # Sentiment, anomaly, trends
+│   ├── alerts/                  # Email, Slack notifications
+│   ├── exports/                 # Excel, PowerPoint, PDF
+│   └── api/routes/              # API endpoints
+│
+├── frontend/                    # Next.js Frontend
+│   ├── app/                     # Pages (chat, dashboard, companies)
+│   ├── components/              # UI components
+│   └── lib/                     # API client, types
+│
+├── chromadb_store/              # Vector database
+├── Flex/                        # Company data (27 files)
+├── Jabil/                       # Company data (84 files)
+├── Celestica/Celestica/         # Company data (77 files)
+├── benchmark/                   # Company data (111 files)
+└── Sanmina/                     # Company data (106 files)
+</pre>
+
+<div class="page-break"></div>
+
+<h2>6. Key Features</h2>
+
+<h3>Fully Automated (Zero Manual Work)</h3>
+
+<table>
+    <tr>
+        <th>Category</th>
+        <th>Automation</th>
+    </tr>
+    <tr>
+        <td>SEC Filings</td>
+        <td>Daily check at 4 PM ET, auto-download and index</td>
+    </tr>
+    <tr>
+        <td>Earnings Transcripts</td>
+        <td>Auto-fetch after earnings calls</td>
+    </tr>
+    <tr>
+        <td>Patents</td>
+        <td>Weekly scan for new filings</td>
+    </tr>
+    <tr>
+        <td>Job Postings</td>
+        <td>Daily scrape for hiring trends</td>
+    </tr>
+    <tr>
+        <td>News</td>
+        <td>Real-time RSS monitoring</td>
+    </tr>
+    <tr>
+        <td>Alerts</td>
+        <td>Email + Slack notifications (pre-configured)</td>
+    </tr>
+    <tr>
+        <td>Reports</td>
+        <td>Weekly/monthly auto-generated and emailed</td>
+    </tr>
+    <tr>
+        <td>Calendar</td>
+        <td>Earnings dates auto-synced to Google Calendar</td>
+    </tr>
+    <tr>
+        <td>Summaries</td>
+        <td>New filings auto-summarized by Claude</td>
+    </tr>
+</table>
+
+<h3>Alert Triggers</h3>
+
+<table>
+    <tr>
+        <th>Trigger</th>
+        <th>Condition</th>
+        <th>Priority</th>
+    </tr>
+    <tr>
+        <td>New SEC Filing</td>
+        <td>10-K, 10-Q, 8-K detected</td>
+        <td>High</td>
+    </tr>
+    <tr>
+        <td>CapEx Anomaly</td>
+        <td>>20% change from baseline</td>
+        <td>High</td>
+    </tr>
+    <tr>
+        <td>Sentiment Shift</td>
+        <td>Score changes >0.3</td>
+        <td>Medium</td>
+    </tr>
+    <tr>
+        <td>Keyword Match</td>
+        <td>Custom keywords in new docs</td>
+        <td>Medium</td>
+    </tr>
+    <tr>
+        <td>Hiring Spike</td>
+        <td>>50% increase in postings</td>
+        <td>Low</td>
+    </tr>
+    <tr>
+        <td>Patent Filed</td>
+        <td>New patent by competitor</td>
+        <td>Low</td>
+    </tr>
+</table>
+
+<h2>7. Cost Summary</h2>
+
+<div class="cost-box">
+    <h3>Monthly Cost: ~$20-50</h3>
+    <table>
+        <tr>
+            <th>Service</th>
+            <th>Cost</th>
+        </tr>
+        <tr>
+            <td>Claude API</td>
+            <td>~$20-50</td>
+        </tr>
+        <tr>
+            <td>Everything else</td>
+            <td>$0 (free tiers)</td>
+        </tr>
+        <tr>
+            <td><strong>Total</strong></td>
+            <td><strong>~$20-50</strong></td>
+        </tr>
+    </table>
+</div>
+
+<h3>Company CIKs (for SEC Scraper)</h3>
+
+<table>
+    <tr>
+        <th>Company</th>
+        <th>CIK</th>
+        <th>Ticker</th>
+    </tr>
+    <tr>
+        <td>Flex</td>
+        <td>0000866374</td>
+        <td>FLEX</td>
+    </tr>
+    <tr>
+        <td>Jabil</td>
+        <td>0000898293</td>
+        <td>JBL</td>
+    </tr>
+    <tr>
+        <td>Celestica</td>
+        <td>0001030894</td>
+        <td>CLS</td>
+    </tr>
+    <tr>
+        <td>Benchmark</td>
+        <td>0001080020</td>
+        <td>BHE</td>
+    </tr>
+    <tr>
+        <td>Sanmina</td>
+        <td>0000897723</td>
+        <td>SANM</td>
+    </tr>
+</table>
+
+<div class="page-break"></div>
+
+<h2>Environment Variables</h2>
+
+<h3>Backend (.env)</h3>
+<pre>
+# LLM (MAIN COST)
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Vector Database
+CHROMADB_PATH=../chromadb_store
+EMBEDDING_MODEL=all-mpnet-base-v2
+
+# Database
+DATABASE_URL=sqlite:///./flex_intel.db
+
+# Web Search
+BRAVE_API_KEY=BSA...
+
+# Email Alerts
+SENDGRID_API_KEY=SG...
+ALERT_FROM_EMAIL=alerts@yourapp.com
+
+# Slack
+SLACK_BOT_TOKEN=xoxb-...
+SLACK_WEBHOOK_URL=https://hooks.slack.com/...
+
+# Google Calendar
+GOOGLE_CALENDAR_CREDENTIALS=./credentials.json
+
+# SEC Scraper
+SEC_USER_AGENT=FlexIntel/1.0 (your@email.com)
+INGESTION_SCHEDULE=0 16 * * 1-5
+</pre>
+
+<h3>Frontend (.env.local)</h3>
+<pre>
+NEXT_PUBLIC_API_URL=http://localhost:8000
+</pre>
+
+<hr style="margin: 40px 0; border: none; border-top: 2px solid #e5e7eb;">
+
+<p style="text-align: center; color: #6b7280; font-size: 0.9em;">
+    <strong>Flex CapEx Intelligence Platform</strong><br>
+    Project Plan v1.0 | February 2026<br>
+    Total: 12 weeks | 4 developers | ~$20-50/month
+</p>
+
+</body>
+</html>

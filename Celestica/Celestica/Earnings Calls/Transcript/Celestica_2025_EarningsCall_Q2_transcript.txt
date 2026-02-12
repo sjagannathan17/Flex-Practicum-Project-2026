@@ -1,0 +1,737 @@
+[00:00.0 - 00:08.0] Ladies and gentlemen, thank you for joining us and welcome to the Celestica Q2 2025 financial results and conference call.
+[00:08.0 - 00:12.0] After today's prepared remarks, we will host a question and answer session.
+[00:12.0 - 00:15.0] If you would like to ask a question, please raise your hand.
+[00:15.0 - 00:21.0] If you have dialed into today's call, please press star nine to raise your hand and star six to unmute.
+[00:21.0 - 00:26.0] I will now hand the conference over to Matthew Pallotta, head of investor relations.
+[00:26.0 - 00:28.0] Please go ahead.
+[00:29.0 - 00:36.0] Good morning, and thank you for joining us on Celestica's Q2 2025 earnings conference call.
+[00:36.0 - 00:45.0] On the call today, we have Rob Maiones, president and chief executive officer, and Mandeep Chawla, chief financial officer.
+[00:45.0 - 00:52.0] Please note that during the course of this call, we will make forward-looking statements relating to the future performance of Celestica,
+[00:52.0 - 00:57.0] which are based on management's current expectations, forecasts, and assumptions.
+[00:57.0 - 01:01.0] While these forward-looking statements represent our current judgment,
+[01:01.0 - 01:08.0] actual results could differ materially from a conclusion, forecast, or projection in the forward-looking statements made today.
+[01:08.0 - 01:13.0] Certain material factors and assumptions are applied in drawing any such statement.
+[01:13.0 - 01:17.0] For identification and discussion of such factors and assumptions,
+[01:17.0 - 01:23.0] as well as risk factors that may impact future performance and results of Celestica,
+[01:23.0 - 01:33.0] please refer to our public filings available at www.sec.gov and www.cedarplus.ca,
+[01:33.0 - 01:36.0] as well as the investor relations section on our website.
+[01:36.0 - 01:44.0] We undertake no obligation to update these forward-looking statements unless expressly required to do so by law.
+[01:44.0 - 01:49.0] In addition, during this call, we will refer to various non-GAAP financial measures,
+[01:49.0 - 01:58.0] including adjusted operating margin, adjusted gross margin, adjusted return on invested capital or adjusted ROIC, free cash flow,
+[01:58.0 - 02:08.0] gross debt to trailing 12-month TTM adjusted EBITDA leverage ratio, adjusted earnings per share or adjusted EPS, and adjusted effective tax rate.
+[02:08.0 - 02:12.0] We have included in our earnings release, found in the investor relations section of our website,
+[02:12.0 - 02:17.0] a reconciliation of non-GAAP financial measures to the most comparable GAAP measures.
+[02:18.0 - 02:23.0] With respect to our Q3 2025 guidance and 2025 annual outlook,
+[02:23.0 - 02:32.0] our earnings release does not include a reconciliation of forward-looking non-GAAP measures to the most directly comparable GAAP measures on a forward-looking basis,
+[02:32.0 - 02:39.0] as items that we exclude from GAAP to calculate these comparable non-GAAP measures are dependent on future events
+[02:39.0 - 02:45.0] that are not able to be reliably predicted by management and are not part of our routine operating activities.
+[02:45.0 - 02:54.0] We are unable to provide such a reconciliation without unreasonable effort due to the uncertainty and inherent difficulty in predicting the occurrence,
+[02:54.0 - 02:58.0] the financial impact, and the periods in which the adjustments may be recognized.
+[02:58.0 - 03:09.0] The occurrence, timing, and amount of any of the items excluded from GAAP to calculate non-GAAP could significantly impact our Q3 2025 and 2025 GAAP results.
+[03:09.0 - 03:14.0] Unless otherwise specified, all references to dollars on this call are to U.S. dollars,
+[03:14.0 - 03:23.0] all per-share information is based on diluted shares outstanding, and all references to comparative figures are a year-over-year comparison.
+[03:23.0 - 03:26.0] Let me now turn the call over to Rob.
+[03:26.0 - 03:32.0] Thank you, Matt, and good morning, everyone, and thank you for joining us on today's call.
+[03:33.0 - 03:39.0] We saw solid demand across our portfolio in the second quarter, which drove very strong performance.
+[03:39.0 - 03:51.0] We achieved revenues of $2.89 billion and adjusted EPS of $1.39 with both metrics exceeding the high end of our guidance ranges.
+[03:51.0 - 04:01.0] Our adjusted operating margin of 7.4% once again marked the highest performance in the company history.
+[04:01.0 - 04:08.0] Our ATS segment continues to experience very strong growth, driven by the demand for networking products from our hyperscale customers,
+[04:08.0 - 04:16.0] as they pursue significant expansions of their data center infrastructure to support new AI applications.
+[04:16.0 - 04:22.0] And our ATS segment, solid demand in our capital equipment business and industrial businesses,
+[04:23.0 - 04:31.0] drove higher than expected revenues, while segment margins of 5.3% continue to improve meaningfully.
+[04:31.0 - 04:41.0] In the second quarter, the impact from tariffs on our financial results was minimal, as the pause on reciprocal tariffs and exemptions on electronics goods,
+[04:41.0 - 04:47.0] including data center hardware, insulated the majority of our portfolio.
+[04:47.0 - 04:54.0] Before I provide you with our updated annual financial outlook and some additional color on our businesses,
+[04:54.0 - 05:01.0] I would like to turn the call over to Mandy, who will discuss our second quarter financial performance and our guidance for the third quarter.
+[05:00.8 - 05:08.0] of 2025. Mandeep, over to you. Thank you, Rob, and good morning, everyone.
+[05:08.6 - 05:15.8] Second quarter revenue of $2.89 billion was up 21% and above the high end of our guidance range,
+[05:15.8 - 05:20.5] driven primarily by a very strong demand in our communications and market from hyperscaler
+[05:20.5 - 05:29.0] customers. Adjusted gross margin for the second quarter was 11.7%, up 110 basis points, driven
+[05:29.0 - 05:35.4] by higher volumes and improving mix in both segments. Our second quarter adjusted operating
+[05:35.4 - 05:43.7] margin was 7.4%, up 110 basis points, driven by higher margin across both our CCS and ATS segments.
+[05:45.0 - 05:49.3] Our adjusted earnings per share for the second quarter was $1.39,
+[05:50.2 - 05:55.3] exceeding the high end of our guidance range, and an increase of 49 cents, or 54%.
+[05:55.3 - 06:03.6] Our adjusted affected tax rate for the quarter was 20%. And finally, our second quarter adjusted
+[06:03.6 - 06:12.5] ROIC was 35.5%, compared to 26.6% a year ago, driven by higher operating profit and strong
+[06:12.5 - 06:19.0] working capital management. Moving on to our segment performance. ATS segment revenue totaled
+[06:19.3 - 06:27.4] $819 million, up 7%, and above our guidance of being flat year over year. The higher revenue
+[06:27.4 - 06:32.2] was primarily driven by strong demand in our capital equipment business, and returning growth
+[06:32.2 - 06:38.7] in our industrial business. Our ATS segment accounted for 28% of total company revenue in
+[06:38.7 - 06:48.3] the second quarter. Revenue in our CCS segment was $2.07 billion, up 28%, driven once again by
+[06:48.3 - 06:54.6] very strong growth in our communications end market. The CCS segment accounted for 72% of total
+[06:54.6 - 07:01.6] company revenue in the quarter. Our communications end market revenues increased by 75%, above our
+[07:01.6 - 07:08.2] guidance of high 50 percentage growth, driven primarily by strong demand and ramping programs
+[07:08.2 - 07:13.8] in our HPS networking business, complemented by strengthening demand in our optical programs.
+[07:14.6 - 07:19.8] Revenue in our enterprise end market was 37% lower, which was better than our guidance of a
+[07:19.8 - 07:26.6] low 40s percentage decline. The lower revenues were a result of an anticipated technology transition
+[07:26.6 - 07:34.7] in an AI ML compute program with one of our hyperscaler customers. HPS revenues of $1.2
+[07:34.7 - 07:41.4] billion in the second quarter were higher by 82%, and accounted for 43% of total company revenue.
+[07:41.5 - 07:48.2] This exceptional growth is being driven by the ramping of several 800G networking switch programs,
+[07:48.8 - 07:52.7] complementing strong hyperscaler demand for our 400G switches.
+[07:54.6 - 08:00.1] Moving on to segment margins. ATS segment margin in the second quarter rose to 5.3%,
+[08:01.0 - 08:06.3] up 70 basis points, primarily driven by improved profitability in our A&E business.
+[08:07.3 - 08:14.2] CCS segment margin in the second quarter was 8.3%, an improvement of 130 basis points,
+[08:14.2 - 08:21.0] driven by a higher mix of HPS revenues and strong productivity. During the quarter,
+[08:21.0 - 08:25.7] we had two customers that each accounted for at least 10% of total revenue,
+[08:25.7 - 08:34.2] representing 31% and 13% of revenue, respectively. Moving on to working capital. At the end of the
+[08:34.2 - 08:41.1] second quarter, our inventory balance was $1.92 billion, a sequential increase of $130 million,
+[08:41.8 - 08:49.4] and a year-over-year increase of $74 million. Cash deposits were $397 million at the end of
+[08:49.4 - 08:56.2] the second quarter, down $75 million sequentially, and down $179 million year-over-year.
+[08:57.0 - 08:59.9] Fast-cycle days during the second quarter were 66.
+[09:01.8 - 09:06.7] Turning to cash flows. Capital expenditures for the second quarter were $33 million,
+[09:07.3 - 09:13.5] or approximately 1.1% of revenue, compared to 1.5% in the second quarter of 2024.
+[09:14.5 - 09:22.0] Year-to-date, our capital expenditures have been below our anticipated range of 1.5% to 2.0% of
+[09:22.6 - 09:29.0] revenue, due to stronger-than-expected revenue growth and timing of expenditures. However,
+[09:29.0 - 09:34.1] we anticipate capital expenditures in the second half of the year to increase relative to the first
+[09:34.1 - 09:41.1] half, and for total annual spend to be within our annual range of 1.5% to 2.0% of revenues.
+[09:43.2 - 09:49.4] During the second quarter, we generated $120 million of free cash flow, $54 million higher
+[09:49.4 - 09:54.3] than the prior year period. Our free cash flow year-to-date, as of the end of the quarter,
+[09:54.3 - 10:01.6] totaled $214 million. Turning to our balance sheet and capital outlook.
+[10:01.6 - 10:08.4] location. At the end of the second quarter, our cash balance was $314 million. Combined
+[10:08.4 - 10:14.5] with $660 million of borrowing capacity under our revolver, we currently have approximately
+[10:14.5 - 10:19.6] $1 billion in total liquidity, which we believe is sufficient to meet our projected business
+[10:19.6 - 10:27.8] needs. Our gross debt at the end of the quarter was $823 million, and our net debt position
+[10:27.8 - 10:35.0] was $509 million. Our gross debt, the non-GAAP trailing 12-month adjusted EBITDA leverage
+[10:35.0 - 10:42.6] ratio, was 0.9 turns, an improvement of 0.2 turns sequentially, and 0.3 turns versus the
+[10:42.6 - 10:48.5] prior year period. As of June 30th, we were in compliance with all financial covenants
+[10:48.5 - 10:55.5] under our credit agreement. During the second quarter, we repurchased approximately 600,000
+[10:55.5 - 11:01.4] shares for cancellation at a cost of $40 million under our normal course issuer bid,
+[11:01.4 - 11:08.4] bringing our total purchases under the NCIB to $115 million year-to-date. We intend to
+[11:08.4 - 11:15.4] remain opportunistic on share buybacks for the second half of 2025.
+[11:15.4 - 11:20.2] Now let's turn to our guidance for the third quarter of 2025. Similar to last quarter,
+[11:20.2 - 11:25.5] we highlight that our guidance figures assume no material changes to tariffs or trade restrictions
+[11:25.5 - 11:30.5] compared to what is in effect as of July 28th, as any changes to these policies and
+[11:30.5 - 11:35.9] their potential impact on our results cannot be reliably predicted at this time. We also
+[11:35.9 - 11:41.1] note that substantially all tariffs paid by Celestica are expected to be recovered from
+[11:41.1 - 11:47.3] our customers and are not expected to materially impact our non-GAAP adjusted operating earnings
+[11:47.3 - 11:55.1] or our non-GAAP adjusted net earnings. Third quarter revenue is projected to be between
+[11:55.1 - 12:03.5] $2.875 and $3.125 billion, representing growth of 20% at the midpoint. Adjusted earnings
+[12:03.5 - 12:11.9] per share are anticipated to be between $1.37 and $1.53, representing an increase of 41
+[12:11.9 - 12:18.0] cents at the midpoint, or 39%. Assuming the achievement of the midpoint of our revenue
+[12:18.0 - 12:24.8] and adjusted EPS guidance ranges, our non-GAAP operating margin would be 7.4%, an increase
+[12:24.8 - 12:30.7] of 60 basis points over the prior year period. We expect our adjusted effective tax rate
+[12:30.7 - 12:37.8] for the third quarter to be approximately 19%. Finally, let's review our end market
+[12:37.8 - 12:43.6] outlook for the third quarter. In our ATS segment, we anticipate revenue to be down
+[12:43.6 - 12:48.2] in the low single digit percentage range, as growth in our industrial business is being
+[12:48.2 - 12:53.6] offset by lower volumes in our A&E business, due to our previously announced decision not
+[12:53.6 - 13:00.3] to renew a margin-diluted program. In our CCS segment, we project revenue in our communications
+[13:00.3 - 13:05.7] end market to grow in the low 60s percentage range, supported by continued demand strength
+[13:05.7 - 13:12.9] for our networking switches, including ongoing ramps in multiple 800G programs. In our enterprise
+[13:12.9 - 13:18.6] end market, we expect a mid-20s percentage decrease in revenue, driven primarily by a
+[13:18.6 - 13:24.6] technology transition in an AI ML compute program, with the latest generation program
+[13:24.6 - 13:30.3] beginning to ramp in the third quarter. With that, I will now turn the call back over to
+[13:30.3 - 13:35.7] Rob for an update on our latest financial outlook for 2025, and to provide additional
+[13:35.7 - 13:38.7] color on our business.
+[13:38.7 - 13:44.4] Thank you, Mandy. Given our solid first half performance and the strengthening demand forecast
+[13:44.4 - 13:50.3] for many of our customers, we are raising our 2025 annual financial outlook. We are
+[13:50.3 - 13:58.8] increasing our revenue outlook for the year, from $10.85 billion to $11.55 billion, reflecting
+[13:58.8 - 14:05.1] year-over-year growth of 20%. We are also increasing our non-gap adjusted EPS outlook
+[14:05.1 - 14:13.5] for the year, from $5 per share to $5.50 per share, which represents year-over-year growth
+[14:13.5 - 14:21.3] of 42%. Our adjusted EPS outlook reflects an anticipated non-gap operating margin of
+[14:21.3 - 14:29.2] 7.4%. With a higher anticipated profitability, we are also raising our free cash flow outlook
+[14:29.2 - 14:37.5] for the year, from $350 million to $400 million. As with our quarterly guidance, these figures
+[14:37.5 - 14:44.2] assume no material changes to tariffs or trade restrictions compared to those in effect
+[14:44.2 - 14:46.7] as of July 28th.
+[14:46.7 - 14:53.2] Now moving on to some additional color on our businesses. In our CCS segment, we now
+[14:53.2 - 14:59.4] anticipate growth of nearly 30% for the full year. In our communications end market, we
+[14:59.4 - 15:02.3] continue to ramp multiple 800G programs.
+[15:02.4 - 15:06.8] while demand for our 400G programs remains strong.
+[15:06.8 - 15:10.5] Overall, hyperscaler demand for our networking products
+[15:10.5 - 15:13.8] is very robust as these customers continue
+[15:13.8 - 15:17.2] to significantly invest in their data center infrastructure.
+[15:18.7 - 15:22.2] In our enterprise-end market, as anticipated,
+[15:22.2 - 15:25.3] Q3 will see us begin to ramp volumes
+[15:25.3 - 15:29.0] for our next generation AI ML compute program
+[15:29.0 - 15:31.2] with a large hyperscaler customer.
+[15:31.2 - 15:33.7] We expect this to contribute to a strengthening
+[15:33.7 - 15:37.1] of enterprise volumes in the second half of the year
+[15:37.1 - 15:38.7] and into 2026.
+[15:39.8 - 15:42.3] We also continue to pursue a robust pipeline
+[15:42.3 - 15:45.7] of opportunities for new awards with hyperscaler
+[15:45.7 - 15:48.8] and digital native customers across compute,
+[15:48.8 - 15:50.8] storage, and rack integration.
+[15:52.3 - 15:54.4] Moving on to our ATS segment,
+[15:54.4 - 15:57.0] we are maintaining our annual outlook for revenues
+[15:57.0 - 16:00.5] to remain approximately flat to 2024.
+[16:01.4 - 16:03.2] In our industrial business,
+[16:03.2 - 16:06.1] the strength we saw return in the second quarter
+[16:06.1 - 16:10.6] is expected to continue into the second half of 2025,
+[16:10.6 - 16:12.9] supported by several ramping programs.
+[16:14.0 - 16:17.4] In A&E, we continue to see strong improvements
+[16:17.4 - 16:20.9] in profitability driven by mixed improvements,
+[16:20.9 - 16:23.7] including our previously communicated decision
+[16:23.7 - 16:26.1] not to renew a margin dilutive program.
+[16:27.0 - 16:30.5] The revenue impact from this program began in Q2
+[16:30.5 - 16:33.2] and is expected to result in lower year-over-year revenues
+[16:33.2 - 16:36.2] in A&E for the remainder of the year,
+[16:36.2 - 16:38.6] despite otherwise healthy demand
+[16:38.6 - 16:41.1] across the rest of our A&E portfolio.
+[16:43.3 - 16:45.2] In our capital equipment business,
+[16:45.2 - 16:49.5] we achieved solid growth in the first half of 2025,
+[16:49.5 - 16:52.1] driven by the strength in our base demand,
+[16:52.1 - 16:54.1] supported by new program ramps.
+[16:55.0 - 16:58.2] As anticipated, some second half demand
+[16:58.3 - 17:00.5] was pulled into the first half,
+[17:00.5 - 17:04.1] and consequently, we expect demand to moderate.
+[17:04.1 - 17:05.7] The second half revenue is expected
+[17:05.7 - 17:07.7] to be lower than the first half.
+[17:07.7 - 17:11.1] Despite this, we anticipate full year growth
+[17:11.1 - 17:13.8] approximately in line with market growth rates.
+[17:15.0 - 17:18.3] Overall, we continue to anticipate another year
+[17:18.3 - 17:22.9] of solid financial performance for Celestica in 2025.
+[17:22.9 - 17:25.3] We remain confident in our ability
+[17:25.3 - 17:27.4] to continue our strong momentum,
+[17:27.4 - 17:30.8] even with the uncertainty in the current macro environment.
+[17:30.8 - 17:33.5] Our portfolio is strongly supported
+[17:33.5 - 17:36.5] by enduring long-term secular tailwinds.
+[17:37.7 - 17:40.8] We believe Celestica is exceptionally well-positioned
+[17:40.8 - 17:44.6] to help our customers navigate today's uncertain landscape,
+[17:44.6 - 17:48.1] backed by a globally diversified manufacturing network
+[17:48.1 - 17:51.9] and our best-in-class supply chain and operations teams.
+[17:51.9 - 17:55.2] As a company that thrives in managing complexity,
+[17:55.2 - 17:58.2] we feel these challenges will only further highlight
+[17:58.2 - 18:00.8] the critical value we provide.
+[18:00.8 - 18:03.0] With our market-leading capabilities
+[18:03.0 - 18:06.1] and competitive positioning in key technologies,
+[18:06.1 - 18:08.9] a disciplined approach to capital allocation
+[18:08.9 - 18:12.7] and consistency in our operation execution,
+[18:12.7 - 18:16.1] we believe we are positioned to continue to excel
+[18:16.1 - 18:19.6] and to sustain this positive momentum into 2026
+[18:19.6 - 18:21.6] and over the long term.
+[18:21.6 - 18:23.4] We look forward to updating you on our progress
+[18:23.4 - 18:25.3] during the next call in October.
+[18:25.3 - 18:27.7] And with that, I will now turn the call back
+[18:27.7 - 18:30.4] to the operator to begin the Q&A session.
+[18:33.2 - 18:34.0] Thank you.
+[18:34.0 - 18:36.6] We will now begin the question and answer session.
+[18:36.6 - 18:40.1] Please limit yourself to one question and one follow-up.
+[18:40.1 - 18:43.4] If you'd like to ask a question, please raise your hand now.
+[18:43.4 - 18:45.3] If you have dialed into today's call,
+[18:45.3 - 18:47.3] please press star nine to raise your hand
+[18:47.3 - 18:49.0] and star six to unmute.
+[18:49.9 - 18:52.3] Please stand by while we compile the Q&A roster.
+[18:54.4 - 18:56.4] And your first question comes from the line
+[18:56.4 - 18:59.3] of Carl Ackerman with BNP Paribas.
+[19:00.3 - 19:02.5] Carl, your line is unmuted.
+[19:02.5 - 19:04.2] You may now go ahead.
+[19:04.2 - 19:05.6] Great, thank you, gentlemen.
+[19:07.0 - 19:08.4] I have two, please.
+[19:08.4 - 19:10.6] Could you speak to the breadth of customers
+[19:10.6 - 19:12.9] as well as the number of platforms
+[19:12.9 - 19:14.9] that you have on 800 gig switch ports
+[19:14.9 - 19:19.2] that are helping drive your upward revised outlook for CCS?
+[19:19.2 - 19:20.9] In other words, I guess, how should investors
+[19:20.9 - 19:23.2] gauge the breadth of design engagements you have
+[19:23.2 - 19:26.7] on 800 gig and above relative to 400G?
+[19:26.7 - 19:28.1] Now, the follow-up, please.
+[19:30.7 - 19:31.6] Yeah, hi, Carl.
+[19:33.0 - 19:38.0] Yeah, on 800G, in terms of the breadth we have versus 400G,
+[19:38.6 - 19:42.5] I would say every 400G customer we had
+[19:42.5 - 19:46.7] has turned into a 800G customer.
+[19:47.7 - 19:52.7] So the breadth of our offering is quite large.
+[19:53.8 - 19:58.1] Our market share also for 800G is that much larger
+[19:58.1 - 20:02.1] than market share for 400G as well,
+[20:02.1 - 20:03.4] based on our early wins.
+[20:03.2 - 20:09.3] So the breadth that we're seeing across a number of hyperscalers and the ramps we're
+[20:09.3 - 20:15.6] seeing across a number of hyperscalers is great to see and it's fairly pronounced.
+[20:15.6 - 20:24.5] I'll just add on to that to say a little bit more color on 400 and 800.
+[20:24.5 - 20:29.4] The 400 demand has been very strong for quite some time.
+[20:29.4 - 20:31.7] We saw a lot of strength in the first quarter.
+[20:31.7 - 20:36.4] What was nice about the second quarter is the 800G now is ramping and it's basically
+[20:36.4 - 20:40.2] on parity with our 400G volumes in the second quarter.
+[20:40.2 - 20:42.3] And now we see 800G continue to accelerate.
+[20:42.3 - 20:48.8] So the point that Rob made, if you think about our top three hyperscaler customers, we've
+[20:48.8 - 20:51.2] won 800G programs with all three of them.
+[20:51.2 - 20:54.7] We saw an acceleration in demand in the second quarter with one in particular and the other
+[20:54.7 - 20:57.4] two are now starting to catch up in the back half.
+[20:57.4 - 21:00.4] So there's a lot of breadth, I would say.
+[21:02.4 - 21:03.4] Great, thank you for that.
+[21:03.4 - 21:07.7] I mean, just given the amount of revenue growth that you're seeing in the business, could
+[21:07.7 - 21:13.5] you remind us on the manufacturing readiness you have at your Monterey and Richardson campuses
+[21:13.5 - 21:17.1] today to handle the growing demand of your CCS business?
+[21:17.1 - 21:18.1] Thank you.
+[21:21.1 - 21:22.1] Yeah, I can start off.
+[21:22.1 - 21:23.5] Rob can add on if he'd like.
+[21:23.5 - 21:27.1] From a capacity perspective, we're still very comfortable.
+[21:27.1 - 21:32.6] We are seeing a significant amount of demand for Southeast Asia, both in Thailand as well
+[21:32.6 - 21:34.8] as in Malaysia.
+[21:34.8 - 21:38.3] Customers are continuing to want to invest in the United States in our Richardson, Texas
+[21:38.3 - 21:39.8] facility.
+[21:39.8 - 21:42.7] And customers are continuing to look at Mexico.
+[21:42.7 - 21:47.5] And so if you look at our capital plans as well, our CapEx spend, those are the locations
+[21:47.5 - 21:51.4] where we're spending the money and we're continuing to invest to support the growth.
+[21:51.4 - 21:53.5] We have not run out of capacity.
+[21:53.8 - 22:00.8] And as we commented last quarter, we have the ability to support, I would say, $3 billion
+[22:00.8 - 22:05.5] to $4 billion of additional revenue should our customers want to continue to be in those
+[22:05.5 - 22:06.5] geos.
+[22:08.5 - 22:13.7] And I would add, Carl, that right now the majority of our networking is coming out of
+[22:13.7 - 22:21.1] Thailand, but we also are producing networking products, energy products out of our Mexico
+[22:21.1 - 22:22.1] facility as well.
+[22:24.1 - 22:25.1] Thank you.
+[22:28.1 - 22:29.1] Thank you.
+[22:29.1 - 22:31.9] Your next question comes from the line of Ruben Roy with Stiefel.
+[22:31.9 - 22:33.9] Ruben, your line is open.
+[22:33.9 - 22:34.9] Please go ahead.
+[22:35.9 - 22:36.9] Yes.
+[22:36.9 - 22:37.9] Hi.
+[22:37.9 - 22:38.9] Thank you for taking my question.
+[22:38.9 - 22:39.9] Congrats on the continued momentum.
+[22:39.9 - 22:45.4] Mandeep, I wanted to zoom out maybe and, you know, given the Q3 guidance and the full year
+[22:45.4 - 22:53.1] guidance, the implications for Q4, maybe a little decel coming in CCS and, you know,
+[22:53.8 - 22:56.3] enterprise, you know, coming back a little bit into year-end.
+[22:56.3 - 23:01.2] Just wondering if you'll walk through some of the puts and takes on how to think about,
+[23:01.2 - 23:03.5] you know, sort of the momentum into year-end.
+[23:03.5 - 23:04.5] Thank you.
+[23:04.5 - 23:05.5] Yeah.
+[23:05.5 - 23:06.5] Thanks, Ruben.
+[23:06.5 - 23:10.8] I would say that we're pleased with the full year outlook.
+[23:10.8 - 23:13.7] The $11,550 is 20% growth.
+[23:13.7 - 23:16.7] We've been more or less back for Q1, Q2, and Q3.
+[23:16.7 - 23:22.0] To your point, it implies Q4 would maybe grow at 18%.
+[23:22.0 - 23:26.3] So, Q4 really just continues to take into consideration the uncertainties that are out there.
+[23:26.3 - 23:29.6] What I can tell you is this is our high-confidence view.
+[23:29.6 - 23:35.7] Our demand outlook is higher than the $11,550, but we're taking into account, you know, challenges
+[23:35.7 - 23:40.1] such as material availability or situations where customers may choose to temporarily
+[23:40.1 - 23:45.7] pause just given the continuing turmoil that's happening in the tariff environment.
+[23:45.7 - 23:49.7] But the $11,550 is our high-confidence view at this point.
+[23:49.7 - 23:50.7] Got it.
+[23:50.7 - 23:51.7] Thank you.
+[23:52.5 - 23:58.2] And just as a follow-up for Rob, perhaps, it seems like 400 gig is hanging in maybe
+[23:58.2 - 24:03.3] for longer than you folks might have expected earlier this year, and obviously, 800 ramp
+[24:03.3 - 24:04.3] is happening now.
+[24:04.3 - 24:10.4] I was wondering if you could maybe comment on updated thoughts around 1.6T timing now
+[24:10.4 - 24:14.4] that we've got the official launch of the silicon, you know, just wondering how you're
+[24:14.4 - 24:18.1] thinking about that as we, you know, look forward to 2026.
+[24:18.1 - 24:19.1] Thank you.
+[24:19.1 - 24:20.1] Yeah.
+[24:20.1 - 24:21.1] Thanks, Ruben.
+[24:21.5 - 24:27.9] You know, we received Tomahawk-6 samples in June, and we successfully brought up the first
+[24:27.9 - 24:32.9] system within days of receiving that sample, so that bodes well for the silicon and bodes
+[24:32.9 - 24:35.5] well for our engineering.
+[24:35.5 - 24:44.0] Right now, we have several new programs, Tomahawk-6 programs, 1.6T programs, that will start generating
+[24:44.0 - 24:49.7] some revenue in the back half of 2026 and certainly into 2027.
+[24:50.2 - 24:55.2] Again, this will all be paced by silicon availability.
+[24:57.0 - 24:58.0] Appreciate it.
+[25:00.8 - 25:01.8] Thank you.
+[25:01.8 - 25:04.1] Your next question comes from the line of David Vogt.
+[25:04.0 - 25:07.0] If UBS, David, your line is now open.
+[25:07.0 - 25:08.1] Please go ahead.
+[25:08.1 - 25:09.8] Great guys, thanks for taking my question.
+[25:09.8 - 25:11.0] So maybe two for me also.
+[25:11.0 - 25:13.6] So maybe, Rob, can you dig in a little bit
+[25:13.6 - 25:16.9] on the 800G ramp that you referenced or Mindy preferenced?
+[25:18.1 - 25:19.6] Looks like Google, you know, if I strip out
+[25:19.6 - 25:20.9] sort of what's going on with TPU
+[25:20.9 - 25:23.4] is probably incredibly strong from an 800G ramp.
+[25:23.4 - 25:25.1] And can you maybe talk to what you're seeing
+[25:25.1 - 25:27.6] from the other two 800G customers
+[25:27.6 - 25:30.5] in terms of how they're ramping in 2Q and to 3Q?
+[25:30.5 - 25:31.7] So it looks like maybe one of them
+[25:31.7 - 25:33.3] might be a little bit more muted
+[25:33.3 - 25:35.1] to start this 800G ramp.
+[25:35.1 - 25:36.8] I wonder if that's just more timing.
+[25:36.8 - 25:38.1] And then I'll give you my follow-up
+[25:38.1 - 25:40.8] is when I think about the capital equipment business
+[25:40.8 - 25:43.2] that had a little bit of a pull forward into H1,
+[25:43.2 - 25:44.9] can you maybe shed some light on,
+[25:44.9 - 25:47.7] was that more on the lithography side, memory, logic,
+[25:47.7 - 25:49.7] kind of what are you seeing by end vertical
+[25:49.7 - 25:53.0] within capital equipment, you know, H1 versus H2?
+[25:53.0 - 25:53.8] Thanks.
+[25:54.8 - 25:57.6] Okay, let me start off with the capital equipment one
+[25:57.6 - 25:60.0] and I'll go to the networking one.
+[25:60.0 - 26:03.5] So on capital equipment, you know, Q2,
+[26:03.5 - 26:06.2] very strong growth, 20 plus percent.
+[26:07.2 - 26:09.1] It was really driven by normalization
+[26:09.1 - 26:14.1] of inventory levels that we started seeing
+[26:14.3 - 26:17.7] in the second quarter of 2024.
+[26:17.7 - 26:19.4] As we go into the third quarter,
+[26:19.4 - 26:21.2] we are seeing some incremental demand
+[26:21.2 - 26:23.5] from a couple of our customers,
+[26:23.5 - 26:26.0] but we're also seeing that offset
+[26:26.0 - 26:29.4] by a decrease in demand by others.
+[26:29.4 - 26:33.8] And hence kind of flattish as we go into the third quarter.
+[26:33.8 - 26:36.9] And for those customers, we actually saw an acceleration
+[26:36.9 - 26:39.4] of what we think is an acceleration of demand
+[26:39.4 - 26:41.8] from the second half into the first half.
+[26:41.8 - 26:43.9] And so, you know, I do think,
+[26:43.9 - 26:45.5] and we believe that capital equipment
+[26:45.5 - 26:47.4] will have a growth here this year
+[26:47.4 - 26:48.9] in line with market rates,
+[26:48.9 - 26:50.5] but it will be more front-end focused
+[26:50.5 - 26:55.5] than back-end focus relative to the pulling that we saw.
+[26:59.5 - 27:03.8] And on the 400G versus the 800G,
+[27:03.8 - 27:08.0] yeah, we, as Mandy mentioned earlier,
+[27:08.0 - 27:09.8] you know, right now in the second quarter,
+[27:09.8 - 27:13.8] we saw about a, I'll call it a 50-50 split
+[27:13.8 - 27:18.5] between 400G and 800G networking volumes.
+[27:18.5 - 27:20.8] As we get into the back half of the year,
+[27:20.8 - 27:25.8] we certainly see 800G ramping up in excess of that,
+[27:26.0 - 27:29.5] but 400G also has a very long tail through this year
+[27:29.5 - 27:33.4] and certainly connects with our visibility right now.
+[27:33.4 - 27:35.1] There will always be ebbs and flows,
+[27:35.1 - 27:38.3] but, you know, across our customer base,
+[27:38.3 - 27:39.8] there's certainly a couple of customers
+[27:39.8 - 27:43.6] that are ramping a lot harder and a lot faster
+[27:43.6 - 27:46.0] than others on 800G.
+[27:46.0 - 27:47.0] Great, thanks, guys.
+[27:49.2 - 27:50.0] Thank you.
+[27:50.0 - 27:51.3] Your next question comes from the line
+[27:51.3 - 27:55.3] of Thanos Moschopoulos with BMO Capital Markets.
+[27:55.4 - 27:56.2] Your line is open.
+[27:56.2 - 27:57.6] Please go ahead.
+[27:57.6 - 27:58.5] Hi, good morning.
+[27:59.6 - 28:02.4] On the cash cycle, is it reasonable to expect
+[28:02.4 - 28:04.8] some ongoing improvements in cash cycle days
+[28:04.8 - 28:07.3] just simply as CCS is becoming a bigger part of the mix
+[28:07.3 - 28:08.4] relative to ATS?
+[28:10.4 - 28:12.4] Hi, Thanos, Mandy Pierre.
+[28:12.4 - 28:15.1] It's certainly an area that we continue to work to improve.
+[28:15.1 - 28:17.6] We're really happy with our cash generation.
+[28:17.6 - 28:20.1] You know, we've generated positive free cash flow
+[28:20.1 - 28:22.4] every quarter for over five years,
+[28:22.4 - 28:24.0] and we're raising the outlook this year,
+[28:24.0 - 28:26.9] as you would expect, from 350 to 400.
+[28:26.9 - 28:28.3] You know, the thing that I'll note
+[28:28.3 - 28:30.0] is that we continue to have a lot of confidence
+[28:30.0 - 28:32.0] in our cash generation ability,
+[28:32.0 - 28:35.3] even while we're growing our revenues at a 20% clip.
+[28:35.3 - 28:38.0] And so you can think about the amount of working capital
+[28:38.0 - 28:40.6] that we're investing in to support this growth.
+[28:40.6 - 28:42.8] But that being said, we do think that we'll continue
+[28:42.8 - 28:44.0] to have strong inventory turns.
+[28:44.0 - 28:47.0] Lead times on materials are steady,
+[28:47.0 - 28:48.3] probably at around 16 weeks,
+[28:48.3 - 28:51.8] which is in line with what you would have seen pre-COVID.
+[28:51.8 - 28:53.5] And so we do expect to be able to continue
+[28:54.1 - 28:55.4] to turn inventory quickly.
+[28:55.4 - 28:57.5] 400, we think, is the right number for this year,
+[28:57.5 - 28:59.9] and we would be targeting a higher number next year.
+[29:00.7 - 29:01.6] Great.
+[29:01.6 - 29:03.0] And on the CCS margins,
+[29:03.0 - 29:03.9] how should we think about
+[29:03.9 - 29:06.2] the near to medium-term trajectory,
+[29:06.2 - 29:09.5] just given that you'll have enterprise ramping back up,
+[29:09.5 - 29:13.1] which might provide a negative mixed dynamic there?
+[29:15.0 - 29:19.0] Yeah, I mean, going back to the outlook that we have,
+[29:19.0 - 29:22.9] given the 11,550 implies about 18% growth
+[29:22.9 - 29:26.4] in the CCS, or excuse me, the total company,
+[29:26.4 - 29:28.5] our ATS growth is going to be muted
+[29:28.5 - 29:33.5] because of the return of that unprofitable program
+[29:33.8 - 29:34.7] to one of our customers.
+[29:34.7 - 29:37.4] So it's really been driven by CCS.
+[29:37.4 - 29:38.6] What I would say is, to your point,
+[29:38.6 - 29:40.4] the enterprise demand is starting to improve.
+[29:40.4 - 29:42.0] As we get into the fourth quarter,
+[29:42.0 - 29:43.1] we will start to see enterprise
+[29:43.1 - 29:45.1] come back to year-to-year growth.
+[29:45.1 - 29:47.1] And right now, the communications demand
+[29:47.1 - 29:49.5] will continue to be strong, driven by 800G.
+[29:49.5 - 29:51.4] I'll just say again, though,
+[29:51.4 - 29:54.2] that our customer outlook is higher than that.
+[29:54.2 - 29:56.0] And so we're just factoring in right now
+[29:56.0 - 29:57.0] a lot of the uncertainties,
+[29:57.0 - 29:59.0] but we would look to see very strong growth
+[29:59.0 - 30:01.3] in both communications and enterprise.
+[30:03.2 - 30:04.4] That's fine, thank you.
+[30:04.8 - 30:07.5] Thank you.
+[30:07.5 - 30:11.9] Your next question comes from the line of Sameek Chatterjee with JP Morgan.
+[30:11.9 - 30:12.9] Your line is open.
+[30:12.9 - 30:13.9] Please go ahead.
+[30:13.9 - 30:14.9] Yep.
+[30:14.9 - 30:15.9] Hi.
+[30:15.9 - 30:16.9] I hope you can hear me.
+[30:16.9 - 30:17.9] Strong print here.
+[30:17.9 - 30:25.8] And maybe if I can start with your CCS guide for the full year, you've raised that substantially
+[30:25.8 - 30:27.0] for the full year.
+[30:27.0 - 30:31.6] I'm just wondering when you call out strengthening demand for the second half, you're just calling
+[30:31.6 - 30:35.9] that out more for the enterprise segment itself.
+[30:35.9 - 30:39.6] Maybe if you can sort of dive into, is that the area that you're seeing more visibility
+[30:39.6 - 30:44.3] from your customers, or does that extend over to 800 gig in terms of volume expectations
+[30:44.3 - 30:48.9] for the second half, or is the really sort of the upside surprise on communication more
+[30:48.9 - 30:52.8] from 400 gig demand being more resilient than you expected earlier?
+[30:52.8 - 30:53.8] And I have a follow-up.
+[30:53.8 - 30:54.8] Thank you.
+[30:54.8 - 30:55.8] Yeah.
+[30:55.8 - 30:56.8] Hi, Sameek.
+[30:57.0 - 30:58.8] I'd say a couple of pieces.
+[30:58.8 - 31:02.7] On the enterprise, as we've talked about, and everyone is aware, we're going through
+[31:02.7 - 31:04.4] a technology transition.
+[31:04.4 - 31:09.0] That program is ramping nicely in the quarter right now, and so we're seeing a good contribution
+[31:09.0 - 31:12.2] in the third quarter, and we will get more out of that in the fourth quarter.
+[31:12.2 - 31:16.7] So while we are showing negative year-over-year growth rates in the second and third quarter,
+[31:16.7 - 31:19.8] in the fourth quarter, we expect to start resuming growth.
+[31:19.8 - 31:24.6] On the communication side, when we talk about acceleration of growth, it's in the 800 gig
+[31:24.6 - 31:25.6] demand.
+[31:25.6 - 31:30.9] To one of the questions that was given earlier, we saw it in the second quarter with our largest
+[31:30.9 - 31:31.9] customer.
+[31:31.9 - 31:36.7] We're now seeing it pick up with our other large hyperscaler customers as well.
+[31:36.7 - 31:43.5] 400 gig is moderating, still very strong demand, just not as strong as the first half because
+[31:43.5 - 31:46.6] that's being replaced by 800 gig.
+[31:46.6 - 31:51.3] And then again, if we saw demand strength across all the areas that we think we could
+[31:51.3 - 31:55.8] see, we would hope that we could do more than what we've outlined.
+[31:55.8 - 31:56.8] Go ahead.
+[31:56.8 - 31:57.8] Go ahead.
+[31:57.8 - 32:02.9] And maybe for the follow-up, you just sort of highlighted this earlier to a question
+[32:02.9 - 32:09.1] about the 4Q run rate being around that sort of 18, let's call it sort of ballpark 20%,
+[32:09.1 - 32:10.5] which is what you've been running at.
+[32:10.5 - 32:15.1] I mean, is that a fair way of thinking about sustainability of growth into next year as
+[32:15.1 - 32:19.8] well, even as we layer on some of these AI ML projects that ramp further?
+[32:19.8 - 32:24.8] Would you sort of look at that as a sustainable growth pace for investors to think about 2026
+[32:24.8 - 32:26.2] as a starting point?
+[32:26.2 - 32:27.2] Thank you.
+[32:27.2 - 32:28.2] Yeah.
+[32:28.2 - 32:36.8] I think what you're also getting to is it's probably a bit early to give a full 2026 number.
+[32:36.8 - 32:40.2] Customer outlooks just don't go out that far at this point.
+[32:40.2 - 32:45.5] In October, when we do our investor day, we will share our view of 2026, but what I can
+[32:45.5 - 32:50.7] tell you right now is that the hyperscaler demand is very strong through the back end
+[32:50.7 - 32:51.7] of this year.
+[32:51.7 - 32:55.1] And we do have outlooks with our customers going into the first half of next year, and
+[32:55.1 - 32:56.5] we're not seeing a slowdown.
+[32:56.5 - 33:00.4] In addition to that, we have a number of programs that we've already won and are in the process
+[33:00.4 - 33:04.6] of ramping, which gives us further confidence going into the first half right now.
+[33:04.6 - 33:09.2] And then also, as you think about next year, we do believe that ATS is going to grow in
+[33:09.2 - 33:15.2] line with our targets that we set, which are typically around 10% over the long term.
+[33:15.9 - 33:17.9] So right now, the growth is continuing into the first half.
+[33:17.9 - 33:19.9] We'll just wait to give a full year number.
+[33:19.9 - 33:22.9] We just need a little bit more time to work with our customers.
+[33:23.9 - 33:32.9] I would also add that we have the capacity to service growth north of 20% per year for sure.
+[33:33.9 - 33:34.9] Got it.
+[33:34.9 - 33:35.9] Thank you.
+[33:35.9 - 33:36.9] Thanks for the comments.
+[33:37.9 - 33:38.9] Thank you.
+[33:38.9 - 33:44.9] Your next question comes from the line of Paul Treiber with RBC Capital Markets.
+[33:45.5 - 33:46.5] Your line is open.
+[33:46.5 - 33:47.5] Please go ahead.
+[33:47.5 - 33:48.5] Yeah.
+[33:48.5 - 33:49.5] Thanks.
+[33:49.5 - 33:50.5] Thanks very much and good morning.
+[33:50.5 - 33:55.2] Could you speak to the new program pipeline that you're seeing right now, and then the
+[33:55.2 - 34:02.2] opportunity to expand further with existing hyperscalers, but then also additional hyperscalers
+[34:02.2 - 34:05.4] beyond the top three that you have?
+[34:05.4 - 34:09.4] And can you speak to it in terms of on the communication side, but then also the enterprise
+[34:09.4 - 34:10.4] side?
+[34:11.4 - 34:12.4] Sure.
+[34:13.0 - 34:14.0] Yeah.
+[34:14.0 - 34:23.4] So in terms of new programs, we're continuing to build the breadth that we have in terms
+[34:23.4 - 34:25.8] of our offering with our existing hyperscalers.
+[34:25.8 - 34:31.9] So in terms of all the hyperscalers, if we're providing one with networking products for
+[34:31.9 - 34:38.8] in conversations or doing proof of concepts or things like that to provide them with AI
+[34:38.8 - 34:40.3] compute products and things on those lines.
+[34:41.2 - 34:45.9] So our first order of business is to kind of increase our share of wallet with our hyperscalers.
+[34:45.9 - 34:52.2] And those conversations are mature and ongoing and having some good traction.
+[34:52.2 - 34:59.2] In terms of penetrating new hyperscalers, we're fairly penetrated.
+[34:59.2 - 35:05.7] Our focus right now are in new regions or also with digital natives, as we mentioned.
+[35:05.7 - 35:08.7] and we're having some very interesting conversations
+[35:08.7 - 35:11.1] on what the right entry point is for us
+[35:11.1 - 35:14.9] to help support these customers moving forward.
+[35:14.9 - 35:18.9] As we mentioned also in previous terming calls
+[35:19.9 - 35:22.2] with our recent digital native win,
+[35:22.2 - 35:25.3] which includes the design manufacturing
+[35:25.3 - 35:27.7] for a full orchestrated AI rack,
+[35:27.7 - 35:30.4] so not just a networking rack,
+[35:30.4 - 35:32.5] but a full orchestrated rack.
+[35:32.5 - 35:34.4] That really gives us incremental proof points
+[35:34.4 - 35:36.4] to broaden our solutions
+[35:36.4 - 35:41.2] for the whole plethora of additional customers out there.
+[35:44.0 - 35:44.9] Thanks.
+[35:44.9 - 35:46.3] And a follow-up for that is,
+[35:46.3 - 35:51.3] is pricing factoring into discussions at this point
+[35:51.3 - 35:53.4] or is it one of the items
+[35:53.4 - 35:57.0] that's much lower down discussion point
+[35:57.0 - 36:01.3] just given the demand environment at the moment?
+[36:02.3 - 36:03.1] Yep.
+[36:03.1 - 36:06.3] In our industry, pricing is always a factor,
+[36:06.3 - 36:09.5] but it is really not the main factor right now.
+[36:09.5 - 36:11.7] I think our customers are looking for
+[36:11.7 - 36:16.6] certainly certainty of supply at scale.
+[36:16.6 - 36:19.9] They're looking for best in class designs
+[36:19.9 - 36:21.9] and technology leadership.
+[36:21.9 - 36:26.6] And those are the top two on the list.
+[36:26.6 - 36:29.6] Competitive pricing will always be a factor in our industry,
+[36:30.2 - 36:32.5] but if you have the first two,
+[36:32.5 - 36:35.9] then the second one usually just falls in line
+[36:35.9 - 36:37.9] because the customers understand the value
+[36:37.9 - 36:40.6] that you're actually delivering to them.
+[36:41.9 - 36:43.3] Yeah, only thing I'd add to that one, Paul,
+[36:43.3 - 36:45.8] is we constantly work with our customers
+[36:45.8 - 36:47.4] on total cost of ownership.
+[36:47.4 - 36:49.4] And we think that our footprint
+[36:49.4 - 36:54.1] gives us a very sustainable advantage in this space.
+[36:54.1 - 36:57.6] Whether customers need to be close to the deployment areas,
+[36:57.8 - 37:00.7] whether they're looking for lower cost geographies,
+[37:00.7 - 37:01.8] being in 16 countries,
+[37:01.8 - 37:03.7] we really are able to offer a wide variety
+[37:03.7 - 37:04.9] of solutions to them.
+[37:04.9 - 37:09.1] And because of our relative discipline
+[37:09.1 - 37:11.5] on CapEx deployment,
+[37:11.5 - 37:15.5] we aim to run our facilities at a high level of utilization.
+[37:15.5 - 37:17.9] So we're looking to constantly drive productivity
+[37:17.9 - 37:20.5] and pass those savings on to our customers as well.
+[37:22.3 - 37:24.1] Okay, thanks for taking the questions.
+[37:26.0 - 37:26.8] Thank you.
+[37:26.8 - 37:28.5] As a reminder, if you'd like to ask a question,
+[37:28.5 - 37:30.1] please raise your hand.
+[37:30.1 - 37:31.8] If you have dialed into today's call,
+[37:31.8 - 37:33.7] please press star nine to raise your hand
+[37:33.7 - 37:35.3] and star six to unmute.
+[37:36.6 - 37:38.2] And your next question comes from the line
+[37:38.2 - 37:41.1] of Atif Malik with Citi.
+[37:41.1 - 37:42.0] Your line is open.
+[37:42.0 - 37:42.8] Please go ahead.
+[37:44.1 - 37:47.1] Hi, thank you for taking my questions and nice results.
+[37:47.1 - 37:50.7] My first question is on your 10% of sales
+[37:50.7 - 37:51.5] and more customers.
+[37:51.5 - 37:54.1] You had three in Q1, it dropped to two.
+[37:55.1 - 37:57.6] How many are you expecting in the September quarter?
+[37:59.9 - 38:01.7] Yeah, hi Atif, it's Mandeep here
+[38:01.7 - 38:03.8] and really nice to see Citibank
+[38:03.8 - 38:06.5] back in the coverage universe for us.
+[38:06.5 - 38:07.9] So welcome.
+[38:07.9 - 38:11.6] We saw strong growth across our top three customers.
+[38:11.6 - 38:14.5] As you've noted, one of them just fell under,
+[38:14.5 - 38:15.9] it was just a smidgen under,
+[38:15.9 - 38:17.7] it rounds to 10% still.
+[38:17.7 - 38:19.1] And we are seeing both,
+[38:19.1 - 38:21.3] the good thing is that we still saw quarter to quarter growth
+[38:21.3 - 38:22.5] with that customer.
+[38:22.5 - 38:25.5] It's just frankly the base grew faster than they did.
+[38:25.5 - 38:27.6] When you go into the following quarters,
+[38:27.6 - 38:29.2] we do expect that we're gonna have three customers
+[38:29.2 - 38:32.0] above 10% going into the third and fourth quarter.
+[38:33.4 - 38:34.3] Great.
+[38:34.3 - 38:35.9] And as a follow up in your prepared remarks,
+[38:35.9 - 38:38.0] you guys talked about strengthening
+[38:38.0 - 38:40.8] in some optical projects.
+[38:40.8 - 38:43.7] Can you kind of elaborate on what these projects are?
+[38:46.4 - 38:50.3] Yes, we have an enterprise customer
+[38:50.3 - 38:53.1] that has been ramping some programs
+[38:54.1 - 38:58.2] and I'll call that in the data center interconnect area.
+[38:59.3 - 39:01.5] Those products have been wildly successful in the market
+[39:01.5 - 39:04.1] and we're supporting them in ramping those programs.
+[39:05.8 - 39:06.7] Thank you.
+[39:08.7 - 39:09.6] Thank you.
+[39:09.6 - 39:11.5] Your next question comes from the line of Todd Coupland
+[39:11.5 - 39:13.2] with CIBC.
+[39:13.2 - 39:14.1] Your line is open.
+[39:14.1 - 39:14.9] Please go ahead.
+[39:18.6 - 39:19.4] Can you hear me okay?
+[39:19.4 - 39:20.3] Yeah, thanks.
+[39:20.3 - 39:21.1] Good morning, everyone.
+[39:22.1 - 39:26.3] I wanted you to bridge what we hear from hyperscalers.
+[39:26.3 - 39:29.8] Recently, we heard a big CapEx increase last week
+[39:29.8 - 39:31.3] from a large hyperscaler.
+[39:31.3 - 39:35.0] We're getting three other updates this week.
+[39:35.0 - 39:38.9] And just bridge how we should think about those increases
+[39:38.9 - 39:42.1] relative to your change in guidance.
+[39:45.7 - 39:47.1] Why don't I start, Todd?
+[39:47.1 - 39:48.1] Good morning to you.
+[39:49.6 - 39:51.8] There's always a little bit of a lag, if you will,
+[39:51.8 - 39:54.4] between the announcements that the hyperscalers are making
+[39:54.4 - 39:57.1] and the forecast that we're receiving from them.
+[39:57.1 - 40:00.5] And so when we see these increases come through
+[40:00.5 - 40:03.7] in prepared remarks from our customers,
+[40:03.7 - 40:06.7] often it's an affirmation of what we've already been seeing.
+[40:06.5 - 40:12.1] demand perspective. And so to the comment that I had made earlier, we're seeing very strong demand
+[40:12.1 - 40:16.5] right now in the back half of this year. That demand outlook with our customers looking at
+[40:16.5 - 40:21.7] their forecast is continuing into the first half. And so really we look at the announcements that
+[40:21.7 - 40:26.0] have just been made and we expect will be made as an affirmation of the forecast that we've
+[40:26.0 - 40:33.2] already received. And Todd, I would add one of our reading indicators, the CapEx is certainly
+[40:33.2 - 40:40.9] a reading indicator. Another reading indicator is also silicon, because of the lead time
+[40:40.9 - 40:46.5] associated with a lot of this silicon. So as far ahead as we can and understand what our customers
+[40:46.5 - 40:53.3] are putting an order, asking us to put an order and that helps us align our longer term forecasts
+[40:54.7 - 40:58.2] and long-term financial and revenue outlooks as well.
+[40:58.2 - 41:04.9] Great. Thanks. Thanks for that, Culler. There's been a number of questions on
+[41:04.9 - 41:11.3] switch market share. I wanted to turn to server market share. It seemed like you had
+[41:12.1 - 41:17.8] lost a little bit at the end of last year. Now it's coming back. Could you just frame up
+[41:18.5 - 41:22.6] what your server market share trends are at the moment? Thanks a lot.
+[41:22.9 - 41:30.9] Yeah, thanks. So, I would say that we are gaining share with our largest customers
+[41:32.1 - 41:39.7] with respect to AI server market share. Frankly, a lot of that is just due to strong
+[41:40.2 - 41:48.3] execution and ability to build these very complex products at scale. And deep pension,
+[41:49.1 - 41:54.6] deep pension, we just went through a technology transition. We see these programs starting to
+[41:54.6 - 42:00.2] ramp in the third quarter and gaining some significant momentum as we exit the year and
+[42:00.2 - 42:07.2] also into next year. And we will also expect this product line to produce probably even
+[42:07.2 - 42:14.2] more revenues based on that increased share as we get into 2020, late 26 and into 27
+[42:14.2 - 42:19.2] and beyond based on next generation programs. Thank you very much.
+[42:21.7 - 42:26.3] Thank you. Your next question comes from the line of Robert Young with Canaccord Genuity.
+[42:26.3 - 42:28.2] Robert, your line is now open. Please go ahead.
+[42:28.2 - 42:45.6] Robert, your line is now open. Please go ahead or press star six if you've dialed in.
+[42:47.7 - 42:48.4] Can you hear me now?
+[42:51.1 - 42:52.4] Yes, we can hear you.
+[42:52.4 - 43:00.5] All right. Okay. So, you've had some very strong momentum on 1.6 terabyte. And I'd
+[43:00.5 - 43:06.0] love to get some context on whether that has continued. I think earlier in the call,
+[43:06.0 - 43:11.2] you said that the full rack proof point was opening up new opportunities. And so,
+[43:11.2 - 43:17.0] if you could just talk about the halo, the relationship with the hyperscalers, this 1.6
+[43:17.8 - 43:23.0] win rate and the full rack proof points. What is that doing around the opportunity
+[43:23.0 - 43:26.2] to grow white label opportunities along the ODM path?
+[43:29.3 - 43:37.1] Yeah, thanks, Rob. So, on the 1.6, we continue to win, I call it 1.6T variants. So,
+[43:38.0 - 43:45.3] we have 1.6T awards with many of the large hyperscalers. There's a lot of variants,
+[43:45.3 - 43:52.9] different types of 1.6T silicon or different use cases in the rack. So, we're continuing to kind of
+[43:52.9 - 43:59.3] grow our market share on these variants for those customers. In terms of the digital native win and
+[43:59.3 - 44:05.7] doing that fully orchestrated rack, that is certainly opening up new doors and new conversations
+[44:06.5 - 44:13.7] with people, even the hyperscalers. But the entry point on that might be next generation systems
+[44:13.7 - 44:18.9] in terms of what more can we do. So, those conversations are still,
+[44:19.6 - 44:26.1] I'll call it in the early phases, but producing a lot of interesting conversations.
+[44:28.4 - 44:36.0] Okay. And then my second question, just on the full rack solution, as you add maintenance and
+[44:36.0 - 44:42.3] service into the mix of services, I know that you acquired NCS Global, but do you need to acquire
+[44:42.3 - 44:47.1] or are you well-positioned for that shift? And then what's the potential timing? If you
+[44:47.1 - 44:51.5] give any context around margin impact and timing, that would be helpful. I'll pass the line.
+[44:52.9 - 44:55.7] Yeah, I'll start. I'll let Mandy finish on the M&A front.
+[44:57.5 - 45:06.5] Yeah, services is certainly a major focus area for us. NCS Global was a fantastic acquisition
+[45:06.5 - 45:07.1] and is certainly...
+[45:07.3 - 45:13.8] supporting us. In order to really support the demand that we have from our customers on services,
+[45:15.4 - 45:18.4] we will need and are planning to expand our services
+[45:18.4 - 45:22.1] footprint and offering. And with that, I'll turn it over to Mandy.
+[45:23.8 - 45:31.4] Yeah, Rob, so services is an area of focus for us. And the acquisition for SES was able to bring in
+[45:31.4 - 45:36.2] some good capabilities and a good foundation. We do have a very extensive partner network.
+[45:36.7 - 45:41.1] And so we don't see any gaps in being able to support the customer width that we've
+[45:41.1 - 45:44.3] already received. But there are going to be opportunities along the way to vertically
+[45:44.3 - 45:51.1] integrate. And so we do continue to look at various targets. And if we can see the synergies
+[45:52.2 - 45:55.8] come to bear, then we will be comfortable to go ahead and act.
+[45:55.8 - 45:58.0] But our final list continues to include service targets.
+[45:58.0 - 46:06.3] And obviously, services margins would be north of the company margins as well and be accretive.
+[46:07.6 - 46:13.5] Right. Is there any timing on the rollout of that services offering? Is that happening
+[46:13.5 - 46:19.6] today? Or is it something like, how do we think about that from a modeling perspective?
+[46:20.4 - 46:30.0] It is happening today, but not at the scale where it would be moving the company's financials.
+[46:30.6 - 46:39.0] I would say. I would think about it, Rob, in terms of a materiality perspective is when we get into
+[46:39.0 - 46:45.6] that large digital native one. That's where it's going to be a larger part of the offering. That
+[46:46.2 - 46:52.4] being said, we price and look to support our customers holistically. And so not everything
+[46:52.4 - 46:56.7] is going to always be accretive to the company. Services certainly will be, but there will be a
+[46:56.7 - 47:01.8] variety of services we provide. So we're going to be incrementally investing in this area. And I
+[47:01.8 - 47:05.7] would say it has more of a materiality impact, probably as we get to 2027.
+[47:07.5 - 47:08.1] Yeah, thanks.
+[47:08.4 - 47:15.4] Thank you. Your final question is a follow-up from David Vogt from UBS. David, your line is open.
+[47:15.4 - 47:16.0] Please go ahead.
+[47:16.7 - 47:20.2] Great. Thanks guys for taking my follow-up. Mandeep, this is a question for you. You mentioned
+[47:20.2 - 47:24.0] that you have enough capacity, or maybe Rob mentioned you have enough capacity for calendar
+[47:24.0 - 47:29.9] year 26 growth in CCS, and you have basically visibility for the next 12 months. Can you help
+[47:29.9 - 47:35.4] us understand when you would need to make adjustments to your capacity as we move through
+[47:35.6 - 47:40.9] to your capacity as we move through 25 into 26 for the back half of 26 and 27? How should we
+[47:40.9 - 47:45.6] think about that flowing through your capital priorities as demand strengthens or your
+[47:45.6 - 47:47.9] visibility improves as we move forward? Thanks.
+[47:50.6 - 47:57.9] Yeah, why don't I start off on the number side and Rob can jump in as needed. So if you look at
+[47:57.9 - 48:02.3] one of the large buildings that we were able to add on in Thailand, we were able to do it in about
+[48:02.3 - 48:09.1] 12 months. And so expansions in areas like Mexico and Southeast Asia, about 12-month lead time is
+[48:09.1 - 48:15.4] required. Just as a reminder on the approach that we take is we have a campus strategy the way our
+[48:15.4 - 48:21.2] network is set up. And so we do have the ability to add on additional buildings within the campuses
+[48:21.2 - 48:27.5] typically, and then we can quickly fill it with equipment. We have already made decisions to
+[48:27.5 - 48:34.0] expand capacity to support programs that we've won in areas such as Thailand, such as Richardson,
+[48:34.0 - 48:38.8] Texas, such as in Mexico. You'll see the CapEx spend in the first half of this year being a
+[48:38.8 - 48:43.8] little bit on the lighter side. And that's just reflective of expenditures that we've actually
+[48:43.8 - 48:47.8] incurred so far. But the back half of this year is going to be a little bit more weighted.
+[48:48.6 - 48:53.8] Just taking a step back from an overall CapEx intensity perspective, one and a half to two
+[48:53.8 - 48:58.8] percent is still the right number for us. This year we'll be tracking towards $200 million.
+[48:58.8 - 49:03.1] It just has been under two percent. But one and a half to two percent of our revenues continues
+[49:03.1 - 49:07.4] to be around the same amount that we would expect to spend. And I'll just highlight that
+[49:07.4 - 49:12.0] only about 40 basis points of our CapEx spend is for maintenance. And so the rest of it is
+[49:12.0 - 49:16.3] to support growth programs, which gives us a lot of discretion on where we point those dollars.
+[49:17.1 - 49:21.2] But right now we think that we can meet the demand for the programs we've already won with that
+[49:21.3 - 49:23.2] amount of spend. Great. Thanks, Matty.
+[49:26.7 - 49:30.6] Thank you. There are no further questions at this time. I will now turn the call back over
+[49:30.6 - 49:37.2] to Mr. Rob Mayones for closing remarks. Thank you. And thank you all for your time
+[49:37.2 - 49:43.0] and engagement today. We're pleased to report a strong second quarter demonstrating our resilience
+[49:43.0 - 49:47.7] in a dynamic market. The upward revision of our four-year outlet reflects the strength of our
+[49:47.7 - 49:53.2] customer relationships and the confidence in the current demand environment. We value your
+[49:53.2 - 49:58.0] ongoing support and look forward to sharing more positive updates with you next quarter.
+[49:58.0 - 50:01.3] Thank you again for joining us this morning and have a great day.
+[50:03.8 - 50:07.6] This concludes today's call. Thank you for attending. You may now disconnect.
