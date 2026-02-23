@@ -227,19 +227,56 @@ def extract(path):
     return ""
 
 # ---------------------------------------------------------------------------
-# FILING TYPE: auto-detect for benchmark (mixed folder)
+# CONTENT-BASED DOC TYPE PATTERNS (for ambiguous filenames)
 # ---------------------------------------------------------------------------
-def detect_filing_type(path):
+CONTENT_DOC_PATTERNS = {
+    "10-K": [
+        r"ANNUAL\s*REPORT", r"FORM\s*10-K", r"FORM\s*20-F",
+        r"pursuant\s*to\s*section\s*13\s*or\s*15\(d\)",
+        r"fiscal\s*year\s*ended",
+        r"annual\s*report\s*on\s*form\s*10-k",
+        r"annual\s*report\s*on\s*form\s*20-f",
+    ],
+    "10-Q": [
+        r"QUARTERLY\s*REPORT", r"FORM\s*10-Q", r"FORM\s*6-K",
+        r"quarterly\s*report\s*on\s*form\s*10-q",
+        r"quarter\s*ended", r"quarterly\s*period\s*ended",
+        r"report\s*of\s*foreign\s*private\s*issuer",
+    ],
+}
+
+# ---------------------------------------------------------------------------
+# FILING TYPE: auto-detect with foreign issuer + content fallback
+# ---------------------------------------------------------------------------
+def detect_filing_type(path, content=""):
     name = path.name.lower()
+
+    # Foreign issuer forms (Celestica: 20-F = annual, 6-K = quarterly)
+    if re.search(r"20-?f|20f", name):       return "10-K"
+    if re.search(r"6-?k|6k", name):         return "10-Q"
+
+    # Standard US forms
     if name.startswith("10-k") or "10k" in name:   return "10-K"
     if name.startswith("10-q") or "10q" in name:   return "10-Q"
     if name.startswith("8-k")  or "8k"  in name:   return "8-K"
+    if "annual" in name and "report" in name:       return "10-K"
+
+    # Content-based fallback for ambiguous filenames
+    if content:
+        sample = content[:5000]
+        scores = {}
+        for dtype, patterns in CONTENT_DOC_PATTERNS.items():
+            scores[dtype] = sum(1 for p in patterns if re.search(p, sample, re.IGNORECASE))
+        best = max(scores, key=scores.get) if scores else None
+        if best and scores[best] >= 2:
+            return best
+
     return "Other"
 
 # ---------------------------------------------------------------------------
 # FISCAL QUARTER EXTRACTION
 # ---------------------------------------------------------------------------
-def get_fiscal_quarter(path, company):
+def get_fiscal_quarter(path, company, content=""):
     name = path.name
 
     # --- Pattern 1: FY22Q3 / FY2022Q3 / fy24q2 ---
@@ -309,6 +346,20 @@ def get_fiscal_quarter(path, company):
     m = re.search(r"[Qq](\d)[_\-](\d{4})", name)
     if m:
         return f"FY{m.group(2)[-2:]}", f"Q{m.group(1)}"
+
+    # --- Content-based fallback (for UUID filenames like Sanmina) ---
+    if content:
+        sample = content[:10000]
+        fy_patterns = [
+            r"fiscal\s*year\s*ended\s*.*?(20\d{2})",
+            r"year\s*ended\s*(?:january|february|march|april|may|june|july|august|september|october|november|december)\s*\d{1,2}\s*,?\s*(20\d{2})",
+            r"for\s*the\s*year\s*ended\s*.*?(20\d{2})",
+            r"quarterly\s*(?:report|period)\s*ended\s*.*?(20\d{2})",
+        ]
+        for pat in fy_patterns:
+            m = re.search(pat, sample, re.IGNORECASE)
+            if m:
+                return f"FY{m.group(1)[-2:]}", ""
 
     return "Unknown", ""
 
@@ -402,14 +453,17 @@ def build_db():
     company_stats = defaultdict(lambda: {"files": 0, "chunks": 0})
 
     for filepath, company, filing_type in all_files:
-        fy, q = get_fiscal_quarter(filepath, company)
-
         print(f"  📄 [{company:<11}] {filepath.name:<65} ", end="", flush=True)
 
         text = extract(filepath)
         if not text or len(text.strip()) < 100:
             print("→ empty")
             continue
+
+        # Use content-based detection for filing type and fiscal quarter
+        if not filing_type or filing_type == "Other":
+            filing_type = detect_filing_type(filepath, text)
+        fy, q = get_fiscal_quarter(filepath, company, text)
 
         chunks = chunk_text(text)
         if not chunks:

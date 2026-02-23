@@ -47,15 +47,36 @@ class Document:
 class DocumentProcessor:
     """Process and extract text from company documents"""
     
-    # Document type patterns
+    # Document type patterns (includes foreign issuer forms: 20-F, 6-K)
     DOC_TYPE_PATTERNS = {
-        "10-K": [r"10-?K", r"10K", r"annual.*report"],
-        "10-Q": [r"10-?Q", r"10Q", r"quarterly.*report"],
+        "10-K": [r"10-?K", r"10K", r"annual.*report", r"20-?F", r"20F"],
+        "10-Q": [r"10-?Q", r"10Q", r"quarterly.*report", r"6-?K", r"6K"],
         "8-K": [r"8-?K", r"8K"],
         "earnings_call": [r"earnings.*call", r"transcript", r"EarningsCall"],
         "earnings_presentation": [r"earnings.*presentation", r"EarningsPresentation", r"investor.*presentation"],
         "press_release": [r"press.*release", r"EarningsRelease", r"PR_"],
         "shareholder_letter": [r"shareholder.*letter", r"ShareholderLetter"],
+    }
+
+    CONTENT_DOC_PATTERNS = {
+        "10-K": [
+            r"ANNUAL\s*REPORT",
+            r"FORM\s*10-K",
+            r"FORM\s*20-F",
+            r"pursuant\s*to\s*section\s*13\s*or\s*15\(d\)",
+            r"fiscal\s*year\s*ended",
+            r"annual\s*report\s*on\s*form\s*10-k",
+            r"annual\s*report\s*on\s*form\s*20-f",
+        ],
+        "10-Q": [
+            r"QUARTERLY\s*REPORT",
+            r"FORM\s*10-Q",
+            r"FORM\s*6-K",
+            r"quarterly\s*report\s*on\s*form\s*10-q",
+            r"quarter\s*ended",
+            r"quarterly\s*period\s*ended",
+            r"report\s*of\s*foreign\s*private\s*issuer",
+        ],
     }
     
     # Fiscal year/quarter patterns
@@ -115,11 +136,6 @@ class DocumentProcessor:
         filename = filepath.name
         suffix = filepath.suffix.lower()
         
-        # Extract document metadata
-        doc_type = self._detect_doc_type(filename)
-        fiscal_year = self._extract_fiscal_year(filename)
-        quarter = self._extract_quarter(filename)
-        
         # Extract content based on file type
         if suffix == ".pdf":
             content = self._extract_pdf(filepath)
@@ -132,6 +148,11 @@ class DocumentProcessor:
         
         if not content or len(content.strip()) < 100:
             return None
+        
+        # Extract document metadata (pass content for fallback detection)
+        doc_type = self._detect_doc_type(filename, content)
+        fiscal_year = self._extract_fiscal_year(filename, content)
+        quarter = self._extract_quarter(filename)
         
         return Document(
             filename=filename,
@@ -148,21 +169,46 @@ class DocumentProcessor:
             }
         )
     
-    def _detect_doc_type(self, filename: str) -> str:
-        """Detect document type from filename"""
-        
+    def _detect_doc_type(self, filename: str, content: str = "") -> str:
+        """Detect document type using filename patterns, then content-based fallback."""
         filename_lower = filename.lower()
-        
+
+        # Priority: explicit foreign issuer forms
+        if re.search(r"6-?k|6k", filename_lower):
+            return "10-Q"
+        if re.search(r"20-?f|20f", filename_lower):
+            return "10-K"
+
+        # Filename pattern matching
+        filename_match = None
         for doc_type, patterns in self.DOC_TYPE_PATTERNS.items():
             for pattern in patterns:
                 if re.search(pattern, filename_lower, re.IGNORECASE):
-                    return doc_type
-        
-        return "other"
+                    filename_match = doc_type
+                    break
+            if filename_match:
+                break
+
+        # If filename gives a clear non-ambiguous type, use it
+        if filename_match and filename_match not in ("10-K", "10-Q", "other", None):
+            return filename_match
+
+        # Content-based detection for ambiguous or missing types
+        if content and (not filename_match or filename_match in ("10-K", "10-Q", "other")):
+            content_sample = content[:5000]
+            scores = {}
+            for doc_type, patterns in self.CONTENT_DOC_PATTERNS.items():
+                score = sum(1 for p in patterns if re.search(p, content_sample, re.IGNORECASE))
+                scores[doc_type] = score
+
+            best_type = max(scores, key=scores.get) if scores else None
+            if best_type and scores[best_type] >= 2:
+                return best_type
+
+        return filename_match or "other"
     
-    def _extract_fiscal_year(self, filename: str) -> Optional[str]:
-        """Extract fiscal year from filename"""
-        
+    def _extract_fiscal_year(self, filename: str, content: str = "") -> Optional[str]:
+        """Extract fiscal year from filename, falling back to content scanning."""
         for pattern in self.FY_PATTERNS:
             match = re.search(pattern, filename, re.IGNORECASE)
             if match:
@@ -170,7 +216,22 @@ class DocumentProcessor:
                 if len(year) == 2:
                     year = f"20{year}"
                 return f"FY{year[-2:]}"
-        
+
+        # Content-based fallback for UUID or non-standard filenames
+        if content:
+            content_sample = content[:10000]
+            fy_content_patterns = [
+                r"fiscal\s*year\s*ended\s*.*?(20\d{2})",
+                r"year\s*ended\s*(?:january|february|march|april|may|june|july|august|september|october|november|december)\s*\d{1,2}\s*,?\s*(20\d{2})",
+                r"for\s*the\s*year\s*ended\s*.*?(20\d{2})",
+                r"annual\s*report\s*.*?(20\d{2})",
+                r"quarterly\s*(?:report|period)\s*ended\s*.*?(20\d{2})",
+            ]
+            for pattern in fy_content_patterns:
+                match = re.search(pattern, content_sample, re.IGNORECASE)
+                if match:
+                    return f"FY{match.group(1)[-2:]}"
+
         return None
     
     def _extract_quarter(self, filename: str) -> Optional[str]:
