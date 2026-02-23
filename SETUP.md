@@ -493,8 +493,8 @@ Flex-Practicum-Project-2026/
 
 | Problem | Solution |
 |---------|----------|
-| `No files found` | The script looks for data in `~/Documents/flex_practicum/`. Either move data there or update `BASE` in `build_chromadb.py` |
-| `Skipping Celestica — not found` | Some companies might not have all data folders. This is OK — it processes what it finds |
+| `No files found` | Make sure you're running the script from the project root (`Flex-Practicum-Project-2026/`) |
+| `Skipping [company] — not found` | Some companies might not have all subfolders. This is OK — it processes what it finds |
 | Script is very slow | Normal — it's embedding ~400 documents. Takes 15-30 minutes on most machines |
 | `OutOfMemoryError` | Close other applications. The embedding model needs ~2 GB RAM |
 
