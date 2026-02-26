@@ -62,8 +62,8 @@ async def compare_sentiments(
     
     return {
         "comparison": results,
-        "most_positive": results[0]["company"] if results else None,
-        "most_negative": results[-1]["company"] if results else None,
+        "most_positive": results[0].get("company") if results else None,
+        "most_negative": results[-1].get("company") if results else None,
     }
 
 

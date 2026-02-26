@@ -1,11 +1,25 @@
 """
 Vector retrieval module for RAG pipeline.
-Handles document search with year detection, recency boosting, and re-ranking.
+Handles document search with year detection, recency boosting, and LLM re-ranking.
+
+LLM Reranking (inspired by RAG-Challenge-2):
+- First retrieve more candidates than needed (e.g., 3x)
+- Use LLM to score relevance of each candidate to the query
+- Return top-k based on LLM scores, not just vector similarity
 """
 import re
+import json
 from typing import Optional
 
-from backend.core.database import get_collection, embed_text
+from openai import OpenAI
+
+from backend.core.database import (
+    get_collection, 
+    get_company_collection, 
+    has_company_collections,
+    embed_text,
+)
+from backend.core.config import OPENAI_API_KEY, RERANK_MODEL
 
 
 def _extract_year_from_query(query: str) -> Optional[str]:
@@ -55,6 +69,222 @@ _RECENCY_KEYWORDS = {
     "this year", "this quarter", "updated", "new",
 }
 
+# ---------------------------------------------------------------------------
+# CAPEX SYNONYM EXPANSION
+# Different companies use different labels for the same concept
+# ---------------------------------------------------------------------------
+CAPEX_SYNONYMS = [
+    "capital expenditure",
+    "capital expenditures", 
+    "capex",
+    "cap ex",
+    "purchases of property and equipment",
+    "purchase of property and equipment",
+    "acquisition of property plant and equipment",
+    "acquisition of property, plant and equipment",
+    "additions to property and equipment",
+    "capital spending",
+    "payments for property and equipment",
+    "property plant equipment purchases",
+    "PPE purchases",
+    "fixed asset purchases",
+    "investing in property and equipment",
+]
+
+# Keywords that trigger CapEx expansion
+CAPEX_TRIGGERS = {"capex", "cap ex", "capital expenditure", "capital expenditures", "capital spending"}
+
+# Other financial term synonyms
+FINANCIAL_SYNONYMS = {
+    "revenue": ["revenue", "net revenue", "net sales", "total revenue", "sales"],
+    "profit": ["profit", "net income", "earnings", "net profit", "income from operations"],
+    "margin": ["margin", "gross margin", "operating margin", "profit margin", "gross profit margin"],
+    "debt": ["debt", "long-term debt", "total debt", "borrowings", "indebtedness"],
+    "cash": ["cash", "cash and cash equivalents", "cash position", "liquidity"],
+}
+
+
+def _expand_capex_query(query: str) -> str:
+    """
+    If query mentions CapEx-related terms, expand with synonyms for better retrieval.
+    """
+    query_lower = query.lower()
+    
+    # Check if query contains CapEx triggers
+    if any(trigger in query_lower for trigger in CAPEX_TRIGGERS):
+        # Add key synonyms to the query for better vector matching
+        expansion = " ".join([
+            "purchases of property and equipment",
+            "capital expenditures",
+            "property plant equipment",
+        ])
+        return f"{query} {expansion}"
+    
+    return query
+
+
+def _expand_financial_terms(query: str) -> str:
+    """
+    Expand other financial terms with their synonyms.
+    """
+    query_lower = query.lower()
+    expansions = []
+    
+    for term, synonyms in FINANCIAL_SYNONYMS.items():
+        if term in query_lower:
+            # Add a few key synonyms
+            expansions.extend(synonyms[:3])
+    
+    if expansions:
+        return f"{query} {' '.join(expansions)}"
+    
+    return query
+
+
+def expand_query(query: str) -> str:
+    """
+    Apply all query expansions for better retrieval.
+    """
+    expanded = _expand_capex_query(query)
+    expanded = _expand_financial_terms(expanded)
+    return expanded
+
+
+# ---------------------------------------------------------------------------
+# QUERY ROUTING (RAG-Challenge-2 Style)
+# ---------------------------------------------------------------------------
+
+# Known companies in our database
+KNOWN_COMPANIES = ["Flex", "Jabil", "Celestica", "Benchmark", "Sanmina"]
+
+
+def extract_companies_from_query(query: str) -> list[str]:
+    """
+    Extract company names mentioned in the query.
+    Returns list of matched company names.
+    """
+    query_lower = query.lower()
+    found = []
+    for company in KNOWN_COMPANIES:
+        if company.lower() in query_lower:
+            found.append(company)
+    return found
+
+
+def detect_query_type(query: str) -> dict:
+    """
+    Analyze query to determine its type and routing strategy.
+    
+    Returns dict with:
+    - type: "single_company" | "multi_company" | "cross_company"
+    - companies: list of detected companies
+    - is_comparison: whether this is a comparison query
+    - suggested_sections: sections to boost based on query content
+    """
+    companies = extract_companies_from_query(query)
+    query_lower = query.lower()
+    
+    # Detect comparison keywords
+    comparison_keywords = [
+        "compare", "comparison", "versus", "vs", "vs.", "differ",
+        "which company", "who has higher", "who has more", "who has lower",
+        "rank", "ranking", "between", "across companies"
+    ]
+    is_comparison = any(kw in query_lower for kw in comparison_keywords)
+    
+    # Detect suggested sections based on content
+    suggested_sections = []
+    
+    if any(term in query_lower for term in CAPEX_TRIGGERS):
+        suggested_sections.extend([
+            "Capital Expenditures",
+            "Cash Flow Statement", 
+            "Liquidity and Capital Resources",
+        ])
+    
+    if "revenue" in query_lower or "sales" in query_lower or "income" in query_lower:
+        suggested_sections.append("Income Statement")
+        suggested_sections.append("Results of Operations")
+    
+    if "asset" in query_lower or "liabilit" in query_lower or "equity" in query_lower:
+        suggested_sections.append("Balance Sheet")
+    
+    if "risk" in query_lower:
+        suggested_sections.append("Item 1A. Risk Factors")
+    
+    if "business" in query_lower and "overview" in query_lower:
+        suggested_sections.append("Item 1. Business")
+    
+    # Determine query type
+    if len(companies) == 0:
+        query_type = "cross_company"
+    elif len(companies) == 1 and not is_comparison:
+        query_type = "single_company"
+    else:
+        query_type = "multi_company"
+    
+    return {
+        "type": query_type,
+        "companies": companies,
+        "is_comparison": is_comparison,
+        "suggested_sections": suggested_sections,
+    }
+
+
+def route_query(query: str) -> dict:
+    """
+    Route a query to the appropriate search strategy.
+    
+    For multi-company comparisons, this can be used to split the query
+    into sub-queries (one per company).
+    
+    Returns:
+        - strategy: "direct" | "split_by_company"
+        - filters: suggested filters
+        - boost_sections: sections to boost
+        - sub_queries: for split strategy, the individual company queries
+    """
+    analysis = detect_query_type(query)
+    
+    if analysis["type"] == "single_company":
+        return {
+            "strategy": "direct",
+            "filters": {"company": analysis["companies"][0]},
+            "boost_sections": analysis["suggested_sections"],
+            "sub_queries": None,
+        }
+    
+    elif analysis["type"] == "multi_company" and analysis["is_comparison"]:
+        # Split into sub-queries for each company
+        sub_queries = []
+        for company in analysis["companies"]:
+            # Create a simplified query focused on this company
+            sub_query = re.sub(
+                r'\b(' + '|'.join(KNOWN_COMPANIES) + r')\b',
+                company,
+                query,
+                flags=re.IGNORECASE,
+            )
+            sub_queries.append({
+                "query": sub_query,
+                "company": company,
+            })
+        
+        return {
+            "strategy": "split_by_company",
+            "filters": None,
+            "boost_sections": analysis["suggested_sections"],
+            "sub_queries": sub_queries,
+        }
+    
+    else:  # cross_company
+        return {
+            "strategy": "direct",
+            "filters": None,
+            "boost_sections": analysis["suggested_sections"],
+            "sub_queries": None,
+        }
+
 
 def _wants_latest(query: str) -> bool:
     """Check if the query implies the user wants the most recent data."""
@@ -81,36 +311,257 @@ def _quarter_sort_key(doc: dict) -> int:
     return int(match.group(1)) if match else 0
 
 
+# ---------------------------------------------------------------------------
+# LLM RERANKING (inspired by RAG-Challenge-2)
+# ---------------------------------------------------------------------------
+
+RERANK_SYSTEM_PROMPT = """You are a relevance scoring expert for financial document retrieval in the EMS (Electronics Manufacturing Services) industry.
+Your task is to score how relevant each document passage is to answering the user's question.
+
+Score each passage from 0 to 10:
+- 10: Directly answers the question with specific data/facts
+- 7-9: Highly relevant, contains key information needed
+- 4-6: Somewhat relevant, provides useful context
+- 1-3: Marginally relevant, tangentially related
+- 0: Not relevant at all
+
+=== CRITICAL: CapEx Synonym Awareness ===
+Different companies use different labels for Capital Expenditure (CapEx):
+- "Purchases of property and equipment" (Flex)
+- "Acquisition of property, plant and equipment" (Jabil)
+- "Purchase of property, plant and equipment" (Celestica)
+- "Purchases of property, plant and equipment" (Benchmark)
+- "Capital expenditures" (Sanmina)
+- "Additions to property and equipment"
+- "Capital spending"
+- "Payments for property and equipment"
+ALL of these refer to CapEx. Score them highly if the user asks about CapEx!
+
+Consider:
+- Does it contain the specific data/metrics asked about?
+- Is it from the right time period (fiscal year/quarter)?
+- Is it about the right company?
+- Does it provide actionable information for the question?
+
+Respond ONLY with a JSON array of scores in the same order as the passages.
+Example: [8, 3, 10, 5, 2]"""
+
+
+# Weights for combining vector and LLM scores (RAG-Challenge-2 style)
+VECTOR_WEIGHT = 0.3
+LLM_WEIGHT = 0.7
+
+
+def rerank_with_llm(
+    query: str,
+    docs: list[dict],
+    top_k: int = 10,
+    batch_size: int = 10,
+    use_weighted_scoring: bool = True,
+) -> list[dict]:
+    """
+    Use LLM to rerank retrieved documents by relevance to the query.
+    
+    Uses weighted scoring (RAG-Challenge-2 style):
+    - final_score = VECTOR_WEIGHT * vector_score + LLM_WEIGHT * llm_score
+    
+    Uses gpt-4o-mini for cost efficiency (reranking is called frequently).
+    
+    Args:
+        query: The user's question
+        docs: List of retrieved documents with 'content' and metadata
+        top_k: Number of top documents to return after reranking
+        batch_size: Number of documents to score per LLM call
+        use_weighted_scoring: Combine vector and LLM scores (default: True)
+        
+    Returns:
+        Reranked list of documents (top_k most relevant)
+    """
+    if not OPENAI_API_KEY:
+        return docs[:top_k]
+    
+    if len(docs) <= top_k:
+        return docs
+    
+    client = OpenAI(api_key=OPENAI_API_KEY)
+    
+    # Score documents in batches
+    scored_docs = []
+    
+    for batch_start in range(0, len(docs), batch_size):
+        batch = docs[batch_start:batch_start + batch_size]
+        
+        # Build passage list for LLM (include section info for better context)
+        passages = []
+        for i, doc in enumerate(batch):
+            section = doc.get('section_header', '')
+            section_str = f" | {section}" if section else ""
+            header = f"[{doc.get('company', '?')} | {doc.get('filing_type', '?')} | {doc.get('fiscal_year', '?')} {doc.get('quarter', '')}{section_str}]"
+            content_preview = doc.get('content', '')[:600]
+            passages.append(f"Passage {i+1} {header}:\n{content_preview}")
+        
+        passages_text = "\n\n---\n\n".join(passages)
+        
+        user_prompt = f"""Question: {query}
+
+Please score the relevance of each passage below (0-10):
+
+{passages_text}
+
+Return ONLY a JSON array of {len(batch)} scores, e.g., [8, 3, 10, ...]"""
+
+        try:
+            response = client.chat.completions.create(
+                model=RERANK_MODEL,  # Uses gpt-4o-mini for cost efficiency
+                max_tokens=200,
+                messages=[
+                    {"role": "system", "content": RERANK_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+            )
+            
+            response_text = response.choices[0].message.content.strip()
+            
+            # Parse JSON scores
+            # Handle potential markdown code blocks
+            if "```" in response_text:
+                match = re.search(r'\[[\d,\s\.]+\]', response_text)
+                response_text = match.group(0) if match else "[]"
+            
+            scores = json.loads(response_text)
+            
+            # Assign scores to documents with weighted combination
+            for doc, score in zip(batch, scores):
+                llm_score = float(score) if isinstance(score, (int, float)) else 0
+                llm_score_normalized = llm_score / 10.0  # Normalize to 0-1
+                
+                doc["llm_score"] = llm_score
+                
+                if use_weighted_scoring:
+                    # Weighted average of vector and LLM scores (RAG-Challenge-2 style)
+                    vector_score = doc.get("vector_score", doc.get("similarity", 0))
+                    combined_score = VECTOR_WEIGHT * vector_score + LLM_WEIGHT * llm_score_normalized
+                    doc["rerank_score"] = combined_score
+                else:
+                    doc["rerank_score"] = llm_score_normalized
+                
+                scored_docs.append(doc)
+                
+        except Exception as e:
+            # If reranking fails, use original similarity scores
+            for doc in batch:
+                doc["rerank_score"] = doc.get("vector_score", doc.get("similarity", 0))
+                doc["llm_score"] = None
+                scored_docs.append(doc)
+    
+    # Sort by combined rerank score descending
+    scored_docs.sort(key=lambda d: d.get("rerank_score", 0), reverse=True)
+    
+    return scored_docs[:top_k]
+
+
 def search_documents(
     query: str,
     company_filter: Optional[str] = None,
     filing_type_filter: Optional[str] = None,
+    section_filter: Optional[str] = None,
     n_results: int = 20,
+    use_reranking: bool = False,
+    boost_sections: Optional[list[str]] = None,
 ) -> list[dict]:
     """
-    Search ChromaDB for relevant document chunks with re-ranking.
+    Search ChromaDB for relevant document chunks with optional LLM re-ranking.
 
-    Applies year boosting when a year is detected in the query and
-    recency boosting when the query implies the user wants recent data.
+    Pipeline (RAG-Challenge-2 style):
+    1. Vector search to get initial candidates (3x n_results)
+    2. Apply metadata filters (company, filing_type, section)
+    3. Apply year/recency/section boosting
+    4. LLM reranking with weighted scoring
+    5. Parent document retrieval (expand child → parent context)
+    
+    Args:
+        query: Search query
+        company_filter: Optional company to filter by
+        filing_type_filter: Optional filing type to filter by
+        section_filter: Optional section header to filter by (e.g., "Cash Flow Statement")
+        n_results: Number of final results to return
+        use_reranking: Whether to use LLM reranking (default: True)
+        boost_sections: List of section headers to boost (e.g., ["Capital Expenditures", "Cash Flow Statement"])
     """
-    collection = get_collection()
-    if collection.count() == 0:
-        return []
+    # Expand query with synonyms for better retrieval (CapEx, revenue, etc.)
+    expanded_query = expand_query(query)
+    query_embedding = embed_text(expanded_query)
+    
+    # Determine which collection(s) to search
+    # If per-company collections exist and company filter is specified, use company collection
+    use_company_collection = has_company_collections() and company_filter
 
-    query_embedding = embed_text(query)
+    if use_company_collection:
+        # RAG-Challenge-2 style: search only the company's collection
+        collection = get_company_collection(company_filter)
+        if collection.count() == 0:
+            return []
+        
+        # Build metadata filters (no need for company filter since we're in company collection)
+        filters = []
+        if filing_type_filter:
+            filters.append({"filing_type": filing_type_filter})
+        if section_filter:
+            filters.append({"section_header": section_filter})
+    elif has_company_collections() and not company_filter:
+        # Per-company collections exist but no company filter — search all companies
+        from backend.core.database import KNOWN_COMPANIES
+        all_docs = []
+        per_company_n = max(n_results, 10)
+        for company in KNOWN_COMPANIES:
+            try:
+                col = get_company_collection(company)
+                if col.count() == 0:
+                    continue
+                sub_filters = []
+                if filing_type_filter:
+                    sub_filters.append({"filing_type": filing_type_filter})
+                if section_filter:
+                    sub_filters.append({"section_header": section_filter})
+                where = {"$and": sub_filters} if len(sub_filters) > 1 else (sub_filters[0] if sub_filters else None)
+                query_embedding = embed_text(query)
+                kwargs = {"query_embeddings": [query_embedding], "n_results": per_company_n, "include": ["documents", "metadatas", "distances"]}
+                if where:
+                    kwargs["where"] = where
+                results = col.query(**kwargs)
+                docs_list = results.get("documents", [[]])[0]
+                metas_list = results.get("metadatas", [[]])[0]
+                dists_list = results.get("distances", [[]])[0]
+                for doc, meta, dist in zip(docs_list, metas_list, dists_list):
+                    similarity = 1 - dist
+                    all_docs.append({**meta, "content": doc, "similarity": similarity})
+            except Exception:
+                continue
+        all_docs.sort(key=lambda d: d["similarity"], reverse=True)
+        docs = all_docs[:n_results]
+        if use_reranking and len(all_docs) > n_results:
+            docs = rerank_with_llm(query, all_docs, top_k=n_results)
+        return docs
+    else:
+        # Legacy mode: search main collection with filters
+        collection = get_collection()
+        if collection.count() == 0:
+            return []
 
+        # Build metadata filters
+        filters = []
+        if company_filter:
+            filters.append({"company": company_filter})
+        if filing_type_filter:
+            filters.append({"filing_type": filing_type_filter})
+        if section_filter:
+            filters.append({"section_header": section_filter})
+    
     where_filter = None
-    if company_filter and filing_type_filter:
-        where_filter = {
-            "$and": [
-                {"company": company_filter},
-                {"filing_type": filing_type_filter},
-            ]
-        }
-    elif company_filter:
-        where_filter = {"company": company_filter}
-    elif filing_type_filter:
-        where_filter = {"filing_type": filing_type_filter}
+    if len(filters) > 1:
+        where_filter = {"$and": filters}
+    elif len(filters) == 1:
+        where_filter = filters[0]
 
     fetch_n = min(n_results * 3, collection.count())
 
@@ -132,13 +583,19 @@ def search_documents(
         return []
 
     docs = []
+    parent_ids_to_fetch = set()
+    
     for doc_text, metadata, distance in zip(
         results["documents"][0],
         results["metadatas"][0],
         results["distances"][0],
     ):
         similarity = 1 - distance
-        docs.append({
+        chunk_type = metadata.get("chunk_type", "unknown")
+        parent_id = metadata.get("parent_id", "")
+        section_header = metadata.get("section_header", "")
+        
+        doc = {
             "content": doc_text,
             "company": metadata.get("company", "Unknown"),
             "source": metadata.get("source_file", metadata.get("source", "Unknown")),
@@ -146,7 +603,47 @@ def search_documents(
             "fiscal_year": metadata.get("fiscal_year", "Unknown"),
             "quarter": metadata.get("quarter", ""),
             "similarity": round(similarity, 4),
-        })
+            "vector_score": round(similarity, 4),  # Keep original for weighted scoring
+            "chunk_type": chunk_type,
+            "parent_id": parent_id,
+            "section_header": section_header,
+            "page_num": metadata.get("page_num", 0),
+        }
+        
+        # Track parent IDs for Parent Document Retrieval
+        if chunk_type == "child" and parent_id:
+            parent_ids_to_fetch.add(parent_id)
+        
+        docs.append(doc)
+    
+    # === PARENT DOCUMENT RETRIEVAL (RAG-Challenge-2 Style) ===
+    # Fetch full parent content for all child chunks
+    if parent_ids_to_fetch:
+        try:
+            parent_results = collection.get(
+                ids=list(parent_ids_to_fetch),
+                include=["documents", "metadatas"],
+            )
+            
+            # Build parent_id -> content mapping
+            parent_content_map = {}
+            if parent_results and parent_results["documents"]:
+                for pid, pdoc in zip(parent_results["ids"], parent_results["documents"]):
+                    parent_content_map[pid] = pdoc
+            
+            # Attach FULL parent content to child docs
+            for doc in docs:
+                if doc["chunk_type"] == "child":
+                    parent_id = doc.get("parent_id", "")
+                    if parent_id in parent_content_map:
+                        # Store full parent content for context
+                        doc["parent_content"] = parent_content_map[parent_id]
+                        # Also add a preview to the content for reranking
+                        parent_preview = parent_content_map[parent_id][:500]
+                        doc["content"] = f"[Page/Section Context: {parent_preview}...]\n\n{doc['content']}"
+        except Exception as e:
+            # If parent fetch fails, continue without parent content
+            pass
 
     # Year boosting
     detected_year = _extract_year_from_query(query)
@@ -162,26 +659,498 @@ def search_documents(
         docs.sort(key=lambda d: (_fy_sort_key(d), _quarter_sort_key(d)), reverse=True)
         for i, doc in enumerate(docs):
             doc["similarity"] += max(0, 0.10 - i * 0.005)
+    
+    # Section boosting (RAG-Challenge-2 style)
+    # Boost documents from sections that are likely to contain the answer
+    if boost_sections:
+        for doc in docs:
+            doc_section = doc.get("section_header", "").lower()
+            for boost_section in boost_sections:
+                if boost_section.lower() in doc_section:
+                    doc["similarity"] += 0.12  # Significant boost for matching sections
+                    break
+    
+    # Auto-detect sections to boost based on query content
+    query_lower = query.lower()
+    auto_boost_sections = []
+    
+    if any(term in query_lower for term in CAPEX_TRIGGERS):
+        auto_boost_sections.extend([
+            "Capital Expenditures", "Cash Flow Statement", 
+            "Liquidity and Capital Resources", "Item 7. MD&A"
+        ])
+    if "revenue" in query_lower or "sales" in query_lower:
+        auto_boost_sections.extend(["Income Statement", "Results of Operations"])
+    if "asset" in query_lower or "liabilit" in query_lower:
+        auto_boost_sections.extend(["Balance Sheet"])
+    
+    if auto_boost_sections:
+        for doc in docs:
+            doc_section = doc.get("section_header", "").lower()
+            for boost_section in auto_boost_sections:
+                if boost_section.lower() in doc_section:
+                    doc["similarity"] += 0.08  # Moderate auto-boost
+                    break
 
     docs.sort(key=lambda d: d["similarity"], reverse=True)
-    return docs[:n_results]
+
+    # === CAPEX TABLE INJECTION ===
+    # Cash flow statement tables have poor semantic embeddings (lots of empty cells
+    # in multi-column SEC HTML tables). For CapEx queries, directly fetch cash flow
+    # table chunks by metadata and inject the best ones into the result set.
+    query_lower = query.lower()
+    if any(trigger in query_lower for trigger in CAPEX_TRIGGERS) and use_company_collection:
+        # Track chunk IDs already in docs to avoid duplicates
+        existing_content_hashes = {hash(d.get("content", "")) for d in docs}
+        try:
+            # Fetch ALL cash flow statement table chunks (no vector search - by metadata)
+            cf_all = collection.get(
+                where={"table_type": "cash_flow_statement"},
+                include=["documents", "metadatas"],
+            )
+            if cf_all and cf_all.get("documents"):
+                # Score and rank cash flow table chunks
+                filing_priority = {"10-K": 3, "10-Q": 2, "8-K": 1, "Press Release": 1}
+                injection_candidates = []
+
+                for doc_text, metadata in zip(cf_all["documents"], cf_all["metadatas"]):
+                    # Skip if not containing actual CapEx data
+                    if not any(kw in doc_text.lower() for kw in [
+                        "purchases of property", "capital expenditure", "investing activities",
+                        "acquisition of property", "additions to property",
+                    ]):
+                        continue
+                    # Skip duplicates already in docs
+                    if hash(doc_text) in existing_content_hashes:
+                        continue
+
+                    # Compute injection score based on year match + filing type priority
+                    score = 0.80  # base score for targeted retrieval
+
+                    ftype = metadata.get("filing_type", "")
+                    score += filing_priority.get(ftype, 0) * 0.05  # 10-K gets +0.15
+
+                    if detected_year:
+                        fy = str(metadata.get("fiscal_year", ""))
+                        variants = _fiscal_year_variants(detected_year)
+                        # Content year match is more reliable than metadata label
+                        # (some companies have off-calendar fiscal years where labels don't match)
+                        content_has_year = detected_year in doc_text
+                        meta_year_match = any(v.lower() in fy.lower() for v in variants)
+                        if content_has_year:
+                            score += 0.20  # Strong boost — year appears in table column header
+                        elif meta_year_match:
+                            score += 0.10  # Weaker boost — only metadata matches
+
+                    injection_candidates.append({
+                        "content": doc_text,
+                        "company": metadata.get("company", company_filter or "Unknown"),
+                        "source": metadata.get("source_file", metadata.get("source", "Unknown")),
+                        "filing_type": ftype,
+                        "fiscal_year": metadata.get("fiscal_year", "Unknown"),
+                        "quarter": metadata.get("quarter", ""),
+                        "similarity": round(score, 4),
+                        "vector_score": 0.0,
+                        "chunk_type": metadata.get("chunk_type", "table"),
+                        "parent_id": metadata.get("parent_id", ""),
+                        "section_header": metadata.get("section_header", "Cash Flow Statement"),
+                        "page_num": metadata.get("page_num", 0),
+                        "parent_content": doc_text,
+                    })
+
+                # Sort candidates: 10-K annual first, then by year match, then by score
+                injection_candidates.sort(key=lambda d: d["similarity"], reverse=True)
+
+                # Inject top candidates (limit to 5 to leave room for regular results)
+                for candidate in injection_candidates[:5]:
+                    docs.append(candidate)
+                    existing_content_hashes.add(hash(candidate["content"]))
+
+        except Exception:
+            pass
+
+        # Re-sort after injection
+        docs.sort(key=lambda d: d["similarity"], reverse=True)
+
+    # === CAPEX TEXT INJECTION (fallback for PDF companies) ===
+    # Triggered when table injection found < 2 high-confidence CapEx results.
+    # PDFs like Celestica store CapEx as plain text paragraphs, not tagged tables.
+    # Uses ChromaDB where_document filter to find chunks explicitly mentioning
+    # "capital expenditure" — bypasses embedding quality issues for short sentences.
+    if any(trigger in query_lower for trigger in CAPEX_TRIGGERS) and use_company_collection:
+        # Only skip text injection if we already have high-confidence results
+        # from the CORRECT year that also contain a dollar value near the CapEx mention.
+        # Intro/cover pages that just mention "capital expenditures" in passing don't count.
+        def _capex_with_value(text: str) -> bool:
+            """True if text has a CapEx keyword within 300 chars of a dollar/numeric value."""
+            for kw in ["capital expenditure", "purchases of property"]:
+                idx = text.lower().find(kw)
+                while idx >= 0:
+                    window = text[max(0, idx - 200):idx + 300]
+                    if re.search(r'\$\s*[\d,]+|\d[\d,.]+\s*million', window, re.IGNORECASE):
+                        return True
+                    idx = text.lower().find(kw, idx + 1)
+            return False
+
+        capex_in_docs = sum(
+            1 for d in docs
+            if d.get("similarity", 0) >= 0.90
+            and _capex_with_value(d.get("parent_content") or d.get("content", ""))
+            and (
+                not detected_year
+                or detected_year in (d.get("parent_content") or d.get("content", ""))
+            )
+        )
+        if capex_in_docs < 2:
+            existing_content_hashes = {hash(d.get("content", "")) for d in docs}
+            try:
+                text_results = collection.get(
+                    where_document={
+                        "$or": [
+                            {"$contains": "capital expenditure"},
+                            {"$contains": "Capital expenditure"},
+                            {"$contains": "Capital Expenditure"},
+                            {"$contains": "CAPITAL EXPENDITURE"},
+                        ]
+                    },
+                    include=["documents", "metadatas"],
+                )
+                if text_results and text_results.get("documents"):
+                    filing_priority = {"10-K": 3, "10-Q": 2, "8-K": 1, "Press Release": 1}
+                    text_candidates = []
+                    # Build a lookup so we can boost existing docs instead of skipping
+                    existing_by_hash = {
+                        hash(d.get("content", "")): d for d in docs
+                    }
+
+                    for doc_text, metadata in zip(
+                        text_results["documents"], text_results["metadatas"]
+                    ):
+                        # Skip if already handled as a cash_flow_statement table chunk
+                        if metadata.get("table_type") == "cash_flow_statement":
+                            continue
+                        # Must contain a dollar/numeric value to be useful
+                        if not re.search(
+                            r'\$\s*[\d,]+|\d[\d,.]+\s*million', doc_text, re.IGNORECASE
+                        ):
+                            continue
+
+                        score = 0.75
+                        ftype = metadata.get("filing_type", "")
+                        score += filing_priority.get(ftype, 0) * 0.05
+
+                        if detected_year:
+                            content_has_year = detected_year in doc_text
+                            fy = str(metadata.get("fiscal_year", ""))
+                            variants = _fiscal_year_variants(detected_year)
+                            meta_year_match = any(
+                                v.lower() in fy.lower() for v in variants
+                            )
+                            # Cumulative: docs FROM the target year (meta_year_match)
+                            # AND mentioning it in content score highest.
+                            if content_has_year:
+                                score += 0.15
+                            if meta_year_match:
+                                score += 0.10
+
+                        # For long parent chunks, extract a 2500-char window
+                        # centered on the most relevant CapEx + year mention so
+                        # _build_context (which truncates at 3000 from the start)
+                        # doesn't cut off the actual numeric value.
+                        excerpt = doc_text
+                        if len(doc_text) > 2500 and detected_year:
+                            best_pos = -1
+                            for kw in ["capital expenditure", "purchases of property"]:
+                                idx = doc_text.lower().find(kw)
+                                while idx >= 0:
+                                    window = doc_text[max(0, idx-150):idx+300]
+                                    if detected_year in window and re.search(
+                                        r'\$\s*[\d,]+|\d[\d,.]+\s*million|\(\d', window
+                                    ):
+                                        best_pos = idx
+                                        break
+                                    idx = doc_text.lower().find(kw, idx + 1)
+                                if best_pos >= 0:
+                                    break
+                            if best_pos >= 0:
+                                start = max(0, best_pos - 500)
+                                excerpt = doc_text[start:start + 2500]
+
+                        doc_hash = hash(doc_text)
+                        if doc_hash in existing_by_hash:
+                            # Chunk already in docs from vector search — boost its score
+                            # if the injection score is higher (don't add a duplicate).
+                            existing = existing_by_hash[doc_hash]
+                            if score > existing.get("similarity", 0):
+                                existing["similarity"] = round(score, 4)
+                                # Also update parent_content to the focused excerpt
+                                if len(doc_text) > 2500:
+                                    existing["parent_content"] = excerpt
+                        else:
+                            text_candidates.append({
+                                "content": excerpt,
+                                "company": metadata.get("company", company_filter or "Unknown"),
+                                "source": metadata.get(
+                                    "source_file", metadata.get("source", "Unknown")
+                                ),
+                                "filing_type": ftype,
+                                "fiscal_year": metadata.get("fiscal_year", "Unknown"),
+                                "quarter": metadata.get("quarter", ""),
+                                "similarity": round(score, 4),
+                                "vector_score": 0.0,
+                                "chunk_type": metadata.get("chunk_type", "text"),
+                                "parent_id": metadata.get("parent_id", ""),
+                                "section_header": metadata.get(
+                                    "section_header", "Capital Expenditures"
+                                ),
+                                "page_num": metadata.get("page_num", 0),
+                                "parent_content": excerpt,
+                            })
+
+                    # Secondary sort: boost chunks that have detected_year AND a
+                    # dollar amount within 200 chars of a CapEx keyword — these are
+                    # the most direct answers (e.g. "CapEx for 2024 were $170.9M").
+                    def _has_capex_year_dollar(d: dict) -> bool:
+                        if not detected_year:
+                            return False
+                        txt = d.get("parent_content") or d.get("content", "")
+                        for kw in ["capital expenditure", "purchases of property"]:
+                            idx = txt.lower().find(kw)
+                            while idx >= 0:
+                                window = txt[max(0, idx - 50):idx + 250]
+                                if detected_year in window and re.search(
+                                    r'\$\s*[\d,]+(?:\.\d+)?(?:\s*million)?', window, re.IGNORECASE
+                                ):
+                                    return True
+                                idx = txt.lower().find(kw, idx + 1)
+                        return False
+
+                    text_candidates.sort(
+                        key=lambda d: (d["similarity"], _has_capex_year_dollar(d)),
+                        reverse=True,
+                    )
+                    for candidate in text_candidates[:5]:
+                        docs.append(candidate)
+                    if text_candidates:
+                        docs.sort(key=lambda d: d["similarity"], reverse=True)
+                    elif any(existing_by_hash):
+                        # Scores may have been updated in-place; re-sort
+                        docs.sort(key=lambda d: d["similarity"], reverse=True)
+            except Exception:
+                pass
+
+    # LLM Reranking (if enabled and we have enough candidates)
+    if use_reranking and len(docs) > n_results:
+        docs = rerank_with_llm(query, docs, top_k=n_results)
+    else:
+        docs = docs[:n_results]
+
+    return docs
 
 
 def search_by_company(
     query: str,
     company: str,
     n_results: int = 20,
+    use_reranking: bool = False,
 ) -> list[dict]:
     """Convenience wrapper to search within a single company."""
-    return search_documents(query, company_filter=company, n_results=n_results)
+    return search_documents(
+        query, 
+        company_filter=company, 
+        n_results=n_results,
+        use_reranking=use_reranking,
+    )
 
 
 def search_cross_company(
     query: str,
     n_results: int = 50,
+    use_reranking: bool = False,
 ) -> list[dict]:
     """Search across all companies without a company filter."""
-    return search_documents(query, n_results=n_results)
+    return search_documents(query, n_results=n_results, use_reranking=use_reranking)
+
+
+def search_with_parent_retrieval(
+    query: str,
+    company_filter: Optional[str] = None,
+    n_results: int = 10,
+    use_reranking: bool = False,
+) -> dict:
+    """
+    Parent Document Retrieval (RAG-Challenge-2 style).
+    
+    Process:
+    1. Search for relevant CHILD chunks (precise matching)
+    2. Get unique PARENT documents (pages/sections) for matched children
+    3. Return full parent content as context (tables, footnotes included)
+    
+    This is the recommended search method for financial QA.
+    
+    Returns:
+        dict with:
+        - parents: List of unique parent documents (pages/sections) 
+        - children: List of matched child chunks
+        - context: Combined parent content for LLM
+    """
+    # Search for documents
+    docs = search_documents(
+        query=query,
+        company_filter=company_filter,
+        n_results=n_results * 3,  # Get more to ensure we find good parents
+        use_reranking=use_reranking,
+    )
+    
+    if not docs:
+        return {"parents": [], "children": [], "context": ""}
+    
+    # Collect unique parents
+    seen_parent_ids = set()
+    unique_parents = []
+    children = []
+    
+    for doc in docs:
+        parent_id = doc.get("parent_id", "")
+        
+        if doc["chunk_type"] == "child":
+            children.append(doc)
+            
+            # Get parent content (fetched in search_documents)
+            parent_content = doc.get("parent_content", "")
+            
+            if parent_id and parent_id not in seen_parent_ids and parent_content:
+                seen_parent_ids.add(parent_id)
+                unique_parents.append({
+                    "parent_id": parent_id,
+                    "content": parent_content,
+                    "page_num": doc.get("page_num", 0),
+                    "section_header": doc.get("section_header", ""),
+                    "company": doc.get("company", ""),
+                    "source": doc.get("source", ""),
+                    "fiscal_year": doc.get("fiscal_year", ""),
+                    "quarter": doc.get("quarter", ""),
+                    "filing_type": doc.get("filing_type", ""),
+                })
+                
+                # Limit to n_results parents
+                if len(unique_parents) >= n_results:
+                    break
+        
+        elif doc["chunk_type"] == "parent":
+            # If we found a parent directly, include it
+            if parent_id not in seen_parent_ids:
+                seen_parent_ids.add(parent_id)
+                unique_parents.append({
+                    "parent_id": parent_id,
+                    "content": doc["content"],
+                    "page_num": doc.get("page_num", 0),
+                    "section_header": doc.get("section_header", ""),
+                    "company": doc.get("company", ""),
+                    "source": doc.get("source", ""),
+                    "fiscal_year": doc.get("fiscal_year", ""),
+                    "quarter": doc.get("quarter", ""),
+                    "filing_type": doc.get("filing_type", ""),
+                })
+                
+                if len(unique_parents) >= n_results:
+                    break
+        
+        elif doc["chunk_type"] == "table":
+            # Tables are their own parents
+            if parent_id not in seen_parent_ids:
+                seen_parent_ids.add(parent_id)
+                unique_parents.append({
+                    "parent_id": parent_id,
+                    "content": doc["content"],
+                    "page_num": doc.get("page_num", 0),
+                    "section_header": doc.get("section_header", ""),
+                    "company": doc.get("company", ""),
+                    "source": doc.get("source", ""),
+                    "fiscal_year": doc.get("fiscal_year", ""),
+                    "quarter": doc.get("quarter", ""),
+                    "filing_type": doc.get("filing_type", ""),
+                    "is_table": True,
+                })
+    
+    # Build combined context from parents
+    context_parts = []
+    for i, parent in enumerate(unique_parents, 1):
+        header = f"[Source {i}: {parent['company']} | {parent['source']} | Page {parent['page_num']} | {parent['section_header']}]"
+        context_parts.append(f"{header}\n{parent['content']}")
+    
+    combined_context = "\n\n---\n\n".join(context_parts)
+    
+    return {
+        "parents": unique_parents,
+        "children": children[:n_results],
+        "context": combined_context,
+        "num_parents": len(unique_parents),
+        "num_children": len(children),
+    }
+
+
+def smart_search(
+    query: str,
+    n_results: int = 20,
+    use_reranking: bool = False,
+) -> dict:
+    """
+    Intelligent search with automatic query routing (RAG-Challenge-2 style).
+    
+    Automatically:
+    - Detects companies mentioned in query
+    - Routes to single-company or cross-company search
+    - Boosts relevant sections based on query content
+    - Handles multi-company comparisons by splitting queries
+    
+    Returns:
+        dict with:
+        - results: list of documents
+        - routing: information about how query was routed
+        - companies_found: companies detected in query
+    """
+    routing = route_query(query)
+    
+    if routing["strategy"] == "split_by_company" and routing["sub_queries"]:
+        # Multi-company comparison: search each company separately
+        all_results = []
+        per_company_results = {}
+        
+        for sub in routing["sub_queries"]:
+            company_results = search_documents(
+                query=sub["query"],
+                company_filter=sub["company"],
+                n_results=n_results // len(routing["sub_queries"]),
+                use_reranking=use_reranking,
+                boost_sections=routing["boost_sections"],
+            )
+            per_company_results[sub["company"]] = company_results
+            all_results.extend(company_results)
+        
+        return {
+            "results": all_results,
+            "routing": routing,
+            "companies_found": [s["company"] for s in routing["sub_queries"]],
+            "per_company_results": per_company_results,
+        }
+    
+    else:
+        # Direct search (single company or cross-company)
+        filters = routing["filters"] or {}
+        results = search_documents(
+            query=query,
+            company_filter=filters.get("company"),
+            n_results=n_results,
+            use_reranking=use_reranking,
+            boost_sections=routing["boost_sections"],
+        )
+        
+        return {
+            "results": results,
+            "routing": routing,
+            "companies_found": extract_companies_from_query(query),
+        }
 
 
 def get_company_documents(company: str, limit: int = 100) -> list[dict]:

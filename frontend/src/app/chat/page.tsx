@@ -31,12 +31,31 @@ interface Source {
   similarity?: number;
 }
 
-const SUGGESTED_QUERIES = [
-  "What is Flex's CapEx for FY2024?",
-  "Compare Jabil and Celestica capital expenditures",
-  "What are Benchmark's recent investments?",
-  "Sanmina property and equipment purchases Q2 2024",
-  "Which company has the highest CapEx?",
+const ANALYST_QUESTIONS = [
+  {
+    question: "What is the AI/Data Center revenue mix for each company, and how has it changed YoY?",
+    category: "AI Investment",
+  },
+  {
+    question: "Compare CapEx guidance across all 5 EMS companies for the current fiscal year",
+    category: "CapEx",
+  },
+  {
+    question: "What liquid cooling and power management capabilities are each company developing?",
+    category: "AI Infrastructure",
+  },
+  {
+    question: "Which hyperscaler customers are driving AI server demand for EMS companies?",
+    category: "Customers",
+  },
+  {
+    question: "What are the gross margin trends for AI/DC vs traditional segments?",
+    category: "Financials",
+  },
+  {
+    question: "What manufacturing capacity expansions are planned for AI server production?",
+    category: "Operations",
+  },
 ];
 
 export default function ChatPage() {
@@ -163,17 +182,25 @@ export default function ChatPage() {
             <p className="text-slate-500 mb-6 max-w-md">
               Ask about capital expenditures, financial data, or competitive analysis across Flex, Jabil, Celestica, Benchmark, and Sanmina.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-lg">
-              {SUGGESTED_QUERIES.map((q, i) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl">
+              {ANALYST_QUESTIONS.map((item, i) => (
                 <button
                   key={i}
-                  onClick={() => sendMessage(q)}
-                  className="text-left px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50 hover:border-blue-300 transition-colors"
+                  onClick={() => sendMessage(item.question)}
+                  className="text-left px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 hover:bg-blue-50 hover:border-blue-300 transition-all group"
                 >
-                  {q}
+                  <div className="flex items-start gap-2">
+                    <span className="px-2 py-0.5 text-xs font-medium bg-slate-100 text-slate-500 rounded group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+                      {item.category}
+                    </span>
+                  </div>
+                  <p className="mt-2 leading-snug">{item.question}</p>
                 </button>
               ))}
             </div>
+            <p className="text-xs text-slate-400 mt-4">
+              Analyst questions from recent EMS earnings calls
+            </p>
           </div>
         ) : (
           <div className="space-y-6 max-w-4xl mx-auto">
