@@ -219,11 +219,118 @@ def extract_pdf(path):
         print(f" ⚠️  PDF error: {e}")
     return _clean_extracted_text(text)
 
+
+def extract_pdf_structured(path):
+    """Extract text from PDF with per-page structure and table tracking.
+    Returns list of dicts: [{page_num, text, tables, unit_header}]."""
+    pages = []
+    try:
+        with pdfplumber.open(path) as pdf:
+            for page_num, page in enumerate(pdf.pages, 1):
+                page_tables = []
+                table_objs = page.find_tables()
+
+                for table in table_objs:
+                    rows = table.extract()
+                    if not rows or len(rows) < 2:
+                        continue
+                    header = [cell.strip() if cell else "" for cell in rows[0]]
+                    data_rows = []
+                    for row in rows[1:]:
+                        cells = [cell.strip() if cell else "" for cell in row]
+                        if any(cells):
+                            data_rows.append(cells)
+                    if data_rows:
+                        page_tables.append({"header": header, "rows": data_rows})
+
+                page_text = _extract_page_with_tables(page)
+                if not page_text or len(page_text.strip()) < 20:
+                    page_text = _extract_page_words(page)
+                page_text = _clean_extracted_text(page_text or "")
+
+                # Detect unit header on this page
+                unit = ""
+                unit_match = re.search(r"\((?:in|amounts?\s+in)\s+(thousands|millions|billions)\)", page_text, re.IGNORECASE)
+                if unit_match:
+                    unit = unit_match.group(1).lower()
+
+                pages.append({
+                    "page_num": page_num,
+                    "text": page_text,
+                    "tables": page_tables,
+                    "unit_header": unit,
+                })
+    except Exception as e:
+        print(f" ⚠️  structured PDF extraction failed: {e}")
+    return pages
+
+
 def extract(path):
     if path.suffix.lower() in (".html", ".htm"):
         return extract_html(path)
     elif path.suffix.lower() == ".pdf":
         return extract_pdf(path)
+    return ""
+
+
+# ---------------------------------------------------------------------------
+# TABLE SERIALIZATION — linearized text for better embedding
+# ---------------------------------------------------------------------------
+def serialize_table_for_embedding(header, rows, table_context=""):
+    """Convert a table to linearized text for embedding.
+    e.g. 'Row 1: Revenue = $5,000M, Growth = 15%'"""
+    lines = []
+    if table_context:
+        lines.append(table_context)
+    for row in rows:
+        pairs = []
+        for h, v in zip(header, row):
+            if h and v:
+                pairs.append(f"{h} = {v}")
+        if pairs:
+            lines.append("; ".join(pairs))
+    return "\n".join(lines)
+
+
+def serialize_table_as_markdown(header, rows):
+    """Convert a table to Markdown format for display."""
+    md = ["| " + " | ".join(header) + " |"]
+    md.append("| " + " | ".join(["---"] * len(header)) + " |")
+    for row in rows:
+        md.append("| " + " | ".join(row) + " |")
+    return "\n".join(md)
+
+
+# ---------------------------------------------------------------------------
+# SEC SECTION DETECTION
+# ---------------------------------------------------------------------------
+SEC_SECTION_PATTERNS = [
+    (r"(?:^|\n)\s*ITEM\s+1[\.:]\s*BUSINESS", "Item 1. Business"),
+    (r"(?:^|\n)\s*ITEM\s+1A[\.:]\s*RISK\s*FACTORS", "Item 1A. Risk Factors"),
+    (r"(?:^|\n)\s*ITEM\s+7[\.:]\s*MANAGEMENT", "Item 7. MD&A"),
+    (r"(?:^|\n)\s*ITEM\s+8[\.:]\s*FINANCIAL\s*STATEMENTS", "Item 8. Financial Statements"),
+    (r"(?i)consolidated\s+statements?\s+of\s+cash\s+flows?", "Cash Flow Statement"),
+    (r"(?i)consolidated\s+balance\s+sheets?", "Balance Sheet"),
+    (r"(?i)consolidated\s+statements?\s+of\s+(?:operations|income)", "Income Statement"),
+    (r"(?i)notes?\s+to\s+(?:consolidated\s+)?financial\s+statements", "Notes to Financial Statements"),
+]
+
+def _detect_section(text):
+    """Detect the SEC section a chunk of text belongs to."""
+    for pattern, section_name in SEC_SECTION_PATTERNS:
+        if re.search(pattern, text[:500]):
+            return section_name
+    return ""
+
+def _detect_table_type(text):
+    """Detect if a chunk contains a specific financial table type."""
+    text_lower = text.lower()
+    if any(kw in text_lower for kw in ["cash flows from", "investing activities", "operating activities"]):
+        return "cash_flow"
+    if any(kw in text_lower for kw in ["total assets", "total liabilities", "stockholders"]):
+        return "balance_sheet"
+    if any(kw in text_lower for kw in ["net revenue", "cost of", "gross profit", "operating income"]):
+        return "income_statement"
     return ""
 
 # ---------------------------------------------------------------------------
@@ -364,9 +471,97 @@ def get_fiscal_quarter(path, company, content=""):
     return "Unknown", ""
 
 # ---------------------------------------------------------------------------
-# CHUNKING
+# CHUNKING — structure-aware with table preservation
 # ---------------------------------------------------------------------------
+MIN_CHUNK_WORDS = 60
+MAX_CHUNK_WORDS = 350
+TARGET_CHUNK_WORDS = 250
+OVERLAP_WORDS = 50
+
+def _split_by_sections(text):
+    """Split text by SEC section headers. Returns list of (section_name, content)."""
+    section_breaks = []
+    for pattern, name in SEC_SECTION_PATTERNS:
+        for m in re.finditer(pattern, text):
+            section_breaks.append((m.start(), name))
+
+    if not section_breaks:
+        return [("", text)]
+
+    section_breaks.sort(key=lambda x: x[0])
+    sections = []
+
+    # Text before first section
+    if section_breaks[0][0] > 0:
+        pre = text[:section_breaks[0][0]].strip()
+        if pre:
+            sections.append(("", pre))
+
+    for i, (pos, name) in enumerate(section_breaks):
+        end = section_breaks[i + 1][0] if i + 1 < len(section_breaks) else len(text)
+        content = text[pos:end].strip()
+        if content:
+            sections.append((name, content))
+
+    return sections
+
+
+def _chunk_section(text, section_name=""):
+    """Chunk a section, keeping tables intact and respecting paragraph boundaries."""
+    paragraphs = re.split(r'\n\s*\n', text)
+    chunks = []
+    current_chunk = []
+    current_words = 0
+
+    for para in paragraphs:
+        para = para.strip()
+        if not para:
+            continue
+        para_words = len(para.split())
+
+        # If this paragraph contains a table (has | characters), keep it intact
+        is_table = para.count("|") >= 4
+
+        if is_table:
+            # Flush current chunk first
+            if current_chunk:
+                chunks.append("\n\n".join(current_chunk))
+                current_chunk = []
+                current_words = 0
+            # Table as its own chunk (even if large)
+            chunks.append(para)
+            continue
+
+        # If adding this paragraph would exceed max, flush
+        if current_words + para_words > MAX_CHUNK_WORDS and current_chunk:
+            chunks.append("\n\n".join(current_chunk))
+            # Keep overlap: last paragraph carries over
+            overlap_text = current_chunk[-1] if current_chunk else ""
+            current_chunk = [overlap_text] if len(overlap_text.split()) <= OVERLAP_WORDS else []
+            current_words = len(" ".join(current_chunk).split())
+
+        current_chunk.append(para)
+        current_words += para_words
+
+    if current_chunk:
+        chunks.append("\n\n".join(current_chunk))
+
+    return [c for c in chunks if len(c.split()) >= MIN_CHUNK_WORDS // 2 or c.count("|") >= 4]
+
+
+def chunk_text_structured(text):
+    """Structure-aware chunking: splits by SEC sections, preserves tables, respects paragraphs."""
+    sections = _split_by_sections(text)
+    all_chunks = []
+    for section_name, content in sections:
+        section_chunks = _chunk_section(content, section_name)
+        for chunk in section_chunks:
+            all_chunks.append((section_name, chunk))
+    return all_chunks
+
+
 def chunk_text(text, chunk_words=250, overlap_words=50):
+    """Fallback fixed-word chunker (used when structure-aware chunking is not needed)."""
     words = text.split()
     if not words:
         return []
@@ -465,29 +660,46 @@ def build_db():
             filing_type = detect_filing_type(filepath, text)
         fy, q = get_fiscal_quarter(filepath, company, text)
 
-        chunks = chunk_text(text)
-        if not chunks:
+        # Detect unit header from full text
+        unit_header = ""
+        unit_match = re.search(r"\((?:in|amounts?\s+in)\s+(thousands|millions|billions)\)", text[:5000], re.IGNORECASE)
+        if unit_match:
+            unit_header = unit_match.group(1).lower()
+
+        # Structure-aware chunking
+        structured_chunks = chunk_text_structured(text)
+        if not structured_chunks:
             print("→ no chunks")
             continue
 
-        print(f"→ {len(chunks)} chunks", end="", flush=True)
+        print(f"→ {len(structured_chunks)} chunks", end="", flush=True)
 
-        # Build batch
+        # Build batch with rich metadata
         ids, texts, metadatas = [], [], []
-        for i, chunk in enumerate(chunks):
-            safe_stem = re.sub(r"[^a-zA-Z0-9_\-]", "_", filepath.stem)
+        safe_stem = re.sub(r"[^a-zA-Z0-9_\-]", "_", filepath.stem)
+        parent_id = f"{company}_{safe_stem}"
+
+        for i, (section_name, chunk) in enumerate(structured_chunks):
             doc_id = f"{company}_{safe_stem}_chunk{i:04d}"
+
+            table_type = _detect_table_type(chunk)
+            if not section_name:
+                section_name = _detect_section(chunk)
 
             ids.append(doc_id)
             texts.append(chunk)
             metadatas.append({
-                "company":      company,
-                "source_file":  filepath.name,
-                "filing_type":  filing_type,
-                "fiscal_year":  fy,
-                "quarter":      q,
-                "chunk_index":  i,
-                "total_chunks": len(chunks),
+                "company":        company,
+                "source_file":    filepath.name,
+                "filing_type":    filing_type,
+                "fiscal_year":    fy,
+                "quarter":        q,
+                "chunk_index":    i,
+                "total_chunks":   len(structured_chunks),
+                "section_header": section_name,
+                "table_type":     table_type,
+                "table_context":  f"in {unit_header}" if unit_header else "",
+                "parent_id":      parent_id,
             })
 
         # Embed + upsert in batches of 64

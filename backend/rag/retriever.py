@@ -1,11 +1,170 @@
 """
 Vector retrieval module for RAG pipeline.
-Handles document search with year detection, recency boosting, and re-ranking.
+Handles document search with year detection, recency boosting, query expansion,
+BM25 keyword search, and Reciprocal Rank Fusion (RRF).
 """
 import re
 from typing import Optional
 
 from backend.core.database import get_collection, embed_text
+
+
+# ---------------------------------------------------------------------------
+# QUERY EXPANSION — catches different CapEx terminology across companies
+# ---------------------------------------------------------------------------
+_FINANCIAL_SYNONYMS = {
+    "capex": [
+        "capital expenditures",
+        "purchases of property and equipment",
+        "acquisition of property, plant and equipment",
+        "purchase of property, plant and equipment",
+        "additions to property and equipment",
+        "capital spending",
+        "payments for property and equipment",
+        "property, plant and equipment additions",
+    ],
+    "revenue": [
+        "net revenue", "net revenues", "total revenue", "sales",
+    ],
+    "profit": [
+        "net income", "operating income", "gross profit", "earnings",
+    ],
+    "free cash flow": [
+        "FCF", "cash flow from operations minus capex",
+    ],
+}
+
+
+def _expand_query(query: str) -> str:
+    """Expand query with financial synonyms for better recall."""
+    q_lower = query.lower()
+    expansions = []
+    for term, synonyms in _FINANCIAL_SYNONYMS.items():
+        if term in q_lower:
+            expansions.extend(synonyms[:3])
+    if expansions:
+        return query + " " + " ".join(expansions)
+    return query
+
+
+# ---------------------------------------------------------------------------
+# BM25 INDEX — keyword-based search for exact term matching
+# ---------------------------------------------------------------------------
+_bm25_index = None
+_bm25_corpus = None
+_bm25_doc_ids = None
+
+
+def _tokenize(text: str) -> list[str]:
+    """Simple whitespace + lowercase tokenizer."""
+    return re.findall(r'\b\w+\b', text.lower())
+
+
+def _get_bm25_index():
+    """Build or return cached BM25 index from ChromaDB documents."""
+    global _bm25_index, _bm25_corpus, _bm25_doc_ids
+    if _bm25_index is not None:
+        return _bm25_index, _bm25_corpus, _bm25_doc_ids
+
+    try:
+        from rank_bm25 import BM25Okapi
+    except ImportError:
+        return None, None, None
+
+    collection = get_collection()
+    count = collection.count()
+    if count == 0:
+        return None, None, None
+
+    batch_size = 5000
+    all_docs = []
+    all_ids = []
+    all_metas = []
+
+    for offset in range(0, count, batch_size):
+        results = collection.get(
+            include=["documents", "metadatas"],
+            limit=batch_size,
+            offset=offset,
+        )
+        all_docs.extend(results.get("documents", []))
+        all_ids.extend(results.get("ids", []))
+        all_metas.extend(results.get("metadatas", []))
+
+    tokenized = [_tokenize(doc) for doc in all_docs]
+    _bm25_index = BM25Okapi(tokenized)
+    _bm25_corpus = list(zip(all_docs, all_metas, all_ids))
+    _bm25_doc_ids = all_ids
+    return _bm25_index, _bm25_corpus, _bm25_doc_ids
+
+
+def _bm25_search(
+    query: str,
+    company_filter: Optional[str] = None,
+    n_results: int = 20,
+) -> list[dict]:
+    """Search using BM25 keyword matching."""
+    bm25, corpus, doc_ids = _get_bm25_index()
+    if bm25 is None or not corpus:
+        return []
+
+    tokens = _tokenize(query)
+    scores = bm25.get_scores(tokens)
+
+    scored = list(zip(scores, corpus))
+    if company_filter:
+        scored = [(s, (doc, meta, did)) for s, (doc, meta, did) in scored
+                  if meta.get("company") == company_filter]
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+    top = scored[:n_results]
+
+    max_score = top[0][0] if top and top[0][0] > 0 else 1.0
+    results = []
+    for score, (doc, meta, did) in top:
+        if score <= 0:
+            continue
+        results.append({
+            "content": doc,
+            "company": meta.get("company", "Unknown"),
+            "source": meta.get("source_file", "Unknown"),
+            "filing_type": meta.get("filing_type", "Unknown"),
+            "fiscal_year": meta.get("fiscal_year", "Unknown"),
+            "quarter": meta.get("quarter", ""),
+            "similarity": round(score / max_score, 4),
+        })
+    return results
+
+
+def _reciprocal_rank_fusion(
+    vector_results: list[dict],
+    bm25_results: list[dict],
+    k: int = 60,
+    n_results: int = 20,
+) -> list[dict]:
+    """Merge vector and BM25 results using Reciprocal Rank Fusion.
+    RRF_score = sum(1 / (k + rank)) across both result lists."""
+    doc_scores: dict[str, float] = {}
+    doc_map: dict[str, dict] = {}
+
+    for rank, doc in enumerate(vector_results):
+        key = f"{doc.get('company', '')}_{doc.get('source', '')}_{doc['content'][:80]}"
+        doc_scores[key] = doc_scores.get(key, 0) + 1.0 / (k + rank + 1)
+        doc_map[key] = doc
+
+    for rank, doc in enumerate(bm25_results):
+        key = f"{doc.get('company', '')}_{doc.get('source', '')}_{doc['content'][:80]}"
+        doc_scores[key] = doc_scores.get(key, 0) + 1.0 / (k + rank + 1)
+        if key not in doc_map:
+            doc_map[key] = doc
+
+    sorted_keys = sorted(doc_scores, key=doc_scores.get, reverse=True)
+    merged = []
+    for key in sorted_keys[:n_results]:
+        doc = doc_map[key]
+        doc["similarity"] = round(doc_scores[key], 4)
+        merged.append(doc)
+    return merged
 
 
 def _extract_year_from_query(query: str) -> Optional[str]:
@@ -97,7 +256,8 @@ def search_documents(
     if collection.count() == 0:
         return []
 
-    query_embedding = embed_text(query)
+    expanded_query = _expand_query(query)
+    query_embedding = embed_text(expanded_query)
 
     where_filter = None
     if company_filter and filing_type_filter:
@@ -164,7 +324,15 @@ def search_documents(
             doc["similarity"] += max(0, 0.10 - i * 0.005)
 
     docs.sort(key=lambda d: d["similarity"], reverse=True)
-    return docs[:n_results]
+
+    # Hybrid: merge with BM25 results using RRF
+    bm25_results = _bm25_search(query, company_filter=company_filter, n_results=n_results)
+    if bm25_results:
+        docs = _reciprocal_rank_fusion(docs, bm25_results, n_results=n_results)
+    else:
+        docs = docs[:n_results]
+
+    return docs
 
 
 def search_by_company(

@@ -49,7 +49,21 @@ Check the unit header at the top of financial statements:
   * "(in millions)" → values are already in millions
   * "(in billions)" → values are already in billions
 Benchmark and Sanmina typically report in thousands.
-Flex, Jabil, and Celestica typically report in millions."""
+Flex, Jabil, and Celestica typically report in millions.
+
+=== Chain of Thought ===
+
+For numerical or factual questions, reason step-by-step before answering:
+1. Identify what specific information is being asked (which company, metric, period)
+2. Search through the context for relevant data points
+3. Verify the data matches the question (right company, right period, right metric)
+4. Check for pitfalls: YTD vs quarterly, unit conversion (thousands vs millions), negative signs
+5. Formulate your answer with proper units and context
+
+If the exact data is NOT found in the context:
+- State clearly that the specific data was not found
+- Do NOT hallucinate or make up numbers
+- If similar or related data exists, mention it but clarify it is not an exact match"""
 
 
 def _build_prompt(query: str, context: str, web_context: str = "") -> str:

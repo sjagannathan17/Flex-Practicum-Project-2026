@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ChartDescription } from '@/components/ui/chart-description';
 import { DashboardSkeleton, CardSkeleton, ChartSkeleton } from '@/components/ui/skeleton';
 import { 
   FileText, 
@@ -335,6 +336,10 @@ export default function DashboardPage() {
                 Leader: {analytics?.classification?.most_ai_focused || 'N/A'}
               </Badge>
             </div>
+            <ChartDescription
+              description="Percentage of earnings call mentions and SEC filing content focused on AI, data center, and related infrastructure investments across EMS companies."
+              source="SEC filings & earnings transcripts"
+            />
           </CardContent>
         </Card>
 
@@ -369,6 +374,10 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
+            <ChartDescription
+              description="Sentiment scores derived from NLP analysis of earnings calls and SEC filings. Higher scores indicate more positive outlook and confidence in company communications."
+              source="Claude AI sentiment analysis"
+            />
           </CardContent>
         </Card>
       </div>
@@ -410,6 +419,10 @@ export default function DashboardPage() {
                 <Legend layout="horizontal" verticalAlign="bottom" />
               </PieChart>
             </ResponsiveContainer>
+            <ChartDescription
+              description="Distribution of indexed documents across the 5 tracked EMS companies. Includes SEC filings, earnings calls, press releases, and other public disclosures."
+              source="ChromaDB vector store"
+            />
           </CardContent>
         </Card>
 
@@ -452,6 +465,10 @@ export default function DashboardPage() {
                 </defs>
               </BarChart>
             </ResponsiveContainer>
+            <ChartDescription
+              description="Breakdown of document types in the knowledge base including 10-K annual reports, 10-Q quarterly filings, earnings call transcripts, and press releases."
+              source="ChromaDB vector store"
+            />
           </CardContent>
         </Card>
       </div>
