@@ -317,11 +317,11 @@ def search_documents(
             if any(v.lower() in fy.lower() for v in variants):
                 doc["similarity"] += 0.15
 
-    # Recency boosting
+    # Recency boosting — aggressive enough to override similarity gaps
     if _wants_latest(query):
         docs.sort(key=lambda d: (_fy_sort_key(d), _quarter_sort_key(d)), reverse=True)
         for i, doc in enumerate(docs):
-            doc["similarity"] += max(0, 0.10 - i * 0.005)
+            doc["similarity"] += max(0, 0.25 - i * 0.01)
 
     docs.sort(key=lambda d: d["similarity"], reverse=True)
 
