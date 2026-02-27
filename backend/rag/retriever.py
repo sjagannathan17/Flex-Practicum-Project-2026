@@ -308,6 +308,17 @@ def search_documents(
             "similarity": round(similarity, 4),
         })
 
+    docs.sort(key=lambda d: d["similarity"], reverse=True)
+
+    # Hybrid: merge with BM25 results using RRF
+    bm25_results = _bm25_search(query, company_filter=company_filter, n_results=n_results * 2)
+    if bm25_results:
+        docs = _reciprocal_rank_fusion(docs, bm25_results, n_results=n_results * 2)
+    else:
+        docs = docs[:n_results * 2]
+
+    # Apply boosts AFTER RRF merge so they aren't overwritten
+
     # Year boosting
     detected_year = _extract_year_from_query(query)
     if detected_year:
@@ -317,22 +328,18 @@ def search_documents(
             if any(v.lower() in fy.lower() for v in variants):
                 doc["similarity"] += 0.15
 
-    # Recency boosting — aggressive enough to override similarity gaps
-    if _wants_latest(query):
-        docs.sort(key=lambda d: (_fy_sort_key(d), _quarter_sort_key(d)), reverse=True)
-        for i, doc in enumerate(docs):
-            doc["similarity"] += max(0, 0.25 - i * 0.01)
+    # Recency filtering — when user asks for recent/latest, drop old documents
+    if _wants_latest(query) and not detected_year:
+        recent_fy = set()
+        all_fys = sorted(set(_fy_sort_key(d) for d in docs if _fy_sort_key(d) != "0000"), reverse=True)
+        recent_fy = set(all_fys[:3])  # Keep top 3 fiscal years
+        if recent_fy:
+            recent_docs = [d for d in docs if _fy_sort_key(d) in recent_fy]
+            if len(recent_docs) >= 5:
+                docs = recent_docs
 
     docs.sort(key=lambda d: d["similarity"], reverse=True)
-
-    # Hybrid: merge with BM25 results using RRF
-    bm25_results = _bm25_search(query, company_filter=company_filter, n_results=n_results)
-    if bm25_results:
-        docs = _reciprocal_rank_fusion(docs, bm25_results, n_results=n_results)
-    else:
-        docs = docs[:n_results]
-
-    return docs
+    return docs[:n_results]
 
 
 def search_by_company(
