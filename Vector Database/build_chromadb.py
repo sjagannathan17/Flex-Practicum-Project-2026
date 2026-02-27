@@ -191,8 +191,9 @@ def _extract_page_words(page):
     return "\n".join(result)
 
 def extract_pdf(path):
-    """Extract text from PDF using pdfplumber (with table + multi-column support).
-    Falls back to PyPDF2 if pdfplumber fails entirely."""
+    """Extract text from PDF using pdfplumber page-by-page to limit memory.
+    Falls back to PyPDF2 if pdfplumber fails."""
+    import gc
     text = ""
     try:
         with pdfplumber.open(path) as pdf:
@@ -202,6 +203,8 @@ def extract_pdf(path):
                     page_text = _extract_page_words(page)
                 if page_text:
                     text += page_text + "\n\n"
+                page.flush_cache()
+        gc.collect()
         if text.strip():
             return _clean_extracted_text(text)
     except Exception as e:
@@ -217,6 +220,7 @@ def extract_pdf(path):
                     text += t + "\n"
     except Exception as e:
         print(f" ⚠️  PDF error: {e}")
+    gc.collect()
     return _clean_extracted_text(text)
 
 
@@ -716,12 +720,17 @@ def build_db():
                 metadatas=b_meta,
             )
 
-        total_chunks += len(chunks)
+        total_chunks += len(structured_chunks)
         stats[filing_type]["files"]  += 1
-        stats[filing_type]["chunks"] += len(chunks)
+        stats[filing_type]["chunks"] += len(structured_chunks)
         company_stats[company]["files"]  += 1
-        company_stats[company]["chunks"] += len(chunks)
-        print(" ✓")
+        company_stats[company]["chunks"] += len(structured_chunks)
+        print(" ✓", flush=True)
+
+        # Free memory after each file
+        import gc
+        del text, structured_chunks, ids, texts, metadatas
+        gc.collect()
 
     # --- Summary ---
     print("\n" + "=" * 70)
