@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DashboardSkeleton, CardSkeleton, ChartSkeleton } from '@/components/ui/skeleton';
+import { ChartDescription } from '@/components/ui/chart-description';
 import { 
   FileText, 
   Building2, 
@@ -19,7 +20,10 @@ import {
   Globe,
   ArrowRight,
   Sparkles,
-  Activity
+  Activity,
+  MessageSquare,
+  Cpu,
+  DollarSign,
 } from 'lucide-react';
 import { 
   PieChart, 
@@ -42,6 +46,24 @@ import {
 } from 'recharts';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+
+interface AnalystQuestion {
+  id: string;
+  question: string;
+  category: string;
+  complexity: string;
+  companies: string[];
+}
+
+interface EMSAIDynamic {
+  company: string;
+  ticker: string;
+  ai_revenue_growth_pct: number;
+  ai_revenue_mix_pct: number;
+  recent_highlights: string[];
+  investment_focus: string[];
+  guidance_outlook: string;
+}
 
 interface OverviewData {
   total_documents: number;
@@ -98,6 +120,8 @@ export default function DashboardPage() {
   const [analytics, setAnalytics] = useState<AnalyticsDashboard | null>(null);
   const [sentiment, setSentiment] = useState<SentimentData | null>(null);
   const [classification, setClassification] = useState<any>(null);
+  const [analystQuestions, setAnalystQuestions] = useState<AnalystQuestion[]>([]);
+  const [emsAIDynamics, setEmsAIDynamics] = useState<EMSAIDynamic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -125,17 +149,27 @@ export default function DashboardPage() {
       }
       
       // Then fetch full data in parallel
-      const [overviewRes, analyticsRes, sentimentRes, classificationRes] = await Promise.all([
+      const [overviewRes, analyticsRes, sentimentRes, classificationRes, questionsRes, dynamicsRes] = await Promise.all([
         fetch(`${API_URL}/api/analysis/overview`),
         fetch(`${API_URL}/api/analytics/dashboard`),
         fetch(`${API_URL}/api/sentiment/compare`),
         fetch(`${API_URL}/api/analytics/classification`),
+        fetch(`${API_URL}/api/intelligence/default-questions`),
+        fetch(`${API_URL}/api/intelligence/ems-ai-dynamics`),
       ]);
 
       if (overviewRes.ok) setData(await overviewRes.json());
       if (analyticsRes.ok) setAnalytics(await analyticsRes.json());
       if (sentimentRes.ok) setSentiment(await sentimentRes.json());
       if (classificationRes.ok) setClassification(await classificationRes.json());
+      if (questionsRes.ok) {
+        const qData = await questionsRes.json();
+        setAnalystQuestions(qData.questions || []);
+      }
+      if (dynamicsRes.ok) {
+        const dData = await dynamicsRes.json();
+        setEmsAIDynamics(dData.companies || []);
+      }
       
       setError(null);
     } catch (err) {
@@ -335,6 +369,10 @@ export default function DashboardPage() {
                 Leader: {analytics?.classification?.most_ai_focused || 'N/A'}
               </Badge>
             </div>
+            <ChartDescription
+              description="Percentage of earnings call mentions and SEC filing content focused on AI, data center, and related infrastructure investments across EMS companies."
+              source="SEC Filings & Earnings Calls"
+            />
           </CardContent>
         </Card>
 
@@ -369,6 +407,10 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
+            <ChartDescription
+              description="Sentiment scores derived from NLP analysis of earnings calls and SEC filings. Higher scores indicate more positive outlook and confidence in company communications."
+              source="Earnings Calls & 10-K/10-Q Analysis"
+            />
           </CardContent>
         </Card>
       </div>
@@ -410,6 +452,10 @@ export default function DashboardPage() {
                 <Legend layout="horizontal" verticalAlign="bottom" />
               </PieChart>
             </ResponsiveContainer>
+            <ChartDescription
+              description="Distribution of indexed documents across the 5 tracked EMS companies. Includes SEC filings, earnings calls, press releases, and other public disclosures."
+              source="ChromaDB Index"
+            />
           </CardContent>
         </Card>
 
@@ -452,6 +498,10 @@ export default function DashboardPage() {
                 </defs>
               </BarChart>
             </ResponsiveContainer>
+            <ChartDescription
+              description="Breakdown of document types in the knowledge base including 10-K annual reports, 10-Q quarterly filings, earnings call transcripts, and press releases."
+              source="SEC EDGAR & Company IR"
+            />
           </CardContent>
         </Card>
       </div>
@@ -582,7 +632,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Company Cards */}
-      <div className="mb-6">
+      <div className="mb-8">
         <h2 className="text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
           <Building2 className="h-5 w-5 text-blue-500" />
           Company Overview
@@ -638,6 +688,132 @@ export default function DashboardPage() {
           })}
         </div>
       </div>
+
+      {/* Analyst Questions & AI Dynamics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Default Analyst Questions */}
+        <Card className="border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-blue-600" />
+              Analyst Questions
+              <Badge className="ml-2 bg-blue-100 text-blue-700 text-xs">From Earnings Calls</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-slate-500 mb-4">
+              Common questions analysts ask during EMS company earnings calls. Click to explore.
+            </p>
+            <div className="grid grid-cols-1 gap-3">
+              {analystQuestions.slice(0, 6).map((q) => (
+                <Link
+                  key={q.id}
+                  href={`/chat?q=${encodeURIComponent(q.question)}`}
+                  className="p-3 bg-slate-50 rounded-xl hover:bg-blue-50 transition-colors group"
+                >
+                  <div className="flex items-start gap-3">
+                    <Badge variant="outline" className="text-xs shrink-0 mt-0.5">
+                      {q.category}
+                    </Badge>
+                    <p className="text-sm text-slate-700 group-hover:text-blue-700 transition-colors">
+                      {q.question}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <Link
+              href="/chat"
+              className="mt-4 flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
+              Ask Your Own Question <ArrowRight className="h-4 w-4" />
+            </Link>
+          </CardContent>
+        </Card>
+
+        {/* EMS AI Dynamics */}
+        <Card className="border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Cpu className="h-5 w-5 text-purple-600" />
+              EMS AI Dynamics
+              <Badge className="ml-2 bg-purple-100 text-purple-700 text-xs">Latest Updates</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {emsAIDynamics.slice(0, 5).map((company) => (
+                <div
+                  key={company.company}
+                  className="p-4 rounded-xl border border-slate-200 hover:border-purple-300 transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                        style={{ backgroundColor: COMPANY_COLORS[company.company] || '#64748B' }}
+                      >
+                        {company.company.charAt(0)}
+                      </div>
+                      <span className="font-semibold text-slate-900">{company.company}</span>
+                      <span className="text-xs text-slate-400">{company.ticker}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-green-100 text-green-700">
+                        +{company.ai_revenue_growth_pct}% AI Growth
+                      </Badge>
+                      <Badge className="bg-purple-100 text-purple-700">
+                        {company.ai_revenue_mix_pct}% AI Mix
+                      </Badge>
+                    </div>
+                  </div>
+                  <p className="text-sm text-slate-600 mb-2">
+                    {company.recent_highlights[0]}
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {company.investment_focus.slice(0, 3).map((focus, idx) => (
+                      <span key={idx} className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full">
+                        {focus}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Link
+              href="/ai-investments"
+              className="mt-4 flex items-center justify-center gap-2 text-purple-600 hover:text-purple-700 text-sm font-medium"
+            >
+              View Big 5 AI CapEx Tracker <ArrowRight className="h-4 w-4" />
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Big 5 AI Investment Summary Banner */}
+      <Card className="border-0 shadow-xl bg-gradient-to-r from-orange-500 to-red-600 mb-6">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <div className="bg-white/20 p-4 rounded-xl">
+                <DollarSign className="h-8 w-8 text-white" />
+              </div>
+              <div className="text-white">
+                <h3 className="text-xl font-bold mb-1">Big 5 AI CapEx 2026: $675B+</h3>
+                <p className="text-orange-100">
+                  AWS, Google, Microsoft, Meta, Oracle collectively investing in AI infrastructure
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/ai-investments"
+              className="flex items-center gap-2 px-6 py-3 bg-white/20 rounded-xl text-white hover:bg-white/30 transition-all"
+            >
+              View Details <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -5,9 +5,9 @@ Uses a combination of financial lexicon and LLM for nuanced analysis.
 import re
 from collections import Counter
 from typing import Optional
-import anthropic
+from openai import OpenAI
 
-from backend.core.config import ANTHROPIC_API_KEY, LLM_MODEL
+from backend.core.config import OPENAI_API_KEY, LLM_MODEL
 from backend.rag.retriever import search_documents, get_company_documents
 from backend.core.cache import analytics_cache, cached
 
@@ -85,7 +85,7 @@ def analyze_lexicon_sentiment(text: str) -> dict:
 
 async def analyze_sentiment_llm(text: str, context: str = "") -> dict:
     """
-    Use Claude to analyze sentiment with nuanced understanding.
+    Use OpenAI to analyze sentiment with nuanced understanding.
     
     Args:
         text: Text to analyze
@@ -94,10 +94,10 @@ async def analyze_sentiment_llm(text: str, context: str = "") -> dict:
     Returns:
         Dict with LLM sentiment analysis
     """
-    if not ANTHROPIC_API_KEY:
-        return {"error": "ANTHROPIC_API_KEY not set"}
+    if not OPENAI_API_KEY:
+        return {"error": "OPENAI_API_KEY not set"}
     
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    client = OpenAI(api_key=OPENAI_API_KEY)
     
     # Truncate text if too long
     if len(text) > 10000:
@@ -121,13 +121,13 @@ Provide a JSON response with:
 Return only valid JSON, no other text."""
 
     try:
-        response = client.messages.create(
+        response = client.chat.completions.create(
             model=LLM_MODEL,
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}]
         )
         
-        response_text = response.content[0].text.strip()
+        response_text = response.choices[0].message.content.strip()
         
         # Try to parse JSON
         import json
@@ -137,7 +137,7 @@ Return only valid JSON, no other text."""
             response_text = re.sub(r'\s*```$', '', response_text)
         
         result = json.loads(response_text)
-        result["tokens_used"] = response.usage.input_tokens + response.usage.output_tokens
+        result["tokens_used"] = response.usage.total_tokens
         return result
         
     except Exception as e:

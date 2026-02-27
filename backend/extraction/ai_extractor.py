@@ -100,10 +100,12 @@ def extract_capex(
     Returns:
         Dict with capex_value, unit, raw_value, confidence, etc.
     """
-    from backend.core.config import ANTHROPIC_API_KEY, LLM_MODEL
+    from backend.core.config import LLM_PROVIDER, OPENAI_API_KEY, ANTHROPIC_API_KEY
+    from backend.core.llm_client import llm_complete
 
-    if not ANTHROPIC_API_KEY:
-        return {"error": "ANTHROPIC_API_KEY not configured"}
+    active_key = ANTHROPIC_API_KEY if LLM_PROVIDER == "anthropic" else OPENAI_API_KEY
+    if not active_key:
+        return {"error": f"{LLM_PROVIDER.upper()}_API_KEY not configured"}
 
     # Locate the Cash Flow Statement section
     section = _find_cashflow_section(document_text)
@@ -127,17 +129,14 @@ def extract_capex(
         + section
     )
 
-    import anthropic
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-
     try:
-        response = client.messages.create(
-            model=LLM_MODEL,
-            max_tokens=500,
-            system=CAPEX_EXTRACTION_PROMPT,
+        raw_text = llm_complete(
             messages=[{"role": "user", "content": user_prompt}],
+            system=CAPEX_EXTRACTION_PROMPT,
+            model_key="main",
+            max_tokens=500,
         )
-        result = parse_extraction_response(response.content[0].text)
+        result = parse_extraction_response(raw_text)
 
         # Normalize units if we got a value
         if result.get("capex_value") is not None:

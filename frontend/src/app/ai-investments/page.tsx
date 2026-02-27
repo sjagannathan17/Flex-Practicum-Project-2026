@@ -1,0 +1,449 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ChartDescription } from '@/components/ui/chart-description';
+import {
+  DollarSign,
+  TrendingUp,
+  Building2,
+  Cpu,
+  Zap,
+  Globe,
+  ArrowUpRight,
+  RefreshCw,
+  Server,
+  ExternalLink,
+} from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+  PieChart,
+  Pie,
+  Legend,
+} from 'recharts';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+
+interface Big5Company {
+  name: string;
+  ticker: string;
+  capex_2026_billions: number;
+  capex_2025_billions: number;
+  yoy_growth_pct: number;
+  ai_focus_areas: string[];
+  key_metrics: Record<string, number>;
+  recent_announcements: string[];
+  color: string;
+}
+
+interface StargateProject {
+  total_investment_billions: number;
+  timeline: string;
+  partners: string[];
+  initial_deployment_billions: number;
+  planned_capacity_gw: number;
+  locations: string[];
+}
+
+interface Big5Data {
+  last_updated: string;
+  source: string;
+  total_2026_capex_billions: number;
+  companies: Big5Company[];
+  stargate_project: StargateProject;
+}
+
+export default function AIInvestmentsPage() {
+  const [data, setData] = useState<Big5Data | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedCompany, setSelectedCompany] = useState<Big5Company | null>(null);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_URL}/api/intelligence/big5-capex`);
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
+        if (json.companies && json.companies.length > 0) setSelectedCompany(json.companies[0]);
+      }
+    } catch (err) {
+      console.error('Failed to fetch Big 5 data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6 flex items-center justify-center">
+        <div className="text-slate-500">Loading AI investment data...</div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6 flex items-center justify-center">
+        <div className="text-red-500">Failed to load data</div>
+      </div>
+    );
+  }
+
+  const chartData = data.companies.map((c) => ({
+    name: c.name.split(' ')[0],
+    capex_2026: c.capex_2026_billions,
+    capex_2025: c.capex_2025_billions,
+    growth: c.yoy_growth_pct,
+    color: c.color,
+  }));
+
+  const pieData = data.companies.map((c) => ({
+    name: c.name.split(' ')[0],
+    value: c.capex_2026_billions,
+    color: c.color,
+  }));
+
+  const totalCapex = data.companies.reduce((sum, c) => sum + c.capex_2026_billions, 0);
+  const avgGrowth = Math.round(data.companies.reduce((sum, c) => sum + c.yoy_growth_pct, 0) / data.companies.length);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <div className="bg-gradient-to-br from-orange-500 to-red-600 p-2 rounded-xl">
+                <DollarSign className="h-6 w-6 text-white" />
+              </div>
+              Big 5 AI Investment Tracker
+            </h1>
+            <p className="text-slate-500 mt-1">
+              AWS, Google, Microsoft, Meta, Oracle - 2026 AI CapEx Overview
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge className="bg-green-100 text-green-700">
+              Updated: {data.last_updated}
+            </Badge>
+            <button
+              onClick={fetchData}
+              className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-orange-500 to-red-600 text-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-orange-100 text-sm">Total 2026 CapEx</p>
+                <p className="text-4xl font-bold">${totalCapex}B</p>
+              </div>
+              <DollarSign className="h-12 w-12 text-orange-200" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-500 text-sm">YoY Growth (Avg)</p>
+                <p className="text-3xl font-bold text-green-600">+{avgGrowth}%</p>
+              </div>
+              <TrendingUp className="h-10 w-10 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-500 text-sm">Stargate Project</p>
+                <p className="text-3xl font-bold text-blue-600">${data.stargate_project.total_investment_billions}B</p>
+              </div>
+              <Server className="h-10 w-10 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-500 text-sm">Planned Capacity</p>
+                <p className="text-3xl font-bold text-purple-600">{data.stargate_project.planned_capacity_gw}GW</p>
+              </div>
+              <Zap className="h-10 w-10 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* CapEx Comparison Bar Chart */}
+        <Card className="border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-blue-600" />
+              2025 vs 2026 CapEx Comparison
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis type="number" unit="B" />
+                <YAxis type="category" dataKey="name" width={80} />
+                <Tooltip
+                  formatter={(value) => [`$${value}B`, '']}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}
+                />
+                <Legend />
+                <Bar dataKey="capex_2025" name="2025 CapEx" fill="#94A3B8" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="capex_2026" name="2026 CapEx" radius={[0, 4, 4, 0]}>
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <ChartDescription
+              description="Year-over-year capital expenditure comparison for Big 5 tech companies focused on AI infrastructure. 2026 projections show near-doubling of investment levels."
+              source={data.source}
+              lastUpdated={data.last_updated}
+            />
+          </CardContent>
+        </Card>
+
+        {/* CapEx Distribution Pie Chart */}
+        <Card className="border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Cpu className="h-5 w-5 text-purple-600" />
+              2026 CapEx Distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  innerRadius={50}
+                  paddingAngle={2}
+                  dataKey="value"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => [`$${value}B`, 'CapEx']} />
+              </PieChart>
+            </ResponsiveContainer>
+            <ChartDescription
+              description="Market share of planned AI infrastructure spending among Big 5 companies. Amazon leads with ~30% of total planned investment."
+              source="Company Earnings Reports"
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Company Cards */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
+          <Building2 className="h-5 w-5 text-blue-500" />
+          Company Details
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+          {data.companies.map((company) => (
+            <button
+              key={company.ticker}
+              onClick={() => setSelectedCompany(company)}
+              className={`text-left p-4 rounded-xl border-2 transition-all ${
+                selectedCompany?.ticker === company.ticker
+                  ? 'border-blue-500 bg-blue-50 shadow-lg'
+                  : 'border-slate-200 bg-white hover:border-slate-300'
+              }`}
+            >
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold mb-2"
+                style={{ backgroundColor: company.color }}
+              >
+                {company.name.charAt(0)}
+              </div>
+              <p className="font-semibold text-slate-900">{company.name.split(' ')[0]}</p>
+              <p className="text-sm text-slate-500">{company.ticker}</p>
+              <div className="mt-2">
+                <p className="text-lg font-bold" style={{ color: company.color }}>
+                  ${company.capex_2026_billions}B
+                </p>
+                <p className="text-xs text-green-600">+{company.yoy_growth_pct}% YoY</p>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Selected Company Details */}
+        {selectedCompany && (
+          <Card className="border-0 shadow-xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
+                  style={{ backgroundColor: selectedCompany.color }}
+                >
+                  {selectedCompany.name.charAt(0)}
+                </div>
+                {selectedCompany.name} - AI Investment Details
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Key Metrics */}
+                <div>
+                  <h4 className="font-semibold text-slate-700 mb-3">Key Metrics</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between p-2 bg-slate-50 rounded-lg">
+                      <span className="text-slate-600">2026 CapEx</span>
+                      <span className="font-bold">${selectedCompany.capex_2026_billions}B</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-slate-50 rounded-lg">
+                      <span className="text-slate-600">2025 CapEx</span>
+                      <span className="font-bold">${selectedCompany.capex_2025_billions}B</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-green-50 rounded-lg">
+                      <span className="text-slate-600">YoY Growth</span>
+                      <span className="font-bold text-green-600">+{selectedCompany.yoy_growth_pct}%</span>
+                    </div>
+                    {Object.entries(selectedCompany.key_metrics).map(([key, value]) => (
+                      <div key={key} className="flex justify-between p-2 bg-slate-50 rounded-lg">
+                        <span className="text-slate-600">{key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}</span>
+                        <span className="font-bold">{typeof value === 'number' ? (value >= 1 ? `$${value}B` : `${value}%`) : value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* AI Focus Areas */}
+                <div>
+                  <h4 className="font-semibold text-slate-700 mb-3">AI Focus Areas</h4>
+                  <div className="space-y-2">
+                    {selectedCompany.ai_focus_areas.map((area, idx) => (
+                      <div key={idx} className="flex items-center gap-2 p-2 bg-purple-50 rounded-lg">
+                        <Cpu className="h-4 w-4 text-purple-600" />
+                        <span className="text-slate-700">{area}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Recent Announcements */}
+                <div>
+                  <h4 className="font-semibold text-slate-700 mb-3">Recent Announcements</h4>
+                  <div className="space-y-2">
+                    {selectedCompany.recent_announcements.map((announcement, idx) => (
+                      <div key={idx} className="p-3 bg-blue-50 rounded-lg">
+                        <p className="text-sm text-slate-700">{announcement}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Stargate Project */}
+      <Card className="border-0 shadow-xl bg-gradient-to-r from-slate-900 to-slate-800">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Globe className="h-5 w-5 text-blue-400" />
+            Stargate Project - $500B AI Infrastructure Initiative
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white/10 rounded-xl p-4">
+              <p className="text-slate-400 text-sm">Total Investment</p>
+              <p className="text-3xl font-bold text-white">${data.stargate_project.total_investment_billions}B</p>
+            </div>
+            <div className="bg-white/10 rounded-xl p-4">
+              <p className="text-slate-400 text-sm">Timeline</p>
+              <p className="text-2xl font-bold text-white">{data.stargate_project.timeline}</p>
+            </div>
+            <div className="bg-white/10 rounded-xl p-4">
+              <p className="text-slate-400 text-sm">Initial Deployment</p>
+              <p className="text-2xl font-bold text-white">${data.stargate_project.initial_deployment_billions}B</p>
+            </div>
+            <div className="bg-white/10 rounded-xl p-4">
+              <p className="text-slate-400 text-sm">Planned Capacity</p>
+              <p className="text-2xl font-bold text-white">{data.stargate_project.planned_capacity_gw}GW</p>
+            </div>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-4">
+            <div>
+              <p className="text-slate-400 text-sm mb-2">Partners</p>
+              <div className="flex gap-2">
+                {data.stargate_project.partners.map((partner) => (
+                  <Badge key={partner} className="bg-blue-500/20 text-blue-300">
+                    {partner}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-slate-400 text-sm mb-2">Locations</p>
+              <div className="flex gap-2">
+                {data.stargate_project.locations.map((location) => (
+                  <Badge key={location} className="bg-green-500/20 text-green-300">
+                    {location}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <p className="text-sm text-slate-400">
+              Source: Futurum Research - AI Capex 2026 Report
+              <a
+                href="https://futurumgroup.com/insights/ai-capex-2026-the-690b-infrastructure-sprint/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-2 inline-flex items-center gap-1 text-blue-400 hover:text-blue-300"
+              >
+                Read Full Report <ExternalLink className="h-3 w-3" />
+              </a>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

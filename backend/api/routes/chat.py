@@ -12,6 +12,7 @@ from pydantic import BaseModel
 
 from backend.rag.retriever import search_documents, search_cross_company
 from backend.rag.generator import generate_response_streaming, SYSTEM_PROMPT
+from backend.rag.assembled_retriever import get_assembled_retriever
 from backend.rag.memory import (
     add_message,
     get_conversation_history,
@@ -51,9 +52,11 @@ COMPARISON_TRIGGERS = [
 class ChatRequest(BaseModel):
     query: str
     session_id: Optional[str] = None
-    mode: str = "rag"
+    mode: str = "rag"  # "rag" | "web" | "hybrid" | "assembled" (NEW)
     include_web: bool = False
     company_filter: Optional[str] = None
+    retrieval_strategy: str = "auto"  # For assembled mode: "auto" | "vector" | "bm25" | "hybrid" | "table"
+    use_reranking: bool = True
 
 
 def _detect_companies(query: str) -> list[str]:
@@ -106,7 +109,12 @@ def _build_context(docs: list[dict]) -> str:
         if doc.get("quarter"):
             header += f" {doc['quarter']}"
         header += f" | sim={doc['similarity']:.2f}]"
-        parts.append(f"{header}\n{doc['content']}")
+        # Use full parent content when available (page/section with tables included)
+        # This ensures financial tables (like cash flow statements) are fully visible
+        content = doc.get("parent_content") or doc["content"]
+        if len(content) > 3000:
+            content = content[:3000] + "..."
+        parts.append(f"{header}\n{content}")
     return "\n\n---\n\n".join(parts)
 
 
@@ -159,12 +167,49 @@ async def _stream_response(request: ChatRequest):
         except ImportError:
             pass
 
-    if companies and len(companies) == 1:
-        docs = search_documents(query, company_filter=companies[0], n_results=15)
+    # NEW: Use AssembledRetriever for "assembled" mode
+    docs = []
+    assembled_context = ""
+    query_analysis = None
+    
+    if request.mode == "assembled":
+        retriever = get_assembled_retriever()
+        result = retriever.search(
+            query=query,
+            company=request.company_filter or (companies[0] if len(companies) == 1 else None),
+            top_k=15,
+            strategy=request.retrieval_strategy,
+            use_parent_expansion=True,
+            use_reranking=request.use_reranking,
+        )
+        docs = [
+            {
+                "company": d.get("company", ""),
+                "filing_type": d.get("filing_type", ""),
+                "fiscal_year": d.get("fiscal_year", ""),
+                "quarter": d.get("quarter", ""),
+                "similarity": d.get("score", 0),
+                "content": d.get("parent_content") or d.get("content", ""),
+                "source": d.get("source", ""),
+                "page_num": d.get("page_num", 0),
+                "section_header": d.get("section_header", ""),
+            }
+            for d in result["results"]
+        ]
+        assembled_context = result.get("context", "")
+        query_analysis = result.get("analysis", {})
+        
+        yield _sse_event("step", {
+            "icon": "🔧",
+            "label": "Assembled Retriever",
+            "detail": f"Strategy: {result.get('strategy_used', 'auto')} | Type: {query_analysis.get('query_type', 'unknown')}",
+        })
+    elif companies and len(companies) == 1:
+        docs = search_documents(query, company_filter=companies[0], n_results=15, use_reranking=request.use_reranking)
     elif is_comparison:
         docs = search_cross_company(query, n_results=30)
     else:
-        docs = search_documents(query, n_results=15)
+        docs = search_documents(query, n_results=15, use_reranking=request.use_reranking)
 
     yield _sse_event("step", {
         "icon": "📚",
@@ -191,7 +236,11 @@ async def _stream_response(request: ChatRequest):
             pass
 
     # Step 5: Build context and generate
-    context = _build_context(docs)
+    # For assembled mode, use pre-built context; otherwise build from docs
+    if request.mode == "assembled" and assembled_context:
+        context = assembled_context
+    else:
+        context = _build_context(docs)
 
     if not context and not web_context:
         yield _sse_event("token", {"text": "I couldn't find relevant documents to answer your question. Try rephrasing or check that the data has been ingested."})
@@ -242,13 +291,42 @@ async def chat(request: ChatRequest):
     query = request.query.strip()
 
     companies = _detect_companies(query)
+    query_analysis = None
+    strategy_used = None
 
-    if companies and len(companies) == 1:
-        docs = search_documents(query, company_filter=companies[0], n_results=15)
+    # NEW: Use AssembledRetriever for "assembled" mode
+    if request.mode == "assembled":
+        retriever = get_assembled_retriever()
+        result = retriever.search(
+            query=query,
+            company=request.company_filter or (companies[0] if len(companies) == 1 else None),
+            top_k=15,
+            strategy=request.retrieval_strategy,
+            use_parent_expansion=True,
+            use_reranking=request.use_reranking,
+        )
+        docs = [
+            {
+                "company": d.get("company", ""),
+                "filing_type": d.get("filing_type", ""),
+                "fiscal_year": d.get("fiscal_year", ""),
+                "source": d.get("source", ""),
+                "similarity": d.get("score", 0),
+                "content": d.get("parent_content") or d.get("content", ""),
+                "page_num": d.get("page_num", 0),
+                "section_header": d.get("section_header", ""),
+            }
+            for d in result["results"]
+        ]
+        context = result.get("context", "")
+        query_analysis = result.get("analysis", {})
+        strategy_used = result.get("strategy_used", "auto")
     else:
-        docs = search_documents(query, n_results=15)
-
-    context = _build_context(docs)
+        if companies and len(companies) == 1:
+            docs = search_documents(query, company_filter=companies[0], n_results=15, use_reranking=request.use_reranking)
+        else:
+            docs = search_documents(query, n_results=15, use_reranking=request.use_reranking)
+        context = _build_context(docs)
 
     web_context = ""
     if request.include_web:
@@ -263,14 +341,27 @@ async def chat(request: ChatRequest):
     response_text = generate_response(query, context, web_context)
     add_message(session_id, "assistant", response_text)
 
-    return {
+    response_dict = {
         "response": response_text,
         "session_id": session_id,
         "sources": [
-            {"company": d["company"], "source": d["source"], "fiscal_year": d["fiscal_year"]}
+            {
+                "company": d.get("company", ""),
+                "source": d.get("source", ""),
+                "fiscal_year": d.get("fiscal_year", ""),
+                "page_num": d.get("page_num"),
+                "section_header": d.get("section_header"),
+            }
             for d in docs[:5]
         ],
     }
+    
+    # Include assembled mode metadata
+    if query_analysis:
+        response_dict["query_analysis"] = query_analysis
+        response_dict["strategy_used"] = strategy_used
+    
+    return response_dict
 
 
 # ---------------------------------------------------------------------------
