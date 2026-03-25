@@ -1,0 +1,496 @@
+{
+  "source": "/Users/Celia/Desktop/courses/quarter_2/pra_before/practicum_demo/Flex-Practicum-Project-2026/data/sec_filings/SANM/8-K_2026-03-12.htm",
+  "type": "html",
+  "section_count": 0,
+  "sections": [],
+  "tables": [
+    {
+      "table_index": 0,
+      "rows": [
+        [
+          "Delaware",
+          "",
+          "000-21272",
+          "",
+          "77-0228183"
+        ],
+        [
+          "(State or other jurisdiction ofincorporation)",
+          "",
+          "(Commission FileNumber)",
+          "",
+          "(I.R.S. Employer IdentificationNo.)"
+        ]
+      ],
+      "row_count": 2
+    },
+    {
+      "table_index": 1,
+      "rows": [
+        [
+          "Title of each class",
+          "",
+          "TradingSymbol(s)",
+          "",
+          "Name of each exchange on which registered"
+        ],
+        [
+          "Common Stock",
+          "",
+          "SANM",
+          "",
+          "NASDAQ Global Select Market"
+        ]
+      ],
+      "row_count": 2
+    },
+    {
+      "table_index": 2,
+      "rows": [
+        [
+          "",
+          "ITEM 5.07",
+          "SUBMISSION OF MATTERS TO A VOTE OF SECURITY HOLDERS"
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "table_index": 3,
+      "rows": [
+        [
+          "",
+          "1.",
+          "To elect eight directors of the Company."
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "table_index": 4,
+      "rows": [
+        [
+          "Nominee",
+          "",
+          "For",
+          "",
+          "",
+          "Against",
+          "",
+          "",
+          "Abstain",
+          "",
+          "",
+          "BrokerNon-Votes",
+          ""
+        ],
+        [
+          "Susan K. Barnes",
+          "",
+          "",
+          "47,654,771",
+          "",
+          "",
+          "",
+          "736,564",
+          "",
+          "",
+          "",
+          "112,390",
+          "",
+          "",
+          "",
+          "2,621,828",
+          ""
+        ],
+        [
+          "David V. Hedley III",
+          "",
+          "",
+          "40,504,828",
+          "",
+          "",
+          "",
+          "7,975,501",
+          "",
+          "",
+          "",
+          "23,396",
+          "",
+          "",
+          "",
+          "2,621,828",
+          ""
+        ],
+        [
+          "Susan A. Johnson",
+          "",
+          "",
+          "40,455,204",
+          "",
+          "",
+          "",
+          "8,023,528",
+          "",
+          "",
+          "",
+          "24,993",
+          "",
+          "",
+          "",
+          "2,621,828",
+          ""
+        ],
+        [
+          "Joseph G. Licata",
+          "",
+          "",
+          "39,495,174",
+          "",
+          "",
+          "",
+          "8,990,753",
+          "",
+          "",
+          "",
+          "17,798",
+          "",
+          "",
+          "",
+          "2,621,828",
+          ""
+        ],
+        [
+          "Michael J. Loparco",
+          "",
+          "",
+          "46,878,928",
+          "",
+          "",
+          "",
+          "1,604,871",
+          "",
+          "",
+          "",
+          "19,926",
+          "",
+          "",
+          "",
+          "2,621,828",
+          ""
+        ],
+        [
+          "Krish Prabhu",
+          "",
+          "",
+          "45,516,654",
+          "",
+          "",
+          "",
+          "2,963,014",
+          "",
+          "",
+          "",
+          "24,057",
+          "",
+          "",
+          "",
+          "2,621,828",
+          ""
+        ],
+        [
+          "Mythili Sankaran",
+          "",
+          "",
+          "27,580,680",
+          "",
+          "",
+          "",
+          "20,896,872",
+          "",
+          "",
+          "",
+          "26,173",
+          "",
+          "",
+          "",
+          "2,621,828",
+          ""
+        ],
+        [
+          "Jure Sola",
+          "",
+          "",
+          "47,412,746",
+          "",
+          "",
+          "",
+          "1,068,216",
+          "",
+          "",
+          "",
+          "22,763",
+          "",
+          "",
+          "",
+          "2,621,828",
+          ""
+        ]
+      ],
+      "row_count": 9
+    },
+    {
+      "table_index": 5,
+      "rows": [
+        [
+          "",
+          "2.",
+          "To ratify the appointment of PricewaterhouseCoopers LLP as the Company’s independent registered public accounting firm for the\nfiscal year ending October 3, 2026."
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "table_index": 6,
+      "rows": [
+        [
+          "For",
+          "",
+          "",
+          "Against",
+          "",
+          "",
+          "Abstain",
+          "",
+          "",
+          "Broker Non-Votes",
+          ""
+        ],
+        [
+          "",
+          "50,528,448",
+          "",
+          "",
+          "",
+          "578,906",
+          "",
+          "",
+          "",
+          "18,199",
+          "",
+          "",
+          "",
+          "0",
+          ""
+        ]
+      ],
+      "row_count": 2
+    },
+    {
+      "table_index": 7,
+      "rows": [
+        [
+          "",
+          "3.",
+          "To approve, on an advisory (non-binding) basis, the compensation of the Company’s named executive officers."
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "table_index": 8,
+      "rows": [
+        [
+          "For",
+          "",
+          "",
+          "Against",
+          "",
+          "",
+          "Abstain",
+          "",
+          "",
+          "Broker Non-Votes",
+          ""
+        ],
+        [
+          "",
+          "39,455,563",
+          "",
+          "",
+          "",
+          "9,020,980",
+          "",
+          "",
+          "",
+          "27,182",
+          "",
+          "",
+          "",
+          "2,621,828",
+          ""
+        ]
+      ],
+      "row_count": 2
+    },
+    {
+      "table_index": 9,
+      "rows": [
+        [
+          "",
+          "4.",
+          "To approve the reservation of an additional 1,200,000 shares of Common Stock for issuance under the 2019 Plan."
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "table_index": 10,
+      "rows": [
+        [
+          "For",
+          "",
+          "",
+          "Against",
+          "",
+          "",
+          "Abstain",
+          "",
+          "",
+          "Broker Non-Votes",
+          ""
+        ],
+        [
+          "",
+          "46,532,962",
+          "",
+          "",
+          "",
+          "1,939,866",
+          "",
+          "",
+          "",
+          "30,897",
+          "",
+          "",
+          "",
+          "2,621,828",
+          ""
+        ]
+      ],
+      "row_count": 2
+    },
+    {
+      "table_index": 11,
+      "rows": [
+        [
+          "",
+          "5.",
+          "To consider and vote upon the stockholder proposal entitled “Proposal 5 – Independent Board Chairman,” requesting\nthat the Board of Directors adopt a policy in order that two separate people hold the office of the Chairman and the office of the CEO."
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "table_index": 12,
+      "rows": [
+        [
+          "For",
+          "",
+          "",
+          "Against",
+          "",
+          "",
+          "Abstain",
+          "",
+          "",
+          "Broker Non-Votes",
+          ""
+        ],
+        [
+          "",
+          "5,761,319",
+          "",
+          "",
+          "",
+          "42,678,217",
+          "",
+          "",
+          "",
+          "64,189",
+          "",
+          "",
+          "",
+          "2,621,828",
+          ""
+        ]
+      ],
+      "row_count": 2
+    },
+    {
+      "table_index": 13,
+      "rows": [
+        [
+          "(d)",
+          "Exhibits."
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "table_index": 14,
+      "rows": [
+        [
+          "",
+          "Exhibit No",
+          "",
+          "Description"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "104",
+          "",
+          "Cover Page Interactive Data File (embedded with the inline XBRL document)"
+        ]
+      ],
+      "row_count": 3
+    },
+    {
+      "table_index": 15,
+      "rows": [
+        [
+          "",
+          "SANMINA CORPORATION"
+        ],
+        [
+          "",
+          ""
+        ],
+        [
+          "",
+          "By:",
+          "/s/ Jonathan Faust"
+        ],
+        [
+          "",
+          "",
+          "Jonathan Faust"
+        ],
+        [
+          "",
+          "",
+          "Executive Vice President and Chief Financial Officer"
+        ]
+      ],
+      "row_count": 5
+    }
+  ],
+  "table_count": 16,
+  "full_text": "false\n0000897723\n0000897723\n2026-03-09\n2026-03-09\niso4217:USD\nxbrli:shares\niso4217:USD\nxbrli:shares\nUNITED\nSTATES\nSECURITIES AND EXCHANGE COMMISSION\nWashington, D.C. 20549\nFORM\n8-K\nCURRENT REPORT\nPursuant to Section 13 or\n15(d) of\nthe Securities Exchange Act of 1934\nMarch 9, 2026\nDate of Report (Date of earliest event reported)\nSANMINA CORPORATION\n(Exact name of registrant as specified in its\ncharter)\nDelaware\n000-21272\n77-0228183\n(State or other jurisdiction of\nincorporation)\n(Commission File\nNumber)\n(I.R.S. Employer Identification\nNo.)\n2700 North First Street\nSan\nJose\n,\nCalifornia\n95134\n(Address of principal executive offices)\n(\n408\n)\n964-3500\n(Registrant’s telephone number, including\narea code)\nCheck the appropriate box below if the Form 8-K filing is intended to simultaneously satisfy the filing obligation of the registrant under\nany of the following provisions:\n¨\nWritten\ncommunications pursuant to Rule 425 under the Securities Act (17 CFR 230.425)\n¨\nSoliciting\nmaterial pursuant to Rule 14a-12 under the Exchange Act (17 CFR 240.14a-12)\n¨\nPre-commencement\ncommunications pursuant to Rule 14d-2(b) under the Exchange Act (17 CFR 240.14d-2(b))\n¨\nPre-commencement communications pursuant to Rule 13e-4(c) under the Exchange Act (17 CFR 240.13e-4(c))\nIndicate by check mark whether the registrant is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (§230.405\nof this chapter) or Rule 12b-2 of the Securities Exchange Act of 1934 (§240.12b-2) of this chapter)\nEmerging growth company\n¨\nIf an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting standards provided pursuant to Section 13(a) of the Exchange Act.\n¨\nSecurities registered pursuant to Section 12(b) of the Act:\nTitle of each class\nTrading\nSymbol(s)\nName of each exchange on which registered\nCommon Stock\nSANM\nNASDAQ Global Select Market\nITEM 5.02\nDEPARTURE OF DIRECTORS OR CERTAIN\nOFFICERS; ELECTION OF DIRECTORS; APPOINTMENT OF CERTAIN OFFICERS; COMPENSATORY ARRANGEMENTS OF CERTAIN OFFICERS\nOn March 9, 2026, the stockholders of the Company\napproved an amendment of the Company’s 2019 Equity Incentive Plan (the “2019 Plan”) to reserve an additional 1,200,000\nshares of Common Stock for issuance thereunder.\nThe 2019 Plan provides for the grant to eligible\nindividuals of stock options, both incentive stock options and nonqualified stock options, stock appreciation rights, restricted stock,\nrestricted stock units, performance units, performance shares and such other cash and stock awards as the administrator of the 2019 Plan\nshall determine. The terms and conditions of each type of award are set forth in the 2019 Plan. Individuals eligible to receive awards\nunder the 2019 Plan include executive officers, employees, consultants and non-employee members of the Company’s Board of Directors.\nThe 2019 Plan expires on December 3, 2028.\nITEM 5.07\nSUBMISSION OF MATTERS TO A VOTE OF SECURITY HOLDERS\nOn March 9, 2026, the Company held its 2026\nAnnual Meeting of Stockholders. The matters voted upon at the meeting by stockholders of record as of January 16, 2026 and the vote\nwith respect to each such matter is set forth below:\n1.\nTo elect eight directors of the Company.\nNominee\nFor\nAgainst\nAbstain\nBroker\nNon-Votes\nSusan K. Barnes\n47,654,771\n736,564\n112,390\n2,621,828\nDavid V. Hedley III\n40,504,828\n7,975,501\n23,396\n2,621,828\nSusan A. Johnson\n40,455,204\n8,023,528\n24,993\n2,621,828\nJoseph G. Licata\n39,495,174\n8,990,753\n17,798\n2,621,828\nMichael J. Loparco\n46,878,928\n1,604,871\n19,926\n2,621,828\nKrish Prabhu\n45,516,654\n2,963,014\n24,057\n2,621,828\nMythili Sankaran\n27,580,680\n20,896,872\n26,173\n2,621,828\nJure Sola\n47,412,746\n1,068,216\n22,763\n2,621,828\n2.\nTo ratify the appointment of PricewaterhouseCoopers LLP as the Company’s independent registered public accounting firm for the\nfiscal year ending October 3, 2026.\nFor\nAgainst\nAbstain\nBroker Non-\nVotes\n50,528,448\n578,906\n18,199\n0\n3.\nTo approve, on an advisory (non-binding) basis, the compensation of the Company’s named executive officers.\nFor\nAgainst\nAbstain\nBroker Non-\nVotes\n39,455,563\n9,020,980\n27,182\n2,621,828\n4.\nTo approve the reservation of an additional 1,200,000 shares of Common Stock for issuance under the 2019 Plan.\nFor\nAgainst\nAbstain\nBroker Non-\nVotes\n46,532,962\n1,939,866\n30,897\n2,621,828\n5.\nTo consider and vote upon the stockholder proposal entitled “Proposal 5 – Independent Board Chairman,” requesting\nthat the Board of Directors adopt a policy in order that two separate people hold the office of the Chairman and the office of the CEO.\nFor\nAgainst\nAbstain\nBroker Non-\nVotes\n5,761,319\n42,678,217\n64,189\n2,621,828\n2\nITEM 9.01 FINANCIAL STATEMENTS AND EXHIBITS\n(d)\nExhibits.\nExhibit No\nDescription\n104\nCover Page Interactive Data File (embedded with the inline XBRL document)\n3\nSIGNATURE\nPursuant to the requirements of the Securities Exchange Act of 1934, the Registrant has duly caused this Report on Form 8-K to be signed\non its behalf by the undersigned hereunto duly authorized.\nSANMINA CORPORATION\nBy:\n/s/ Jonathan Faust\nJonathan Faust\nExecutive Vice President and Chief Financial Officer\nDate: March 11, 2026\n4"
+}
