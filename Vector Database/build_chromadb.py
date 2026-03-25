@@ -43,13 +43,21 @@ Run from the project root:
     python "Vector Database/build_chromadb.py"
 """
 
+import logging
 import re
 import uuid
 import hashlib
+import warnings
 from pathlib import Path
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Optional
+
+# Suppress noisy PyPDF2 font-descriptor warnings from malformed SEC PDFs.
+# These are cosmetic — text extraction still works fine.
+warnings.filterwarnings("ignore", message=".*FontBBox.*")
+logging.getLogger("PyPDF2").setLevel(logging.ERROR)
+logging.getLogger("pypdf").setLevel(logging.ERROR)
 
 # ---------------------------------------------------------------------------
 # IMPORTS
@@ -1860,22 +1868,32 @@ def build_db(use_per_company: bool = True):
         ("Transcript",      "AI data center liquid cooling investment outlook"),
     ]
 
-    for label, query in test_queries:
-        print(f"\n  🔍 [{label}] \"{query}\"")
-        q_emb = model.encode([query])
-        results = collection.query(
-            query_embeddings=q_emb.tolist(),
-            n_results=3,
-            include=["documents", "metadatas", "distances"]
-        )
-        for doc, meta, dist in zip(
-            results["documents"][0],
-            results["metadatas"][0],
-            results["distances"][0]
-        ):
-            sim = round(1 - dist, 3)
-            print(f"     sim={sim}  [{meta['company']:<11}] {meta['source_file']:<50} {meta['filing_type']} | {meta['fiscal_year']} {meta['quarter']}")
-            print(f"     {doc[:120]}...")
+    if use_per_company:
+        # Pick the first available company collection to run smoke tests against
+        smoke_collection = next(iter(company_collections.values()), None)
+        if smoke_collection is None:
+            print("  (no collections to test)")
+            smoke_collection = None
+    else:
+        smoke_collection = collection
+
+    if smoke_collection is not None:
+        for label, query in test_queries:
+            print(f"\n  🔍 [{label}] \"{query}\"")
+            q_emb = model.encode([query])
+            results = smoke_collection.query(
+                query_embeddings=q_emb.tolist(),
+                n_results=3,
+                include=["documents", "metadatas", "distances"]
+            )
+            for doc, meta, dist in zip(
+                results["documents"][0],
+                results["metadatas"][0],
+                results["distances"][0]
+            ):
+                sim = round(1 - dist, 3)
+                print(f"     sim={sim}  [{meta['company']:<11}] {meta['source_file']:<50} {meta['filing_type']} | {meta['fiscal_year']} {meta['quarter']}")
+                print(f"     {doc[:120]}...")
 
     print("\n✅ ChromaDB ready for all companies. Next: RAG query layer.")
 

@@ -18,6 +18,10 @@ lxml>=5.1.0
 # PDF Processing
 PyPDF2>=3.0.0
 
+# Export generation
+python-pptx>=1.0.0
+openpyxl>=3.1.0
+
 # Scheduling
 apscheduler>=3.10.0
 

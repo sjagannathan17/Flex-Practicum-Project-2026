@@ -3,8 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   RefreshCw,
-  Flame,
-  Clock3,
   ExternalLink,
   Rss,
   Globe2,
@@ -60,6 +58,15 @@ const CATEGORY_TINTS: Record<string, string> = {
 const AI_TERMS = ['ai', 'artificial intelligence', 'llm', 'data center', 'nvidia', 'semiconductor', 'liquid cooling', 'immersion cooling', 'thermal management', 'cooling'];
 const PRIORITY_TECH_TERMS = ['ai', 'artificial intelligence', 'data center'];
 
+const HIGH_KEYWORDS = ['partnership', 'deal', 'contract', 'wins', 'customer', 'ai platform', 'hyperscaler', 'collaboration', 'acqui'];
+const MEDIUM_KEYWORDS = ['expansion', 'factory', 'facility', 'earnings', 'revenue', 'guidance', 'capex', 'investment'];
+
+const TAB_KEYWORDS: Record<string, string[]> = {
+  strategic: [...HIGH_KEYWORDS, 'launch', 'introduces', 'selected', 'awarded'],
+  capacity: ['factory', 'plant', 'capacity', 'expansion', 'facility', 'manufacturing', 'build', 'investment', 'capex', 'liquid cooling', 'nearshoring', 'mexico', 'india'],
+  performance: ['earnings', 'revenue', 'margin', 'guidance', 'forecast', 'results', 'analyst', 'price target', 'backlog'],
+};
+
 const FALLBACK_FEED: UnifiedNewsItem[] = [
   {
     title: 'Flex expands AI infrastructure manufacturing programs',
@@ -110,6 +117,81 @@ interface UnifiedNewsItem extends NewsItem {
   timestampLabel: string;
 }
 
+type ThreatLevel = 'HIGH' | 'MEDIUM' | 'LOW';
+
+function getThreatLevel(item: UnifiedNewsItem): ThreatLevel {
+  const text = `${item.title} ${item.description}`.toLowerCase();
+  if (HIGH_KEYWORDS.some((kw) => text.includes(kw))) return 'HIGH';
+  if (MEDIUM_KEYWORDS.some((kw) => text.includes(kw))) return 'MEDIUM';
+  return 'LOW';
+}
+
+function ThreatBadge({ level }: { level: ThreatLevel }) {
+  if (level === 'HIGH') {
+    return (
+      <span className="shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-red-100 text-red-600 border border-red-300">
+        HIGH
+      </span>
+    );
+  }
+  if (level === 'MEDIUM') {
+    return (
+      <span className="shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-orange-100 text-orange-600 border border-orange-300">
+        MEDIUM
+      </span>
+    );
+  }
+  return (
+    <span className="shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-600 border border-green-300">
+      LOW
+    </span>
+  );
+}
+
+function NewsCard({ item }: { item: UnifiedNewsItem }) {
+  const level = getThreatLevel(item);
+  return (
+    <a
+      href={getSafeHref(item)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex gap-3 rounded-xl border border-slate-200 bg-white p-3 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-800 dark:bg-[#0b1220] dark:hover:border-slate-700 dark:hover:bg-white/[0.03]"
+    >
+      <div className="pt-0.5">
+        <ThreatBadge level={level} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold leading-snug text-slate-900 dark:text-slate-100 line-clamp-2">
+          {item.title}
+        </p>
+        <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <Globe2 className="h-3 w-3 shrink-0" />
+          <span className="truncate">{item.source}</span>
+          <span>·</span>
+          <span className="shrink-0">{item.timestampLabel}</span>
+          {item.company && (
+            <>
+              <span>·</span>
+              <span
+                className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold text-white"
+                style={{ backgroundColor: COMPANY_COLORS[item.company] }}
+              >
+                {item.company}
+              </span>
+            </>
+          )}
+        </div>
+        {item.description && (
+          <p className="mt-1.5 line-clamp-1 text-xs text-slate-600 dark:text-slate-400">
+            {item.description}
+          </p>
+        )}
+      </div>
+      <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400" />
+    </a>
+  );
+}
+
 function getCategoryKey(categories?: string[]) {
   return categories?.[0] || 'general';
 }
@@ -151,20 +233,12 @@ function hasPublishedTime(raw?: string) {
 function getPriorityScore(item: UnifiedNewsItem) {
   const content = `${item.title} ${item.description} ${(item.categories || []).join(' ')}`.toLowerCase();
   let score = 0;
-
-  // Priority 1: tracked company news
   if (item.company) {
     score += 1000;
-    // Flex gets the highest weight among tracked companies
     if (item.company === 'FLEX') score += 300;
   }
-
-  // Priority 2: AI / Data Center intent
   if (PRIORITY_TECH_TERMS.some((term) => content.includes(term))) score += 200;
-
-  // Secondary relevance signal from backend
   score += Math.round((item.relevance_score || 0) * 100);
-
   return score;
 }
 
@@ -202,9 +276,19 @@ function getSafeHref(item: NewsItem) {
   return item.url || item.backup_url || '#';
 }
 
+type TabId = 'strategic' | 'capacity' | 'performance' | 'fastfeed';
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: 'strategic', label: 'Strategic Moves ⭐' },
+  { id: 'capacity', label: 'Capacity & Execution' },
+  { id: 'performance', label: 'Performance & Signals' },
+  { id: 'fastfeed', label: 'Fast Feed' },
+];
+
 export default function NewsPage() {
   const [selectedCompany, setSelectedCompany] = useState<string>('ALL');
   const [keyword, setKeyword] = useState('');
+  const [activeTab, setActiveTab] = useState<TabId>('strategic');
   const [companyNews, setCompanyNews] = useState<Record<CompanyTicker, NewsItem[]>>({
     FLEX: [],
     JBL: [],
@@ -289,7 +373,6 @@ export default function NewsPage() {
     const hasKeyword = Boolean(keyword.trim());
     let feed = [...allCompanyNews, ...unifiedIndustryNews, ...unifiedComparativeNews];
 
-    // When no keyword is provided, keep desk scoped to tracked companies + core themes.
     if (!hasKeyword) {
       feed = feed.filter(isTrackedOrAIRelated);
     }
@@ -321,10 +404,8 @@ export default function NewsPage() {
     return [...baseFilteredFeed].sort((a, b) => {
       const priorityDelta = getPriorityScore(b) - getPriorityScore(a);
       if (priorityDelta !== 0) return priorityDelta;
-
       const timeDelta = getPublishedTimestamp(b.published) - getPublishedTimestamp(a.published);
       if (timeDelta !== 0) return timeDelta;
-
       return (b.relevance_score || 0) - (a.relevance_score || 0);
     });
   }, [baseFilteredFeed]);
@@ -334,35 +415,28 @@ export default function NewsPage() {
       const dateA = getPublishedDateKey(a.published);
       const dateB = getPublishedDateKey(b.published);
       if (dateA !== dateB) return dateB.localeCompare(dateA);
-
       const aHasTime = hasPublishedTime(a.published);
       const bHasTime = hasPublishedTime(b.published);
       if (aHasTime && bHasTime) {
         const timeDelta = getPublishedTimestamp(b.published) - getPublishedTimestamp(a.published);
         if (timeDelta !== 0) return timeDelta;
       }
-
       return (b.relevance_score || 0) - (a.relevance_score || 0);
     });
   }, [baseFilteredFeed]);
 
   const shouldUseFallback = selectedCompany === 'ALL' && !keyword.trim() && prioritizedFeed.length === 0;
-  const filteredFeed = shouldUseFallback ? FALLBACK_FEED : prioritizedFeed;
-  const fastFeedSource = shouldUseFallback ? FALLBACK_FEED : timeSortedFeed;
-  const fastFeed = useMemo(() => {
-    if (shouldUseFallback) return fastFeedSource;
-    const now = Date.now();
-    const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
-    return fastFeedSource.filter((item) => {
-      const ts = getPublishedTimestamp(item.published);
-      if (!ts) return false;
-      return now - ts <= twoDaysMs && now >= ts;
-    });
-  }, [fastFeedSource, shouldUseFallback]);
+  const baseFeed = shouldUseFallback ? FALLBACK_FEED : prioritizedFeed;
+  const fastFeedBase = shouldUseFallback ? FALLBACK_FEED : timeSortedFeed;
 
-  const leadStory = filteredFeed[0];
-  const keyStories = filteredFeed.slice(1, 7);
-  const hotRank = filteredFeed.slice(0, 10);
+  const tabFeed = useMemo(() => {
+    if (activeTab === 'fastfeed') return fastFeedBase;
+    const keywords = TAB_KEYWORDS[activeTab] || [];
+    return baseFeed.filter((item) => {
+      const text = `${item.title} ${item.description}`.toLowerCase();
+      return keywords.some((kw) => text.includes(kw));
+    });
+  }, [activeTab, baseFeed, fastFeedBase]);
 
   if (loading) {
     return (
@@ -378,65 +452,54 @@ export default function NewsPage() {
   return (
     <div className="min-h-screen bg-white text-slate-900 dark:bg-[#060a12] dark:text-slate-100">
       <div className="mx-auto max-w-[1720px] px-5 py-5">
+
+        {/* ── Top bar: keyword presets + refresh ── */}
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-lg bg-cyan-50 px-3 py-1.5 text-sm text-cyan-700 dark:bg-[#0f1726] dark:text-cyan-300">News</span>
             <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 dark:text-slate-500">
               <span>Only 5 tracked companies +</span>
-              <button
-                onClick={() => applyKeywordPreset('data center')}
-                className={`rounded-md border px-2 py-1 transition ${
-                  keyword.trim().toLowerCase() === 'data center'
-                    ? 'border-cyan-300 bg-cyan-50 text-cyan-700 dark:border-cyan-400/60 dark:bg-cyan-500/20 dark:text-cyan-200'
-                    : 'border-slate-300 bg-white text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:bg-[#0b111d] dark:text-slate-400 dark:hover:border-slate-600'
-                }`}
-              >
-                Data Center
-              </button>
-              <button
-                onClick={() => applyKeywordPreset('ai')}
-                className={`rounded-md border px-2 py-1 transition ${
-                  keyword.trim().toLowerCase() === 'ai'
-                    ? 'border-cyan-300 bg-cyan-50 text-cyan-700 dark:border-cyan-400/60 dark:bg-cyan-500/20 dark:text-cyan-200'
-                    : 'border-slate-300 bg-white text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:bg-[#0b111d] dark:text-slate-400 dark:hover:border-slate-600'
-                }`}
-              >
-                AI
-              </button>
-              <button
-                onClick={() => applyKeywordPreset('liquid cooling')}
-                className={`rounded-md border px-2 py-1 transition ${
-                  keyword.trim().toLowerCase() === 'liquid cooling'
-                    ? 'border-cyan-300 bg-cyan-50 text-cyan-700 dark:border-cyan-400/60 dark:bg-cyan-500/20 dark:text-cyan-200'
-                    : 'border-slate-300 bg-white text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:bg-[#0b111d] dark:text-slate-400 dark:hover:border-slate-600'
-                }`}
-              >
-                Liquid Cooling
-              </button>
+              {(['data center', 'ai', 'liquid cooling'] as const).map((preset) => (
+                <button
+                  key={preset}
+                  onClick={() => applyKeywordPreset(preset)}
+                  className={`rounded-md border px-2 py-1 transition ${
+                    keyword.trim().toLowerCase() === preset
+                      ? 'border-cyan-300 bg-cyan-50 text-cyan-700 dark:border-cyan-400/60 dark:bg-cyan-500/20 dark:text-cyan-200'
+                      : 'border-slate-300 bg-white text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:bg-[#0b111d] dark:text-slate-400 dark:hover:border-slate-600'
+                  }`}
+                >
+                  {preset === 'data center' ? 'Data Center' : preset === 'ai' ? 'AI' : 'Liquid Cooling'}
+                </button>
+              ))}
               <input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Search keyword…"
                 className="w-[220px] rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 outline-none placeholder:text-slate-500 dark:border-slate-700 dark:bg-[#0b111d] dark:text-slate-100"
               />
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={refreshNews}
-              disabled={refreshing}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-slate-400 disabled:opacity-50 dark:border-slate-700 dark:bg-[#0b111d] dark:text-slate-200 dark:hover:border-slate-600"
-            >
-              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-              {refreshing ? 'Refreshing' : 'Refresh'}
-            </button>
-          </div>
+          <button
+            onClick={refreshNews}
+            disabled={refreshing}
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-slate-400 disabled:opacity-50 dark:border-slate-700 dark:bg-[#0b111d] dark:text-slate-200 dark:hover:border-slate-600"
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            {refreshing ? 'Refreshing' : 'Refresh'}
+          </button>
         </div>
 
+        {/* ── Company pill filter ── */}
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <button
             onClick={() => setSelectedCompany('ALL')}
-            className={`rounded-lg px-3 py-2 text-sm ${selectedCompany === 'ALL' ? 'bg-blue-500 text-white' : 'bg-white text-slate-700 border border-slate-300 dark:bg-[#0b111d] dark:text-slate-300 dark:border-slate-800'}`}
+            className={`rounded-lg px-3 py-2 text-sm ${
+              selectedCompany === 'ALL'
+                ? 'bg-blue-500 text-white'
+                : 'bg-white text-slate-700 border border-slate-300 dark:bg-[#0b111d] dark:text-slate-300 dark:border-slate-800'
+            }`}
           >
             All
           </button>
@@ -456,6 +519,7 @@ export default function NewsPage() {
           ))}
         </div>
 
+        {/* ── Official Company Entrances ── */}
         <div className="mb-4 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-[#0b1220]">
           <div className="mb-2 text-xs uppercase tracking-wide text-slate-600 dark:text-slate-500">Official Company Entrances</div>
           <div className="flex flex-wrap gap-2">
@@ -480,149 +544,56 @@ export default function NewsPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-[1.35fr_0.9fr_1fr] xl:h-[860px]">
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 h-full flex flex-col overflow-hidden dark:border-slate-800 dark:bg-[#0a101c]">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-3xl font-semibold text-slate-900 dark:text-white">Top Story</h2>
-              <span className="text-xs text-slate-600 dark:text-slate-500">Published {leadStory?.timestampLabel || '--'}</span>
+        {/* ── Four-tab main content ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0a101c]">
+
+          {/* Tab bar */}
+          <div className="flex gap-1 overflow-x-auto border-b border-slate-200 px-4 pt-3 dark:border-slate-800 scrollbar-none">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`shrink-0 rounded-t-lg px-4 py-2 text-sm font-medium transition whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? 'bg-blue-500 text-white'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-white/[0.04]'
+                }`}
+              >
+                {tab.label}
+                {activeTab !== tab.id && (
+                  <span className="ml-1.5 rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                    {tab.id === 'fastfeed'
+                      ? fastFeedBase.length
+                      : (baseFeed.filter((item) => {
+                          const text = `${item.title} ${item.description}`.toLowerCase();
+                          return (TAB_KEYWORDS[tab.id] || []).some((kw) => text.includes(kw));
+                        }).length)}
+                  </span>
+                )}
+              </button>
+            ))}
+            <div className="ml-auto flex items-center pb-2 pl-2 shrink-0">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 px-2.5 py-1 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                <Rss className="h-3 w-3 text-cyan-500" />
+                {tabFeed.length} items
+              </div>
             </div>
+          </div>
 
-            <div className="flex-1 overflow-y-auto pr-2 xl:[&::-webkit-scrollbar]:w-1.5 xl:[&::-webkit-scrollbar-thumb]:rounded-full xl:[&::-webkit-scrollbar-thumb]:bg-slate-700 xl:[&::-webkit-scrollbar-track]:bg-transparent">
-              {leadStory && (
-                <a href={getSafeHref(leadStory)} target="_blank" rel="noopener noreferrer" className="block">
-                  {leadStory.image_url && (
-                    <div className="mb-3 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
-                      <img
-                        src={leadStory.image_url}
-                        alt={leadStory.title}
-                        className="h-[300px] w-full object-cover"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  )}
-                  <h3 className="text-4xl font-semibold leading-tight text-slate-900 hover:text-cyan-700 dark:text-white dark:hover:text-cyan-300">{leadStory.title}</h3>
-                  <p className="mt-3 text-base leading-7 text-slate-700 dark:text-slate-300">{leadStory.description}</p>
-                  <div className="mt-3 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                    <Globe2 className="h-3.5 w-3.5" />
-                    <span>{leadStory.source}</span>
-                    <span>• {leadStory.timestampLabel}</span>
-                    {leadStory.company && <span className="rounded-md border border-slate-300 px-2 py-1 dark:border-slate-700">{COMPANY_NAMES[leadStory.company]}</span>}
-                  </div>
-                </a>
-              )}
-
-              <div className="mt-6 space-y-4 border-t border-slate-200 pt-4 dark:border-slate-800">
-                {keyStories.map((item, idx) => (
-                  <a
-                    key={`${item.title}-${idx}`}
-                    href={getSafeHref(item)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 transition hover:border-slate-300 dark:border-slate-800 dark:bg-[#0b1220] dark:hover:border-slate-700 ${
-                      item.image_url ? 'grid-cols-[1fr_120px]' : 'grid-cols-1'
-                    }`}
-                  >
-                    <div>
-                      <h4 className="text-xl font-semibold text-slate-900 hover:text-cyan-700 dark:text-slate-100 dark:hover:text-cyan-300">{item.title}</h4>
-                      <p className="mt-1 line-clamp-2 text-sm text-slate-600 dark:text-slate-400">{item.description}</p>
-                      <div className="mt-2 flex items-center gap-2 text-xs">
-                        <span className={`rounded-full border px-2 py-0.5 ${CATEGORY_TINTS[getCategoryKey(item.categories)]}`}>
-                          {item.categoryLabel}
-                        </span>
-                        <span className="text-slate-500 dark:text-slate-400">{item.timestampLabel}</span>
-                      </div>
-                    </div>
-                    {item.image_url && (
-                      <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
-                        <img
-                          src={item.image_url}
-                          alt={item.title}
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    )}
-                  </a>
+          {/* Tab content */}
+          <div className="p-4">
+            {tabFeed.length === 0 ? (
+              <div className="py-16 text-center text-sm text-slate-400 dark:text-slate-600">
+                No news matched for this tab — try adjusting company filter or keyword
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-[700px] overflow-y-auto pr-1 xl:[&::-webkit-scrollbar]:w-1.5 xl:[&::-webkit-scrollbar-thumb]:rounded-full xl:[&::-webkit-scrollbar-thumb]:bg-slate-300 dark:xl:[&::-webkit-scrollbar-thumb]:bg-slate-700 xl:[&::-webkit-scrollbar-track]:bg-transparent">
+                {tabFeed.map((item, idx) => (
+                  <NewsCard key={`${item.title}-${idx}`} item={item} />
                 ))}
               </div>
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 h-full flex flex-col overflow-hidden dark:border-slate-800 dark:bg-[#0a101c]">
-            <div className="rounded-2xl border border-slate-200 bg-white p-0 h-full flex flex-col dark:border-slate-800 dark:bg-[#0a101c]">
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">Hot Rank</h2>
-                <Flame className="h-5 w-5 text-orange-400" />
-              </div>
-              <div className="space-y-2 flex-1 overflow-y-auto pr-2 xl:[&::-webkit-scrollbar]:w-1.5 xl:[&::-webkit-scrollbar-thumb]:rounded-full xl:[&::-webkit-scrollbar-thumb]:bg-slate-700 xl:[&::-webkit-scrollbar-track]:bg-transparent">
-                {hotRank.map((item, idx) => (
-                <a
-                  key={`${item.title}-${idx}`}
-                  href={getSafeHref(item)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block rounded-lg border border-slate-200 bg-slate-50 p-3 transition hover:border-slate-300 dark:border-slate-800 dark:bg-[#0b1220] dark:hover:border-slate-700"
-                >
-                    <div className="flex gap-3">
-                      <span className="text-2xl font-bold text-orange-400">{idx + 1}</span>
-                      <div className="min-w-0">
-                        <p className="line-clamp-2 text-base font-medium leading-6 text-slate-900 dark:text-slate-100">{item.title}</p>
-                        <div className="mt-1 flex items-center gap-1 text-xs text-slate-600 dark:text-slate-500">
-                          <Globe2 className="h-3.5 w-3.5" />
-                          <span>{item.source}</span>
-                          <span>• {item.timestampLabel}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 h-full flex flex-col overflow-hidden dark:border-slate-800 dark:bg-[#0a101c]">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">Fast Feed</h2>
-              <div className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-3 py-1 text-xs text-slate-600 dark:border-slate-700 dark:text-slate-400">
-                <Rss className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-300" />
-                {fastFeed.length} items
-              </div>
-            </div>
-
-            <div className="space-y-0 border-l border-slate-300 dark:border-slate-800 pl-4 flex-1 overflow-y-auto pr-2 xl:[&::-webkit-scrollbar]:w-1.5 xl:[&::-webkit-scrollbar-thumb]:rounded-full xl:[&::-webkit-scrollbar-thumb]:bg-slate-700 xl:[&::-webkit-scrollbar-track]:bg-transparent">
-              {fastFeed.map((item, idx) => (
-                <a
-                  key={`${item.title}-${idx}`}
-                  href={getSafeHref(item)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="grid grid-cols-[64px_1fr_28px] gap-3 py-3 transition hover:bg-slate-100 dark:hover:bg-white/[0.02]"
-                >
-                  <div className="relative">
-                    <div className="absolute -left-[11px] top-2 h-3 w-3 rounded-full border-2 border-cyan-400 bg-white dark:bg-[#060a12]" />
-                    <p className="text-[11px] font-semibold text-cyan-700 dark:text-cyan-300">{item.timestampLabel}</p>
-                  </div>
-                  <div>
-                    <p className="text-base font-semibold leading-6 text-cyan-700 dark:text-cyan-300">{item.title}</p>
-                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{item.description}</p>
-                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                      {item.company && <span className="rounded border border-slate-300 px-2 py-0.5 text-slate-700 dark:border-slate-700 dark:text-slate-300">{COMPANY_NAMES[item.company]}</span>}
-                      <span className={`rounded border px-2 py-0.5 ${CATEGORY_TINTS[getCategoryKey(item.categories)]}`}>{item.categoryLabel}</span>
-                      <span className="text-slate-600 dark:text-slate-500">{item.source}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start justify-end pt-1 text-slate-600 dark:text-slate-500">
-                    <ExternalLink className="h-4 w-4" />
-                    <Clock3 className="ml-2 h-4 w-4" />
-                  </div>
-                </a>
-              ))}
-            </div>
-          </section>
+            )}
+          </div>
         </div>
 
       </div>

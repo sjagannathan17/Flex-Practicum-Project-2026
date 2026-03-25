@@ -1,13 +1,16 @@
 """
 Automated SEC filing downloader using EDGAR API.
 Downloads new 10-K, 10-Q, and 8-K filings for tracked companies.
+Also fetches 8-K exhibit attachments (earnings call transcripts).
 """
 import httpx
-import os
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
+
+from bs4 import BeautifulSoup
+
 from backend.core.config import COMPANIES, SEC_USER_AGENT, DATA_DIR
 
 
@@ -189,16 +192,141 @@ class SECDownloader:
             filings = await self.get_company_filings(ticker, filing_types, days_back)
             
             for filing in filings:
-                if filing["already_downloaded"]:
-                    continue
-                
-                path = await self.download_filing(filing)
-                if path:
-                    filing["local_path"] = str(path)
-                    new_filings.append(filing)
-        
+                if not filing["already_downloaded"]:
+                    path = await self.download_filing(filing)
+                    if path:
+                        filing["local_path"] = str(path)
+                        new_filings.append(filing)
+
+                # For 8-K filings, always check for new transcript exhibits
+                # (catches exhibits even when the primary document was already downloaded)
+                if filing["form"] == "8-K":
+                    exhibit_paths = await self.download_8k_exhibits(filing)
+                    for ep in exhibit_paths:
+                        new_filings.append({
+                            **filing,
+                            "form": "8-K-EX",
+                            "local_path": str(ep),
+                            "filing_id": f"{filing['filing_id']}_exhibit_{ep.name}",
+                            "description": "8-K Exhibit (transcript)",
+                        })
+
         return new_filings
     
+    async def get_8k_exhibits(self, cik: str, accession: str) -> list[dict]:
+        """
+        Fetch exhibit list from an 8-K filing index page and return entries
+        that are likely earnings call transcripts (by description keyword or
+        file size > 50 KB).
+        """
+        raw_cik = cik.lstrip("0")
+        index_url = (
+            f"https://data.sec.gov/Archives/edgar/data/{raw_cik}/{accession}/"
+        )
+
+        try:
+            async with httpx.AsyncClient() as client:
+                resp = await client.get(index_url, headers=self.headers, timeout=30.0)
+                resp.raise_for_status()
+        except Exception as e:
+            print(f"[8-K exhibits] Error fetching index {index_url}: {e}")
+            return []
+
+        soup = BeautifulSoup(resp.text, "html.parser")
+        transcript_keywords = ["transcript", "earnings call", "conference call"]
+        exhibits = []
+
+        for row in soup.find_all("tr"):
+            cells = row.find_all("td")
+            if len(cells) < 3:
+                continue
+
+            description = cells[1].text.strip().lower()
+            filename = cells[2].text.strip()
+
+            if not filename or "." not in filename:
+                continue
+
+            ext = Path(filename).suffix.lower()
+            if ext not in (".htm", ".html", ".txt"):
+                continue
+
+            is_transcript_desc = any(kw in description for kw in transcript_keywords)
+
+            # Try to parse size from the last table cell (bytes on EDGAR)
+            size_kb = 0.0
+            if len(cells) >= 5:
+                try:
+                    size_kb = int("".join(c for c in cells[4].text if c.isdigit())) / 1024
+                except Exception:
+                    pass
+
+            if is_transcript_desc or size_kb > 50:
+                exhibits.append(
+                    {
+                        "url": f"https://data.sec.gov/Archives/edgar/data/{raw_cik}/{accession}/{filename}",
+                        "description": description,
+                        "filename": filename,
+                    }
+                )
+
+        return exhibits
+
+    async def download_8k_exhibits(self, filing: dict) -> list[Path]:
+        """
+        Download transcript-likely exhibits attached to an 8-K filing.
+        Returns list of paths to successfully downloaded files.
+        """
+        cik = filing["cik"]
+        accession = filing["accession"]
+        ticker = filing["ticker"]
+        filing_date = filing["filing_date"]
+
+        exhibits = await self.get_8k_exhibits(cik, accession)
+        if not exhibits:
+            return []
+
+        company_dir = self.download_dir / ticker
+        company_dir.mkdir(exist_ok=True)
+
+        downloaded: list[Path] = []
+        async with httpx.AsyncClient() as client:
+            for exhibit in exhibits:
+                exhibit_id = (
+                    f"{ticker}_8K_exhibit_{accession}_{exhibit['filename']}"
+                )
+
+                if exhibit_id in self.downloaded:
+                    existing = Path(self.downloaded[exhibit_id])
+                    if existing.exists():
+                        downloaded.append(existing)
+                    continue
+
+                safe_name = exhibit["filename"].replace("/", "_")
+                output_path = company_dir / f"8K_exhibit_{filing_date}_{safe_name}"
+
+                try:
+                    resp = await client.get(
+                        exhibit["url"], headers=self.headers, timeout=60.0
+                    )
+                    resp.raise_for_status()
+
+                    output_path.write_bytes(resp.content)
+                    self.downloaded[exhibit_id] = str(output_path)
+                    self._save_tracking()
+                    downloaded.append(output_path)
+                    print(
+                        f"[8-K exhibit] Downloaded: {ticker} {filing_date} "
+                        f"{exhibit['filename']} ({len(resp.content)//1024} KB)"
+                    )
+
+                except Exception as e:
+                    print(
+                        f"[8-K exhibit] Error downloading {exhibit['filename']}: {e}"
+                    )
+
+        return downloaded
+
     def get_download_stats(self) -> dict:
         """Get statistics about downloaded filings."""
         stats = {

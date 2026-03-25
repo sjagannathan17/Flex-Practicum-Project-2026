@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Send,
   Bot,
@@ -21,8 +21,8 @@ import {
   Clock3,
   ArrowUpRight,
   ChevronDown,
-  ChevronRight,
-  Plus,
+  ChevronUp,
+  Settings,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -33,6 +33,7 @@ type SearchMode = 'rag' | 'web' | 'hybrid';
 type CompanyFilter = 'Flex' | 'Jabil' | 'Celestica' | 'Benchmark' | 'Sanmina';
 type TimeHorizon = 'Any Time' | 'FY2026' | 'FY2025' | 'Last 12 Months';
 type AnswerProvider = 'openai' | 'claude' | 'none';
+type ThreatLevel = 'HIGH' | 'MEDIUM' | 'LOW';
 
 interface Message {
   id: string;
@@ -51,194 +52,169 @@ interface Source {
   similarity?: number;
 }
 
-interface CustomPresetQuestion {
-  id: string;
-  label: string;
-  query: string;
-}
+// ── Static data ───────────────────────────────────────────────────────────────
 
-function isCustomPresetQuestion(value: unknown): value is CustomPresetQuestion {
-  if (!value || typeof value !== 'object') return false;
-  const v = value as Record<string, unknown>;
-  return typeof v.id === 'string' && typeof v.label === 'string' && typeof v.query === 'string';
-}
-
-type QuestionSecondary = {
-  id: string;
-  label: string;
-  prompts: { label: string; query: string }[];
+const COMPANY_COLORS: Record<string, string> = {
+  Flex: '#0078FF',
+  Jabil: '#10B981',
+  Celestica: '#7C3AED',
+  Benchmark: '#F59E0B',
+  Sanmina: '#EF4444',
 };
 
-type QuestionPrimary = {
-  id: string;
-  label: string;
-  children: QuestionSecondary[];
-};
+interface SignalCard {
+  company: string;
+  event: string;
+  signal: string;
+  insight: string;
+  threat: ThreatLevel;
+}
 
-const QUESTION_BANK: QuestionPrimary[] = [
+const SIGNAL_CARDS: SignalCard[] = [
   {
-    id: 'market-demand',
-    label: 'Market Demand',
-    children: [
-      {
-        id: 'data-center-infra',
-        label: 'Data Center Infrastructure',
-        prompts: [
-          {
-            label: 'AI/DC Ramp',
-            query: 'Analysts frequently ask about the ramp of new AI-driven data center infrastructure deployments. Analyze demand ramp signals and expected acceleration across EMS companies.',
-          },
-          {
-            label: 'Deployment Pipeline',
-            query: 'Analyze the deployment pipeline and expected production ramp for new data center infrastructure projects, including near-term bottlenecks and execution dependencies.',
-          },
-        ],
-      },
-      {
-        id: 'hyperscale-customers',
-        label: 'Hyperscale Customers',
-        prompts: [
-          {
-            label: 'Hyperscale Ramps',
-            query: 'Analyze the scale and profitability of Jabil/Flex hyperscale customer ramps, and assess whether recent wins represent a structural market-share shift or temporary execution strength.',
-          },
-        ],
-      },
-      {
-        id: 'geo-nearshoring',
-        label: 'Geographic & Nearshoring',
-        prompts: [
-          {
-            label: 'Geo/Nearshoring',
-            query: 'Given cautious sentiment in Europe, analyze geographic demand trends and how Jabil/Flex footprints in India and Mexico are being utilized for regionalization and nearshoring.',
-          },
-        ],
-      },
-    ],
+    company: 'Jabil',
+    event: 'AI server revenue accelerating',
+    signal: 'AI-related revenue +32% YoY',
+    insight: 'Jabil scaling faster in hyperscaler infrastructure than Flex',
+    threat: 'HIGH',
   },
   {
-    id: 'strategic-positioning',
-    label: 'Strategic Positioning',
-    children: [
-      {
-        id: 'competitive-differentiation',
-        label: 'Competitive Differentiation',
-        prompts: [
-          {
-            label: 'Compare strategic positioning',
-            query: 'Analyze where Flex, Jabil, and Celestica differ most in strategic positioning for data center infrastructure manufacturing.',
-          },
-        ],
-      },
-    ],
+    company: 'Celestica',
+    event: 'Expanded AMD partnership',
+    signal: 'AI networking platform integration announced',
+    insight: 'Strengthening position in AI switching layer, direct overlap with Flex',
+    threat: 'HIGH',
   },
   {
-    id: 'financial-performance',
-    label: 'Financial Performance',
-    children: [
-      {
-        id: 'margin-sustainability',
-        label: 'Margin Sustainability',
-        prompts: [
-          {
-            label: 'Margin Quality',
-            query: 'Analyze how Flex/Jabil achieved sequential margin increases, and determine whether improvement is primarily product-mix shift into higher-value segments (e.g., Health and Industrial) or temporary tailwinds.',
-          },
-        ],
-      },
-    ],
+    company: 'Benchmark',
+    event: 'New facility in Penang',
+    signal: '$45M investment, 2026 Q3 online',
+    insight: 'Expanding SEA footprint, potential to undercut Flex on regional pricing',
+    threat: 'MEDIUM',
   },
   {
-    id: 'external-risks',
-    label: 'External Risks',
-    children: [
-      {
-        id: 'geopolitics',
-        label: 'Geopolitics',
-        prompts: [
-          {
-            label: 'Tariff Impact',
-            query: 'Analyze geopolitical and tariff impacts and management response, including expected effects on cash generation and reported financial results.',
-          },
-        ],
-      },
-    ],
+    company: 'Sanmina',
+    event: 'Server ecosystem wins',
+    signal: '3 new hyperscaler qualifications in Q1',
+    insight: 'Gaining credibility in AI server supply chain',
+    threat: 'MEDIUM',
+  },
+  {
+    company: 'Celestica',
+    event: 'Q4 earnings beat',
+    signal: 'Revenue +18% YoY, margin expansion',
+    insight: 'Strong execution gives them pricing power and investment capacity',
+    threat: 'LOW',
   },
 ];
 
-const QUICK_QUESTIONS = [
+const STRATEGY_CATEGORIES = [
   {
-    label: 'AI/DC Ramp',
-    query: 'Analysts frequently ask about the ramp of new AI-driven data center infrastructure deployments. Analyze demand ramp signals and expected acceleration across EMS companies.',
+    id: 'ai-infra',
+    label: 'AI Infrastructure Leadership',
+    questions: [
+      'Who is gaining share in AI data center hardware?',
+      'Compare AI revenue exposure across all 5 companies',
+      'Which company is scaling fastest in AI infrastructure?',
+      'Compare hyperscaler customer relationships',
+    ],
   },
   {
-    label: 'Margin Quality',
-    query: 'Analyze how Flex/Jabil achieved sequential margin increases, and determine whether improvement is primarily product-mix shift into higher-value segments (e.g., Health and Industrial) or temporary tailwinds.',
+    id: 'capacity',
+    label: 'Capacity & Footprint',
+    questions: [
+      'Where is each company expanding manufacturing capacity?',
+      'Compare Mexico / India / Southeast Asia strategies',
+      'Who is investing most in liquid cooling production?',
+      'Which regions show highest capacity growth risk for Flex?',
+    ],
   },
   {
-    label: 'Hyperscale Ramps',
-    query: 'Analyze the scale and profitability of Jabil/Flex hyperscale customer ramps, and assess whether recent wins represent a structural market-share shift or temporary execution strength.',
+    id: 'financial',
+    label: 'Financial Performance',
+    questions: [
+      'Compare gross margin trends across companies',
+      'Which company shows strongest revenue growth momentum?',
+      'Analyze backlog and demand signals by company',
+      'Compare CapEx intensity as % of revenue',
+    ],
   },
   {
-    label: 'Geo/Nearshoring',
-    query: 'Given cautious sentiment in Europe, analyze geographic demand trends and how Jabil/Flex footprints in India and Mexico are being utilized for regionalization and nearshoring.',
-  },
-  {
-    label: 'Tariff Impact',
-    query: 'Analyze geopolitical and tariff impacts and management response, including expected effects on cash generation and reported financial results.',
-  },
-  {
-    label: 'AI/DC Revenue Mix',
-    query: 'What is the AI/Data Center revenue mix for each company, and how has it changed YoY?',
-  },
-  {
-    label: 'CapEx Guidance',
-    query: 'Compare CapEx guidance across all 5 EMS companies for the current fiscal year.',
-  },
-  {
-    label: 'Liquid Cooling',
-    query: 'What liquid cooling and power management capabilities are each company developing?',
-  },
-  {
-    label: 'Hyperscaler Demand',
-    query: 'Which hyperscaler customers are driving AI server demand for EMS companies?',
-  },
-  {
-    label: 'Gross Margin Trend',
-    query: 'What are the gross margin trends for AI/DC vs traditional segments?',
-  },
-  {
-    label: 'Capacity Expansion',
-    query: 'What manufacturing capacity expansions are planned for AI server production?',
+    id: 'risks',
+    label: 'Risks & External Factors',
+    questions: [
+      'Compare tariff and geopolitical exposure by company',
+      'Identify supply chain concentration risks',
+      'Analyze customer concentration risk',
+      'Which competitor is most exposed to AI spending slowdown?',
+    ],
   },
 ];
 
 const COMPANY_FILTERS: CompanyFilter[] = ['Flex', 'Jabil', 'Celestica', 'Benchmark', 'Sanmina'];
 const TIME_HORIZONS: TimeHorizon[] = ['Any Time', 'FY2026', 'FY2025', 'Last 12 Months'];
 
+const COMPARE_SUFFIX = ' — Compare Flex vs Jabil vs Celestica vs Benchmark vs Sanmina';
+
+const STRUCTURED_RESPONSE_INSTRUCTION = `Structure every response with exactly three sections:
+1. KEY CONCLUSION: 2-3 sentences ranking companies or stating the main finding
+2. SUPPORTING EVIDENCE: 3-5 bullet points with specific data points
+3. IMPLICATION FOR FLEX: 1-2 sentences on what Flex should do or watch
+
+`;
+
 const modeConfig = {
-  rag: {
-    icon: Database,
-    label: 'Filing Search',
-    color: 'bg-blue-100 text-blue-700 border-blue-200',
-    activeClass: 'border-blue-300 bg-blue-50 text-blue-900 shadow-sm',
-    desc: 'SEC docs',
-  },
-  web: {
-    icon: Globe,
-    label: 'Web Search',
-    color: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    activeClass: 'border-emerald-300 bg-emerald-50 text-emerald-900 shadow-sm',
-    desc: 'Public web',
-  },
-  hybrid: {
-    icon: Sparkles,
-    label: 'Hybrid Search',
-    color: 'bg-cyan-100 text-cyan-700 border-cyan-200',
-    activeClass: 'border-cyan-300 bg-cyan-50 text-cyan-900 shadow-sm',
-    desc: 'Docs + web',
-  },
+  rag:    { icon: Database,  label: 'Filing Search', color: 'bg-blue-100 text-blue-700 border-blue-200',    activeClass: 'border-blue-300 bg-blue-50 text-blue-900 shadow-sm',    desc: 'SEC docs' },
+  web:    { icon: Globe,     label: 'Web Search',    color: 'bg-emerald-100 text-emerald-700 border-emerald-200', activeClass: 'border-emerald-300 bg-emerald-50 text-emerald-900 shadow-sm', desc: 'Public web' },
+  hybrid: { icon: Sparkles,  label: 'Hybrid Search', color: 'bg-cyan-100 text-cyan-700 border-cyan-200',    activeClass: 'border-cyan-300 bg-cyan-50 text-cyan-900 shadow-sm',    desc: 'Docs + web' },
 } as const;
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function ThreatPill({ level }: { level: ThreatLevel }) {
+  const styles: Record<ThreatLevel, string> = {
+    HIGH:   'bg-red-500 text-white',
+    MEDIUM: 'bg-orange-500 text-white',
+    LOW:    'bg-green-500 text-white',
+  };
+  const labels: Record<ThreatLevel, string> = { HIGH: '🔴 HIGH', MEDIUM: '🟠 MED', LOW: '🟢 LOW' };
+  return (
+    <span className={`rounded-full px-1.5 py-px text-[9px] font-bold whitespace-nowrap ${styles[level]}`}>
+      {labels[level]}
+    </span>
+  );
+}
+
+function CompactSignalCard({ card }: { card: SignalCard }) {
+  const color = COMPANY_COLORS[card.company] || '#64748B';
+  return (
+    <div className="w-[280px] shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+      {/* Top row: badge + company name + threat pill */}
+      <div className="mb-1.5 flex items-center gap-1.5">
+        <div
+          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[10px] font-bold text-white"
+          style={{ backgroundColor: color }}
+        >
+          {card.company.charAt(0)}
+        </div>
+        <span className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-900 dark:text-slate-100">
+          {card.company}
+        </span>
+        <ThreatPill level={card.threat} />
+      </div>
+      {/* Event headline — 1 line, truncated */}
+      <p className="mb-0.5 truncate text-[11px] font-medium leading-tight text-slate-700 dark:text-slate-200">
+        {card.event}
+      </p>
+      {/* Signal metric — blue, 1 line */}
+      <p className="truncate text-[11px] font-semibold leading-tight text-blue-700 dark:text-blue-300">
+        {card.signal}
+      </p>
+    </div>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -250,58 +226,30 @@ export default function ChatPage() {
   const [answerProvider, setAnswerProvider] = useState<AnswerProvider>('none');
   const [enableFallback, setEnableFallback] = useState(false);
   const [strictGrounding, setStrictGrounding] = useState(true);
-  const [maxResponseWords, setMaxResponseWords] = useState('200');
-  const [openPrimary, setOpenPrimary] = useState<Record<string, boolean>>(
-    () =>
-      QUESTION_BANK.reduce<Record<string, boolean>>((acc, item) => {
-        acc[item.id] = false;
-        return acc;
-      }, {})
-  );
-  const [openSecondary, setOpenSecondary] = useState<Record<string, boolean>>(
-    () =>
-      QUESTION_BANK.reduce<Record<string, boolean>>((acc, item) => {
-        item.children.forEach((child) => {
-          acc[child.id] = false;
-        });
-        return acc;
-      }, {})
-  );
+  const [maxResponseWords] = useState('200');
   const [lastCopiedId, setLastCopiedId] = useState<string | null>(null);
-  const [customQuestions, setCustomQuestions] = useState<CustomPresetQuestion[]>([]);
-  const [openCustomGroup, setOpenCustomGroup] = useState(true);
-  const [showAddPresetForm, setShowAddPresetForm] = useState(false);
-  const [newPresetLabel, setNewPresetLabel] = useState('');
-  const [newPresetQuery, setNewPresetQuery] = useState('');
   const [sessionId] = useState(() => `session_${Date.now()}`);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const inputDockRef = useRef<HTMLDivElement>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  // Dropdown per category pill (replaces openCategory + expanded section)
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  // Signals collapse toggle
+  const [signalsCollapsed, setSignalsCollapsed] = useState(false);
 
+  const messagesAreaRef   = useRef<HTMLDivElement>(null);
+  const inputRef          = useRef<HTMLInputElement>(null);
+  const inputDockRef      = useRef<HTMLDivElement>(null);
+  const settingsBtnRef    = useRef<HTMLButtonElement>(null);
+  const settingsPanelRef  = useRef<HTMLDivElement>(null);
+  const dropdownBtnRefs   = useRef<Record<string, HTMLButtonElement | null>>({});
+  const dropdownPanelRef  = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll messages to bottom
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const el = messagesAreaRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages, isLoading]);
 
-  useEffect(() => {
-    const loadCustomQuestions = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/chat/custom-questions`);
-        if (!res.ok) return;
-        const data = await res.json();
-        const questions = Array.isArray(data?.questions) ? data.questions : [];
-        setCustomQuestions(
-          questions.filter(isCustomPresetQuestion)
-        );
-      } catch {
-        // Keep empty list on failure.
-      }
-    };
-    loadCustomQuestions();
-  }, []);
-
-  // Product rule:
-  // - Entering Hybrid: auto-enable OpenAI if provider is currently off
-  // - Switching to Filing/Web: provider turns off (button remains visible)
+  // Sync mode → provider/fallback
   useEffect(() => {
     if (mode === 'hybrid') {
       setAnswerProvider((prev) => (prev === 'none' ? 'openai' : prev));
@@ -313,123 +261,81 @@ export default function ChatPage() {
     }
   }, [mode]);
 
-  const togglePrimary = (id: string) => {
-    setOpenPrimary((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+  // Close settings on outside click or ESC
+  useEffect(() => {
+    if (!showSettings) return;
+    const handleClick = (e: MouseEvent) => {
+      if (
+        settingsBtnRef.current?.contains(e.target as Node) ||
+        settingsPanelRef.current?.contains(e.target as Node)
+      ) return;
+      setShowSettings(false);
+    };
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowSettings(false); };
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [showSettings]);
 
-  const toggleSecondary = (id: string) => {
-    setOpenSecondary((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+  // Close question dropdown on outside click or ESC
+  useEffect(() => {
+    if (!openDropdown) return;
+    const handleClick = (e: MouseEvent) => {
+      if (dropdownBtnRefs.current[openDropdown]?.contains(e.target as Node)) return;
+      if (dropdownPanelRef.current?.contains(e.target as Node)) return;
+      setOpenDropdown(null);
+    };
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpenDropdown(null); };
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [openDropdown]);
 
-  const focusInputArea = () => {
-    inputDockRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    window.setTimeout(() => inputRef.current?.focus(), 120);
-  };
+  // Fixed-position style for settings panel
+  const getSettingsPanelStyle = useCallback((): React.CSSProperties => {
+    const rect = settingsBtnRef.current?.getBoundingClientRect();
+    if (!rect) return { position: 'fixed', top: 60, right: 20, zIndex: 9999 };
+    return { position: 'fixed', top: rect.bottom + 8, right: window.innerWidth - rect.right, zIndex: 9999 };
+  }, []);
 
-  const fillInputFromPreset = (query: string) => {
-    setInput(query);
-    focusInputArea();
-  };
+  // Fixed-position style for question dropdown
+  const getDropdownStyle = useCallback((categoryId: string): React.CSSProperties => {
+    const btn = dropdownBtnRefs.current[categoryId];
+    if (!btn) return { position: 'fixed', top: 100, left: 0, zIndex: 9999 };
+    const rect = btn.getBoundingClientRect();
+    return { position: 'fixed', top: rect.bottom + 4, left: rect.left, zIndex: 9999 };
+  }, []);
 
-  const cancelNewPreset = () => {
-    setShowAddPresetForm(false);
-    setNewPresetLabel('');
-    setNewPresetQuery('');
-  };
-
-  const saveNewPreset = async () => {
-    const label = newPresetLabel.trim();
-    const query = newPresetQuery.trim();
-    if (!label || !query) return;
-
-    try {
-      const res = await fetch(`${API_URL}/api/chat/custom-questions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ label, query }),
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      const item = data?.question;
-      if (item?.id && item?.label && item?.query) {
-        setCustomQuestions((prev) => [item, ...prev]);
-      }
-      cancelNewPreset();
-    } catch {
-      // Ignore network errors; preserve form for retry.
-    }
-  };
-
-  const deleteCustomPreset = async (id: string) => {
-    try {
-      const res = await fetch(`${API_URL}/api/chat/custom-questions/${encodeURIComponent(id)}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) return;
-      setCustomQuestions((prev) => prev.filter((item) => item.id !== id));
-    } catch {
-      // Ignore network errors.
-    }
-  };
-
-  const toggleAnswerProvider = (provider: Exclude<AnswerProvider, 'none'>) => {
-    setAnswerProvider((prev) => (prev === provider ? 'none' : provider));
-  };
-
-  const isAllCompanies = selectedCompanies.length === 0;
+  const isAllCompanies   = selectedCompanies.length === 0;
   const companyScopeLabel = isAllCompanies ? 'All' : selectedCompanies.join(', ');
   const isLengthCapActive = mode === 'hybrid' && enableFallback && !strictGrounding;
 
   const toggleCompany = (company: CompanyFilter | 'All') => {
-    if (company === 'All') {
-      setSelectedCompanies([]);
-      return;
-    }
-
-    setSelectedCompanies((prev) => {
-      if (prev.includes(company)) {
-        return prev.filter((item) => item !== company);
-      }
-      return [...prev, company];
-    });
+    if (company === 'All') { setSelectedCompanies([]); return; }
+    setSelectedCompanies((prev) =>
+      prev.includes(company) ? prev.filter((c) => c !== company) : [...prev, company]
+    );
   };
 
   const buildQuery = (query: string) => {
-    const constraints = [];
-
-    if (selectedCompanies.length > 0) {
-      constraints.push(`Focus on these companies only: ${selectedCompanies.join(', ')}.`);
-    }
-
-    if (timeHorizon !== 'Any Time') {
-      constraints.push(`Prioritize ${timeHorizon}.`);
-    }
-
-    return constraints.length > 0 ? `${query}\n\nConstraints: ${constraints.join(' ')}` : query;
+    const constraints: string[] = [];
+    if (selectedCompanies.length > 0) constraints.push(`Focus on these companies only: ${selectedCompanies.join(', ')}.`);
+    if (timeHorizon !== 'Any Time') constraints.push(`Prioritize ${timeHorizon}.`);
+    const base = constraints.length > 0 ? `${query}\n\nConstraints: ${constraints.join(' ')}` : query;
+    return STRUCTURED_RESPONSE_INSTRUCTION + base;
   };
 
   const sendMessage = async (query?: string) => {
     const rawText = query || input.trim();
     if (!rawText || isLoading) return;
 
-    if (mode === 'hybrid' && enableFallback && answerProvider === 'none') {
-      const warningMsg: Message = {
-        id: `warning_${Date.now()}`,
-        role: 'assistant',
-        content: 'Hybrid mode fallback is OFF. Please select a model in the top-right (OpenAI or Claude) before continuing.',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, warningMsg]);
-      inputRef.current?.focus();
-      return;
-    }
-
-    const userMsg: Message = {
-      id: `user_${Date.now()}`,
-      role: 'user',
-      content: rawText,
-      timestamp: new Date(),
-    };
+    const userMsg: Message = { id: `user_${Date.now()}`, role: 'user', content: rawText, timestamp: new Date() };
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
@@ -464,206 +370,207 @@ export default function ChatPage() {
       };
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (err) {
-      const errorMsg: Message = {
+      setMessages((prev) => [...prev, {
         id: `error_${Date.now()}`,
         role: 'assistant',
         content: `Failed to get a response. Make sure the backend is running on port 8001.\n\nError: ${err}`,
         timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMsg]);
+      }]);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
     }
   };
 
-  const clearChat = () => {
-    setMessages([]);
-    setLastCopiedId(null);
-    inputRef.current?.focus();
+  const handleStrategyQuestion = (question: string) => {
+    const fullQuery = question + COMPARE_SUFFIX;
+    setInput(fullQuery);
+    setOpenDropdown(null);
+    sendMessage(fullQuery);
   };
+
+  const clearChat = () => { setMessages([]); setLastCopiedId(null); inputRef.current?.focus(); };
 
   const copyMessage = async (message: Message) => {
     try {
       await navigator.clipboard.writeText(message.content);
       setLastCopiedId(message.id);
       window.setTimeout(() => setLastCopiedId(null), 1500);
-    } catch {
-      setLastCopiedId(null);
-    }
+    } catch { setLastCopiedId(null); }
   };
 
-  const mobilePrompts = QUESTION_BANK.flatMap((item) =>
-    item.children.flatMap((sub) => sub.prompts.map((prompt) => ({ category: `${item.label} · ${sub.label}`, label: prompt.label, query: prompt.query })))
-  ).slice(0, 8);
+  const focusInputArea = () => {
+    inputDockRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.setTimeout(() => inputRef.current?.focus(), 120);
+  };
+
+  const fmtTime = (d: Date) =>
+    d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+  // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex h-full flex-col bg-gradient-to-br from-slate-100 via-slate-50 to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <div className="border-b border-slate-200/80 bg-white/90 px-6 py-2.5 backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2.5">
-          <div className="flex flex-col gap-1.5 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-3xl">
-              <h1 className="text-2xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">Research Chat</h1>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <div
-                className={`inline-flex items-center gap-1 rounded-full border p-1 text-xs ${
-                  mode === 'hybrid'
-                    ? 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800'
-                    : 'border-slate-200/70 bg-slate-100/60 opacity-60 dark:border-slate-700/70 dark:bg-slate-800/50 dark:opacity-60'
-                }`}
-              >
-                <button
-                  type="button"
-                  onClick={() => toggleAnswerProvider('openai')}
-                  disabled={mode !== 'hybrid'}
-                  className={`rounded-full px-2.5 py-1 transition ${
-                    answerProvider === 'openai'
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700'
-                  } ${mode !== 'hybrid' ? 'cursor-not-allowed' : ''}`}
-                >
-                  OpenAI
-                </button>
-                <button
-                  type="button"
-                  onClick={() => toggleAnswerProvider('claude')}
-                  disabled={mode !== 'hybrid'}
-                  className={`rounded-full px-2.5 py-1 transition ${
-                    answerProvider === 'claude'
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700'
-                  } ${mode !== 'hybrid' ? 'cursor-not-allowed' : ''}`}
-                >
-                  Claude
-                </button>
-              </div>
-              <div
-                className={`inline-flex items-center gap-1 rounded-full border p-1 text-xs ${
-                  mode === 'hybrid'
-                    ? 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800'
-                    : 'border-slate-200/70 bg-slate-100/60 opacity-60 dark:border-slate-700/70 dark:bg-slate-800/50 dark:opacity-60'
-                }`}
-                title="Fallback, guardrails, and max words controls"
-              >
-                <button
-                  type="button"
-                  onClick={() => setEnableFallback((prev) => !prev)}
-                  disabled={mode !== 'hybrid'}
-                  className={`rounded-full px-2.5 py-1 transition ${
-                    enableFallback
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700'
-                  } ${mode !== 'hybrid' ? 'cursor-not-allowed' : ''}`}
-                >
-                  Fallback {enableFallback ? 'On' : 'Off'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStrictGrounding((prev) => !prev)}
-                  disabled={mode !== 'hybrid'}
-                  className={`rounded-full px-2.5 py-1 transition ${
-                    strictGrounding
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700'
-                  } ${mode !== 'hybrid' ? 'cursor-not-allowed' : ''}`}
-                >
-                  Prompt Guardrails {strictGrounding ? 'On' : 'Off'}
-                </button>
-                <span className="mx-1 h-4 w-px bg-slate-300 dark:bg-slate-600" />
-                <span className="px-1.5 text-slate-600 dark:text-slate-300">Max Words</span>
-                <span
-                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
-                    isLengthCapActive
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-300'
-                  }`}
-                >
-                  {isLengthCapActive ? 'On' : 'Off'}
-                </span>
-                <Input
-                  value={maxResponseWords}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/[^\d]/g, '').slice(0, 4);
-                    setMaxResponseWords(v);
-                  }}
-                  disabled={!isLengthCapActive}
-                  className="h-7 w-16 border-slate-300 bg-white px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-900"
-                  placeholder="200"
-                />
-              </div>
-              {messages.length > 0 && (
-                <Button variant="outline" size="sm" onClick={clearChat} className="border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800">
-                  <Trash2 className="w-4 h-4" />
-                  Clear Chat
-                </Button>
-              )}
-              <Button
-                size="sm"
-                onClick={focusInputArea}
-                className="h-8 bg-blue-600 px-3 text-xs text-white hover:bg-blue-700"
-              >
-                <ArrowUpRight className="h-3.5 w-3.5" />
-                Ask Question
+    <div className="flex h-screen flex-col bg-gradient-to-br from-slate-100 via-slate-50 to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+
+      {/* ── PAGE HEADER ─────────────────────────────────────────────────── */}
+      <div className="shrink-0 border-b border-slate-200/80 bg-white/90 px-6 py-3 backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <h1 className="text-xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">AI Chat</h1>
+          <div className="flex items-center gap-2">
+            {messages.length > 0 && (
+              <Button variant="outline" size="sm" onClick={clearChat} className="border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800">
+                <Trash2 className="h-4 w-4" />
+                Clear Chat
               </Button>
+            )}
+            <Button size="sm" onClick={focusInputArea} className="h-8 bg-blue-600 px-3 text-xs text-white hover:bg-blue-700">
+              <ArrowUpRight className="h-3.5 w-3.5" />
+              Ask Question
+            </Button>
+            <button
+              ref={settingsBtnRef}
+              onClick={() => setShowSettings((p) => !p)}
+              className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${
+                showSettings
+                  ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-300'
+                  : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600'
+              }`}
+              title="Advanced settings"
+            >
+              <Settings className="h-4 w-4" />
+            </button>
+
+            {showSettings && typeof document !== 'undefined' && createPortal(
+              <div
+                ref={settingsPanelRef}
+                style={getSettingsPanelStyle()}
+                className="w-72 rounded-xl border border-slate-200 bg-white p-3 shadow-2xl dark:border-slate-700 dark:bg-slate-900"
+              >
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Retrieval Mode</p>
+                <div className="mb-3 grid grid-cols-3 gap-1">
+                  {(Object.keys(modeConfig) as SearchMode[]).map((m) => {
+                    const cfg = modeConfig[m];
+                    const Icon = cfg.icon;
+                    return (
+                      <button
+                        key={m}
+                        onClick={() => setMode(m)}
+                        className={`rounded-lg border px-2 py-1.5 text-xs font-medium transition-all ${
+                          mode === m ? `${cfg.activeClass} dark:border-blue-800 dark:bg-slate-800 dark:text-slate-100` : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        <Icon className="mx-auto mb-0.5 h-3.5 w-3.5" />
+                        {cfg.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Model (Hybrid only)</p>
+                <div className="flex gap-1">
+                  {(['openai', 'claude'] as const).map((p) => (
+                    <button
+                      key={p}
+                      disabled={mode !== 'hybrid'}
+                      onClick={() => setAnswerProvider((prev) => prev === p ? 'none' : p)}
+                      className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition-all ${
+                        answerProvider === p ? 'bg-blue-600 text-white border-blue-600' : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
+                      } ${mode !== 'hybrid' ? 'cursor-not-allowed opacity-40' : ''}`}
+                    >
+                      {p === 'openai' ? 'OpenAI' : 'Claude'}
+                    </button>
+                  ))}
+                </div>
+              </div>,
+              document.body
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── MAIN LAYOUT ─────────────────────────────────────────────────── */}
+      <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden px-6 py-3">
+
+        {/* ── SECTION 1: Competitive Signals strip ─────────────────────── */}
+        <div className="mb-2 shrink-0">
+          {/* Header row with collapse toggle */}
+          <div className="mb-1.5 flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[13px] font-semibold text-slate-800 dark:text-slate-100">
+                Today&rsquo;s Competitive Signals
+              </span>
+              <Badge className="bg-blue-100 px-1.5 text-[9px] text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                Live
+              </Badge>
             </div>
+            <button
+              type="button"
+              onClick={() => setSignalsCollapsed((p) => !p)}
+              className="flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[11px] text-slate-400 transition-colors hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+            >
+              {signalsCollapsed
+                ? <><ChevronDown className="h-3 w-3" /> Show</>
+                : <><ChevronUp className="h-3 w-3" /> Hide</>
+              }
+            </button>
           </div>
 
-          <div className="grid gap-2 lg:grid-cols-[1.55fr_1fr_1fr]">
-            <Card className="gap-2 border-slate-200 bg-white/95 p-2.5 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
-                <Database className="h-4 w-4 text-blue-600" />
-                Retrieval Mode
-              </div>
-              <div className="grid gap-1.5 md:grid-cols-3">
-                {(Object.keys(modeConfig) as SearchMode[]).map((m) => {
-                  const config = modeConfig[m];
-                  const Icon = config.icon;
+          {/* Card strip — hidden when collapsed */}
+          {!signalsCollapsed && (
+            <div className="flex gap-2.5 overflow-x-auto pb-1.5 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700">
+              {SIGNAL_CARDS.map((card, idx) => (
+                <CompactSignalCard key={idx} card={card} />
+              ))}
+            </div>
+          )}
+        </div>
 
-                  return (
-                    <button
-                      key={m}
-                      title={config.desc}
-                      onClick={() => setMode(m)}
-                      className={`rounded-xl border px-2.5 py-1.5 text-left transition-all ${
-                        mode === m
-                          ? `${config.activeClass} dark:border-blue-800 dark:bg-slate-800 dark:text-slate-100`
-                          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4" />
-                        <span className="text-sm font-semibold leading-5">{config.label}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </Card>
+        {/* ── SECTION 2: Category pill bar with dropdowns ───────────────── */}
+        <div className="mb-2 flex shrink-0 items-center gap-2 overflow-x-auto">
+          {STRATEGY_CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              ref={(el) => { dropdownBtnRefs.current[cat.id] = el; }}
+              onClick={() => setOpenDropdown(openDropdown === cat.id ? null : cat.id)}
+              className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all ${
+                openDropdown === cat.id
+                  ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-300'
+                  : 'border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-900'
+              }`}
+            >
+              {cat.label}
+              <ChevronDown
+                className={`h-3 w-3 transition-transform duration-150 ${openDropdown === cat.id ? 'rotate-180' : ''}`}
+              />
+            </button>
+          ))}
+        </div>
 
-            <Card className="gap-2 border-slate-200 bg-white/95 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
-                <Building2 className="h-4 w-4 text-slate-600" />
-                Company Filter
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                <button
-                  onClick={() => toggleCompany('All')}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                    isAllCompanies
-                      ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300'
-                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-900'
-                  }`}
-                >
-                  All
-                </button>
-                {COMPANY_FILTERS.map((company) => {
-                  const isSelected = selectedCompanies.includes(company);
-                  return (
+        {/* ── SECTION 3 + 4: Chat card (grows to fill remaining space) ──── */}
+        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden border-slate-200 bg-white/95 p-0 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
+
+          {/* Filter bar */}
+          <div className="flex shrink-0 flex-wrap items-center gap-4 border-b border-slate-200 px-4 py-2 dark:border-slate-700">
+            <div className="flex items-center gap-1.5">
+              <Building2 className="h-3.5 w-3.5 shrink-0 text-slate-500" />
+              <span className="mr-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">Company:</span>
+              <button
+                onClick={() => toggleCompany('All')}
+                className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
+                  isAllCompanies
+                    ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300'
+                    : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-900'
+                }`}
+              >
+                All
+              </button>
+              {COMPANY_FILTERS.map((company) => {
+                const isSelected = selectedCompanies.includes(company);
+                return (
                   <button
                     key={company}
                     onClick={() => toggleCompany(company)}
-                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                    className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
                       isSelected
                         ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300'
                         : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-900'
@@ -671,428 +578,205 @@ export default function ChatPage() {
                   >
                     {company}
                   </button>
-                  );
-                })}
-              </div>
-            </Card>
-
-            <Card className="gap-2 border-slate-200 bg-white/95 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
-                <Clock3 className="h-4 w-4 text-slate-600" />
-                Time Focus
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {TIME_HORIZONS.map((range) => (
-                  <button
-                    key={range}
-                    onClick={() => setTimeHorizon(range)}
-                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                      timeHorizon === range
-                        ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300'
-                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-900'
-                    }`}
-                  >
-                    {range}
-                  </button>
-                ))}
-              </div>
-            </Card>
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto w-full max-w-7xl px-6 py-3">
-        <div className="grid min-h-0 gap-4 xl:h-[calc(100vh-148px)] xl:grid-cols-[350px_minmax(0,1fr)]">
-          <Card className="hidden min-h-0 h-[calc(100vh-148px)] overflow-hidden border-slate-200 bg-white/95 p-0 shadow-sm xl:flex xl:flex-col dark:border-slate-700 dark:bg-slate-900/90">
-            <div className="border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Preset Question Library</h2>
-              <p className="mt-1 text-xs leading-4 text-slate-500 dark:text-slate-400">Level 1, 2, and 3 prompts. Click any question to send directly.</p>
+                );
+              })}
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
-              <div className="space-y-2">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-900/70">
-                  <div className="mb-2 flex items-center justify-between">
-                    <div className="text-sm font-semibold text-slate-800 dark:text-slate-100">Top Analyst Questions</div>
-                    <button
-                      onClick={() => setShowAddPresetForm((prev) => !prev)}
-                      className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-500"
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                      Add Preset Question
-                    </button>
-                  </div>
-                  {showAddPresetForm && (
-                    <div className="mb-2 rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800">
-                      <div className="space-y-2">
-                        <div>
-                          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                            Label
-                          </label>
-                          <Input
-                            value={newPresetLabel}
-                            onChange={(e) => setNewPresetLabel(e.target.value)}
-                            placeholder="e.g. AI Supply Chain Risk"
-                            className="h-8 text-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                            Full Question
-                          </label>
-                          <textarea
-                            value={newPresetQuery}
-                            onChange={(e) => setNewPresetQuery(e.target.value)}
-                            placeholder="Type the complete preset question..."
-                            rows={3}
-                            className="w-full rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-200 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                          />
-                        </div>
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={cancelNewPreset}
-                            className="rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-600 hover:border-slate-400 dark:border-slate-600 dark:text-slate-200 dark:hover:border-slate-500"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={saveNewPreset}
-                            disabled={!newPresetLabel.trim() || !newPresetQuery.trim()}
-                            className="rounded-md bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            Save
-                          </button>
-                        </div>
+
+            <div className="flex items-center gap-1.5">
+              <Clock3 className="h-3.5 w-3.5 shrink-0 text-slate-500" />
+              <span className="mr-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">Time:</span>
+              {TIME_HORIZONS.map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setTimeHorizon(range)}
+                  className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
+                    timeHorizon === range
+                      ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300'
+                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-900'
+                  }`}
+                >
+                  {range}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Messages area — takes all remaining Card height ─────────── */}
+          <div
+            ref={messagesAreaRef}
+            className="flex-1 overflow-y-auto border-t border-slate-100 px-5 py-4 dark:border-slate-800"
+          >
+            {messages.length === 0 ? (
+              /* Empty state */
+              <div className="flex h-full min-h-[260px] flex-col items-center justify-center text-center">
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-950/50">
+                  <Bot className="h-5 w-5 text-blue-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Research Workspace</h2>
+                <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                  Ask a question or click a topic above
+                </p>
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+                  <Badge variant="outline" className="border-slate-200 bg-slate-50 text-[11px] text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                    Active Mode: {modeConfig[mode].label}
+                  </Badge>
+                  <Badge variant="outline" className="border-slate-200 bg-slate-50 text-[11px] text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                    Company: {companyScopeLabel}
+                  </Badge>
+                  <Badge variant="outline" className="border-slate-200 bg-slate-50 text-[11px] text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                    Time: {timeHorizon}
+                  </Badge>
+                </div>
+              </div>
+            ) : (
+              /* Message list */
+              <div className="mx-auto max-w-4xl space-y-5">
+                {messages.map((msg) => (
+                  <div key={msg.id} className={`flex gap-2.5 ${msg.role === 'user' ? 'justify-end' : ''}`}>
+                    {msg.role === 'assistant' && (
+                      <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-950/50">
+                        <Bot className="h-4 w-4 text-blue-600" />
+                      </div>
+                    )}
+
+                    <div className={`min-w-0 ${msg.role === 'user' ? 'max-w-[70%]' : 'max-w-[85%]'}`}>
+                      <div
+                        className={`rounded-xl px-4 py-2.5 ${
+                          msg.role === 'user'
+                            ? 'bg-blue-600 text-white'
+                            : 'border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900'
+                        }`}
+                      >
+                        {msg.role === 'assistant' ? (
+                          <div className="prose prose-sm max-w-none prose-slate dark:prose-invert">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                          </div>
+                        ) : (
+                          <p className="text-sm leading-5">{msg.content}</p>
+                        )}
+                      </div>
+
+                      {/* Timestamp + source badges + actions */}
+                      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                          {fmtTime(msg.timestamp)}
+                        </span>
+                        {msg.sources && msg.sources.length > 0 && (
+                          <>
+                            {msg.sources.slice(0, 3).map((src, i) => (
+                              <Badge key={i} variant="outline" className="text-[10px] font-normal">
+                                {src.company} · {src.filing_type} · {src.fiscal_year}
+                              </Badge>
+                            ))}
+                            {msg.mode && (
+                              <Badge className={`border text-[10px] ${modeConfig[msg.mode].color}`}>
+                                {modeConfig[msg.mode].label}
+                              </Badge>
+                            )}
+                          </>
+                        )}
+                        {msg.role === 'assistant' && (
+                          <>
+                            <Button type="button" variant="ghost" size="xs" onClick={() => copyMessage(msg)} className="h-5 px-1.5 text-[10px] text-slate-400 dark:text-slate-500">
+                              <Copy className="h-2.5 w-2.5" />
+                              {lastCopiedId === msg.id ? 'Copied' : 'Copy'}
+                            </Button>
+                            <Button type="button" variant="ghost" size="xs" onClick={() => setInput(msg.content)} className="h-5 px-1.5 text-[10px] text-slate-400 dark:text-slate-500">
+                              Reuse
+                            </Button>
+                          </>
+                        )}
+                        {msg.role === 'user' && (
+                          <Button type="button" variant="ghost" size="xs" onClick={() => { setInput(msg.content); inputRef.current?.focus(); }} className="h-5 px-1.5 text-[10px] text-slate-400 dark:text-slate-500">
+                            <RotateCcw className="h-2.5 w-2.5" />
+                            Reuse
+                          </Button>
+                        )}
                       </div>
                     </div>
-                  )}
-                  <div className="space-y-1">
-                    {QUICK_QUESTIONS.map((question, idx) => (
-                      <button
-                        key={`${question.label}-${idx}`}
-                        onClick={() => sendMessage(question.query)}
-                        className="flex w-full items-start gap-2 rounded-lg px-2 py-1.5 text-left text-sm text-slate-700 transition hover:bg-white dark:text-slate-200 dark:hover:bg-slate-800"
-                      >
-                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full border border-slate-400 dark:border-slate-500" />
-                        <span className="line-clamp-2">{question.label}</span>
-                      </button>
-                    ))}
-                  </div>
 
-                  <div className="mt-2 rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
-                    <button
-                      onClick={() => setOpenCustomGroup((prev) => !prev)}
-                      className="flex w-full items-center justify-between px-3 py-1.5 text-left"
-                    >
-                      <span className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-                        Custom Added Questions
-                      </span>
-                      {openCustomGroup ? (
-                        <ChevronDown className="h-4 w-4 text-slate-400" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4 text-slate-400" />
-                      )}
-                    </button>
-                    {openCustomGroup && (
-                      <div className="border-t border-slate-200 px-2 py-1.5 dark:border-slate-700">
-                        {customQuestions.length === 0 ? (
-                          <p className="px-1 py-1 text-xs text-slate-500 dark:text-slate-400">No custom questions yet.</p>
-                        ) : (
-                          <div className="space-y-1">
-                            {customQuestions.map((question) => (
-                              <div
-                                key={question.id}
-                                className="flex w-full items-start gap-2 rounded-md px-2 py-1 text-xs text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
-                              >
-                                <button
-                                  onClick={() => fillInputFromPreset(question.query)}
-                                  className="flex min-w-0 flex-1 items-start gap-2 text-left"
-                                >
-                                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400 dark:bg-blue-500" />
-                                  <span className="line-clamp-2">{question.label}</span>
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    deleteCustomPreset(question.id);
-                                  }}
-                                  aria-label={`Delete ${question.label}`}
-                                  title="Delete"
-                                  className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded text-[11px] text-slate-400 hover:bg-slate-200 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-200"
-                                >
-                                  ×
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                    {msg.role === 'user' && (
+                      <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/40">
+                        <User className="h-4 w-4 text-blue-600 dark:text-blue-300" />
                       </div>
                     )}
                   </div>
-                </div>
+                ))}
 
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-900/70">
-                  <div className="mb-2 px-1 text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400">Research Topics</div>
-                  <div className="space-y-1">
-                    {QUESTION_BANK.map((item) => {
-                      const isOpen = openPrimary[item.id];
-                      return (
-                        <div key={item.id} className="rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
-                          <button
-                            onClick={() => togglePrimary(item.id)}
-                            className="flex w-full items-center justify-between px-3 py-1.5 text-left"
-                          >
-                            <span className={`text-sm font-semibold ${isOpen ? 'text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-200'}`}>
-                              {item.label}
-                            </span>
-                            {isOpen ? (
-                              <ChevronDown className="h-4 w-4 text-slate-400" />
-                            ) : (
-                              <ChevronRight className="h-4 w-4 text-slate-400" />
-                            )}
-                          </button>
-
-                          {isOpen && (
-                            <div className="border-t border-slate-200 px-2 py-2 dark:border-slate-700">
-                              <div className="space-y-1">
-                                {item.children.map((sub) => {
-                                  const isSecondaryOpen = openSecondary[sub.id];
-                                  return (
-                                    <div key={sub.id} className="rounded-md">
-                                      <button
-                                        onClick={() => toggleSecondary(sub.id)}
-                                        className={`w-full rounded-md px-2 py-1 text-left text-sm ${
-                                          isSecondaryOpen
-                                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300'
-                                            : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
-                                        }`}
-                                      >
-                                        {sub.label}
-                                      </button>
-
-                                      {isSecondaryOpen && (
-                                        <div className="mt-1 space-y-1 pl-3">
-                                          {sub.prompts.map((question, qIdx) => (
-                                            <button
-                                              key={`${sub.id}-${qIdx}`}
-                                              onClick={() => sendMessage(question.query)}
-                                              className="flex w-full items-start gap-2 rounded-md px-2 py-1 text-left text-xs text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
-                                            >
-                                              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400 dark:bg-blue-500" />
-                                              <span>{question.label}</span>
-                                            </button>
-                                          ))}
-                                        </div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="min-h-0 h-full overflow-hidden border-slate-200 bg-white/95 p-0 shadow-sm flex flex-col dark:border-slate-700 dark:bg-slate-900/90">
-            <ScrollArea className="min-h-0 flex-1 px-6 py-4">
-              {messages.length === 0 ? (
-                <div className="flex min-h-[520px] flex-col items-center justify-center text-center">
-                  <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-950/50">
-                    <Bot className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Research Workspace</h2>
-
-                  <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-                    <Badge variant="outline" className="border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                      Active Mode: {modeConfig[mode].label}
-                    </Badge>
-                    <Badge variant="outline" className="border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                      Company: {companyScopeLabel}
-                    </Badge>
-                    <Badge variant="outline" className="border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                      Time: {timeHorizon}
-                    </Badge>
-                  </div>
-
-                  <div className="mt-8 grid w-full max-w-4xl grid-cols-1 gap-3 md:grid-cols-2 xl:hidden">
-                    {mobilePrompts.map((item, i) => (
-                      <button
-                        key={i}
-                        onClick={() => sendMessage(item.query)}
-                        className="text-left rounded-2xl border border-slate-200 bg-white px-4 py-4 transition-all hover:border-blue-200 hover:bg-blue-50/60 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-blue-800 dark:hover:bg-slate-800"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                            {item.category}
-                          </span>
-                          <ArrowUpRight className="h-4 w-4 text-slate-300" />
-                        </div>
-                        <p className="mt-3 text-sm leading-6 text-slate-700 dark:text-slate-200">{item.label}</p>
-                      </button>
-                    ))}
-                  </div>
-
-                  <p className="mt-5 text-xs text-slate-400 dark:text-slate-500 xl:hidden">
-                    Use structured prompts or type your own analyst question.
-                  </p>
-                </div>
-              ) : (
-                <div className="mx-auto max-w-4xl space-y-6">
-                  {messages.map((msg) => (
-                    <div key={msg.id} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
-                      {msg.role === 'assistant' && (
-                        <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100">
-                          <Bot className="h-4 w-4 text-blue-600" />
-                        </div>
-                      )}
-
-                      <div className={`max-w-[84%] ${msg.role === 'user' ? 'order-first' : ''}`}>
-                        <div
-                          className={`rounded-3xl px-5 py-4 ${
-                            msg.role === 'user'
-                              ? 'bg-slate-900 text-white'
-                              : 'border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900'
-                          }`}
-                        >
-                          {msg.role === 'assistant' ? (
-                            <div className="prose prose-sm max-w-none prose-slate dark:prose-invert">
-                              <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-                            </div>
-                          ) : (
-                            <p className="text-sm leading-6">{msg.content}</p>
-                          )}
-                        </div>
-
-                        <div className="mt-2 flex flex-wrap items-center gap-2">
-                          {msg.sources && msg.sources.length > 0 && (
-                            <>
-                              {msg.sources.slice(0, 4).map((src, i) => (
-                                <Badge key={i} variant="outline" className="text-xs font-normal">
-                                  {src.company} · {src.filing_type} · {src.fiscal_year}
-                                </Badge>
-                              ))}
-                              {msg.mode && (
-                                <Badge className={`border text-xs ${modeConfig[msg.mode].color}`}>
-                                  {modeConfig[msg.mode].label}
-                                </Badge>
-                              )}
-                            </>
-                          )}
-
-                          {msg.role === 'assistant' && (
-                            <>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="xs"
-                                onClick={() => copyMessage(msg)}
-                                className="text-slate-500 dark:text-slate-300"
-                              >
-                                <Copy className="w-3 h-3" />
-                                {lastCopiedId === msg.id ? 'Copied' : 'Copy'}
-                              </Button>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="xs"
-                                onClick={() => setInput(msg.content)}
-                                className="text-slate-500 dark:text-slate-300"
-                              >
-                                Reuse Answer
-                              </Button>
-                            </>
-                          )}
-
-                          {msg.role === 'user' && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="xs"
-                              onClick={() => {
-                                setInput(msg.content);
-                                inputRef.current?.focus();
-                              }}
-                              className="text-slate-500 dark:text-slate-300"
-                            >
-                              <RotateCcw className="w-3 h-3" />
-                              Reuse Question
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-
-                      {msg.role === 'user' && (
-                        <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-200">
-                          <User className="h-4 w-4 text-slate-600" />
-                        </div>
-                      )}
+                {isLoading && (
+                  <div className="flex gap-2.5">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-100">
+                      <Bot className="h-4 w-4 text-blue-600" />
                     </div>
-                  ))}
-
-                  {isLoading && (
-                    <div className="flex gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100">
-                        <Bot className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div className="rounded-3xl border border-slate-200 bg-white px-5 py-4 dark:border-slate-700 dark:bg-slate-900">
-                        <div className="flex items-center gap-3">
-                          <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-                          <p className="text-sm text-slate-500 dark:text-slate-300">Searching sources and drafting response...</p>
-                        </div>
+                    <div className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 dark:border-slate-700 dark:bg-slate-900">
+                      <div className="flex items-center gap-2.5">
+                        <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                        <p className="text-sm text-slate-500 dark:text-slate-300">Searching sources and drafting response...</p>
                       </div>
                     </div>
-                  )}
-                  <div ref={scrollRef} />
-                </div>
-              )}
-            </ScrollArea>
-
-            <div ref={inputDockRef} className="border-t border-slate-200 bg-white px-6 py-4 dark:border-slate-700 dark:bg-slate-900">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  sendMessage();
-                }}
-                className="mx-auto max-w-4xl"
-              >
-                <div className="flex gap-3">
-                  <Input
-                    ref={inputRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Ask about CapEx, data center infrastructure, customer exposure, or earnings commentary..."
-                    disabled={isLoading}
-                    className="h-12 flex-1 border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-400"
-                    autoFocus
-                  />
-                  <Button
-                    type="submit"
-                    disabled={isLoading || !input.trim()}
-                    className="h-12 bg-blue-600 px-5 text-white hover:bg-blue-700"
-                  >
-                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    <span className="hidden sm:inline">Send</span>
-                  </Button>
-                </div>
-              </form>
-              <div className="mx-auto mt-3 flex max-w-4xl flex-wrap items-center justify-between gap-2 text-xs text-slate-400 dark:text-slate-500">
-                <p>
-                  Using {modeConfig[mode].desc} · Powered by Claude + ChromaDB (
-                  {mode === 'rag' ? '19K+ document chunks' : mode === 'web' ? 'Brave Search' : 'Documents + Web'})
-                </p>
-                <p>
-                  Scope: {companyScopeLabel} · {timeHorizon}
-                </p>
+                  </div>
+                )}
               </div>
+            )}
+          </div>
+
+          {/* ── Input dock ───────────────────────────────────────────────── */}
+          <div
+            ref={inputDockRef}
+            className="shrink-0 border-t border-slate-200 bg-white px-5 py-3 dark:border-slate-700 dark:bg-slate-900"
+          >
+            <form
+              onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
+              className="mx-auto max-w-4xl"
+            >
+              <div className="flex gap-2.5">
+                <Input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask about CapEx, AI strategy, hyperscaler exposure, earnings trends..."
+                  disabled={isLoading}
+                  className="h-10 flex-1 rounded-lg border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-400"
+                  autoFocus
+                />
+                <Button
+                  type="submit"
+                  disabled={isLoading || !input.trim()}
+                  className="h-10 bg-blue-600 px-4 text-white hover:bg-blue-700"
+                >
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  <span className="hidden sm:inline ml-1">Send</span>
+                </Button>
+              </div>
+            </form>
+            <div className="mx-auto mt-1.5 flex max-w-4xl items-center justify-between gap-2 text-[11px] text-slate-400 dark:text-slate-500">
+              <span>Using SEC docs · Powered by Claude + ChromaDB</span>
+              <span>Scope: {companyScopeLabel} · {timeHorizon}</span>
             </div>
-          </Card>
-        </div>
+          </div>
+        </Card>
       </div>
+
+      {/* ── Question dropdown portal ─────────────────────────────────────── */}
+      {openDropdown && typeof document !== 'undefined' && createPortal(
+        <div
+          ref={dropdownPanelRef}
+          style={getDropdownStyle(openDropdown)}
+          className="w-72 rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+        >
+          {STRATEGY_CATEGORIES.find((c) => c.id === openDropdown)?.questions.map((q, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => handleStrategyQuestion(q)}
+              className="block w-full px-4 py-2 text-left text-xs text-slate-700 transition-colors hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300"
+            >
+              {q}
+            </button>
+          ))}
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

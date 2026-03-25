@@ -3,7 +3,7 @@ Company API endpoints.
 """
 from fastapi import APIRouter, HTTPException
 from backend.core.config import COMPANIES, COMPANY_NAME_TO_TICKER
-from backend.core.database import get_collection_stats
+from backend.core.database import get_all_collections_stats
 
 router = APIRouter()
 
@@ -13,7 +13,7 @@ async def list_companies():
     """
     List all tracked companies with their metadata.
     """
-    stats = get_collection_stats()
+    stats = get_all_collections_stats()
     companies_data = []
     
     for ticker, info in COMPANIES.items():
@@ -47,8 +47,8 @@ async def get_company(ticker: str):
         raise HTTPException(status_code=404, detail=f"Company {ticker} not found")
     
     info = COMPANIES[ticker]
-    stats = get_collection_stats()
-    
+    stats = get_all_collections_stats()
+
     # Get document count for this company
     company_name = info["name"].split()[0]
     doc_count = stats.get("companies", {}).get(company_name, 0)
@@ -72,22 +72,19 @@ async def get_company_filings(ticker: str, filing_type: str = None, limit: int =
     
     company_name = COMPANIES[ticker]["name"].split()[0]
     
-    # Get documents from ChromaDB
-    from backend.core.database import get_collection
-    collection = get_collection()
-    
-    where_filter = {"company": company_name}
+    # Get documents from ChromaDB (per-company collection)
+    from backend.core.database import get_company_collection
+    collection = get_company_collection(company_name)
+
+    where_filter = {}
     if filing_type:
-        where_filter = {"$and": [
-            {"company": company_name},
-            {"filing_type": filing_type}
-        ]}
-    
-    results = collection.get(
-        where=where_filter,
-        include=["metadatas"],
-        limit=limit * 10,  # Get more to deduplicate
-    )
+        where_filter = {"filing_type": filing_type}
+
+    get_kwargs: dict = {"include": ["metadatas"], "limit": limit * 10}
+    if where_filter:
+        get_kwargs["where"] = where_filter
+
+    results = collection.get(**get_kwargs)
     
     # Deduplicate by source file
     seen_files = set()
@@ -129,8 +126,8 @@ async def compare_companies(tickers: str):
     if invalid:
         raise HTTPException(status_code=404, detail=f"Companies not found: {invalid}")
     
-    stats = get_collection_stats()
-    
+    stats = get_all_collections_stats()
+
     comparison = []
     for ticker in ticker_list:
         info = COMPANIES[ticker]

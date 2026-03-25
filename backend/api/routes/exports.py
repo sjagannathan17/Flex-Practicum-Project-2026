@@ -1,6 +1,8 @@
 """
 API routes for report exports.
 """
+import re
+
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 
@@ -38,12 +40,36 @@ async def export_comparison_excel():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/exports/powerpoint/comparison/all")
+async def export_comparison_powerpoint():
+    """Generate AI-powered full comparison PowerPoint (all 5 companies)."""
+    try:
+        pptx_bytes = generate_powerpoint_report(company=None)
+        return Response(
+            content=pptx_bytes,
+            media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            headers={"Content-Disposition": "attachment; filename=flex_competitive_intelligence_brief.pptx"},
+        )
+    except ValueError as e:
+        # User-safe parse error from LLM pipeline
+        raise HTTPException(status_code=422, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/exports/powerpoint/{company}")
 async def export_company_powerpoint(company: str):
+    """Generate AI-powered single-company PowerPoint report."""
     try:
         pptx_bytes = generate_powerpoint_report(company)
-        return Response(content=pptx_bytes, media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                        headers={"Content-Disposition": f"attachment; filename={company.lower()}_presentation.pptx"})
+        safe_name = re.sub(r"[^\w\-]", "_", company.lower())
+        return Response(
+            content=pptx_bytes,
+            media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            headers={"Content-Disposition": f"attachment; filename={safe_name}_competitive_brief.pptx"},
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

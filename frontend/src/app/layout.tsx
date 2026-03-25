@@ -6,7 +6,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Flex Competitive Intelligence Platform | AI Powered',
+  title: 'EMS Pulse | AI-Powered Competitive Intelligence',
   description: 'AI-powered competitive intelligence analysis for EMS companies - Analyze CapEx strategies, AI investments, and competitive dynamics',
 };
 

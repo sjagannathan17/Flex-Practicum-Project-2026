@@ -10,10 +10,8 @@ import {
   FileText,
   BarChart3,
   TrendingUp,
-  Database,
   Sparkles,
   ChevronRight,
-  Brain,
   Globe,
   GitCompare,
   Bell,
@@ -58,27 +56,25 @@ const navGroups: NavGroup[] = [
     label: 'Competitive Intelligence',
     items: [
       { href: '/competitor-investments', label: 'Competitors', icon: GitCompare, badge: 'NEW' },
-      { href: '/ai-investments', label: 'Big Five CapEx', icon: TrendingUp, badge: 'NEW' },
-      { href: '/map', label: 'Facilities Map', icon: Globe, badge: 'NEW' },
+      { href: '/ai-investments', label: 'Hyperscaler Demand', icon: TrendingUp, badge: 'NEW' },
+      { href: '/map', label: 'Competitive Footprint', icon: Globe, badge: 'NEW' },
+      { href: '/calendar', label: 'Earnings Intel', icon: CalendarDays, badge: 'NEW' },
+      { href: '/analysis', label: 'AI Exposure', icon: BarChart3, badge: 'NEW' },
     ],
   },
   {
     id: 'other',
     label: 'Other',
     items: [
-      { href: '/calendar', label: 'Calendar', icon: CalendarDays },
       { href: '/companies', label: 'Companies', icon: Building2 },
-      { href: '/analysis', label: 'Analysis', icon: BarChart3 },
-      { href: '/analytics', label: 'Analytics', icon: Brain },
     ],
   },
   {
     id: 'reports',
     label: 'Reports & System',
     items: [
-      { href: '/reports', label: 'Reports', icon: FileText },
+      { href: '/reports', label: 'Intelligence Reports', icon: FileText },
       { href: '/alerts', label: 'Alerts', icon: Bell },
-      { href: '/data', label: 'Data Center', icon: Database },
       { href: '/settings', label: 'Settings', icon: Settings },
     ],
   },
@@ -87,11 +83,9 @@ const navGroups: NavGroup[] = [
 export function Sidebar() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    const savedTheme = localStorage.getItem('theme-mode');
-    return savedTheme ? savedTheme === 'dark' : true;
-  });
+  // Always start as `true` so the initial client render matches the server.
+  // The real saved preference is applied in a useEffect after hydration.
+  const [isDark, setIsDark] = useState(true);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     'news-desk': true,
     'ai-research-chat': true,
@@ -104,9 +98,17 @@ export function Sidebar() {
     setOpenGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
   };
 
+  // On first mount, sync from localStorage (runs only after hydration).
   useEffect(() => {
-    const root = document.documentElement;
-    root.classList.toggle('dark', isDark);
+    const savedTheme = localStorage.getItem('theme-mode');
+    if (savedTheme !== null) {
+      setIsDark(savedTheme === 'dark');
+    }
+  }, []);
+
+  // Keep the DOM class and storage in sync whenever isDark changes.
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
     localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
   }, [isDark]);
 
@@ -160,6 +162,7 @@ export function Sidebar() {
   return (
     <>
       <aside
+        suppressHydrationWarning
         className={cn(
           'relative h-screen flex flex-col transition-all duration-300 shadow-2xl',
           theme.asideBg,
@@ -187,7 +190,7 @@ export function Sidebar() {
             <span className="text-white font-black text-[10px] tracking-[0.08em]">FLEX</span>
           </div>
           <div>
-            <h1 className="font-bold text-2xl leading-tight tracking-tight">FLEX Pulse</h1>
+            <h1 className="font-bold text-2xl leading-tight tracking-tight">EMS Pulse</h1>
             <div className="flex items-center gap-1.5 mt-1">
               <Sparkles className="h-3 w-3 text-purple-400" />
               <p className="text-xs font-medium bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI Powered</p>

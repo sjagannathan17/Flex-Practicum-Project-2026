@@ -365,7 +365,6 @@ def stage_build_index(args):
         # Run the build
         start_time = time.time()
         build_db(
-            data_dir=str(FILINGS_DIR),
             use_per_company=args.per_company,
         )
         elapsed = time.time() - start_time
