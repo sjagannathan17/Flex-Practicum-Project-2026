@@ -135,7 +135,10 @@ export default function RatingsFeed() {
       if (isManual) setRefreshing(true);
       else setLoading(true);
       setError(null);
-      const res = await fetch(`${API_URL}/api/analyst-view/ratings-feed`);
+      const url = isManual
+        ? `${API_URL}/api/analyst-view/ratings-feed?force=true`
+        : `${API_URL}/api/analyst-view/ratings-feed`;
+      const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setItems(data.feed ?? data.ratings ?? data.results ?? []);

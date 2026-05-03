@@ -161,6 +161,7 @@ async def ratings_feed(
     company: Optional[str] = Query(None),
     analyst: Optional[str] = Query(None),
     limit: int = Query(50),
+    force: bool = Query(False),
 ):
     """
     Aggregates recent_actions from company intel cache into a unified feed.
@@ -168,10 +169,10 @@ async def ratings_feed(
     """
     cache_key = f"analyst_view:ratings_feed:{company}:{analyst}:{limit}"
     cached = api_cache.get(cache_key)
-    if cached is not None:
+    if cached is not None and not force:
         return cached
 
-    intel = await get_all_company_intel()
+    intel = await get_all_company_intel(force=force)
     companies = intel.get("companies", [])
 
     feed: list[dict] = []
