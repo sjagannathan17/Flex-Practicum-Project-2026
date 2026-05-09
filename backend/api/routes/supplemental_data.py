@@ -18,6 +18,22 @@ from backend.ingestion.job_scraper import (
     get_hiring_score,
     get_job_categories,
 )
+from backend.ingestion.workday_scraper import (
+    WORKDAY_TENANTS,
+    search_company_jobs_workday,
+)
+from backend.ingestion.successfactors_scraper import (
+    SF_TENANTS,
+    search_company_jobs_sf,
+)
+
+
+# ATS dispatch registry: company name → fetcher coroutine.
+# Companies not listed here fall back to the generic web-search scraper.
+_ATS_DISPATCH = {
+    **{c: search_company_jobs_workday for c in WORKDAY_TENANTS},
+    **{c: search_company_jobs_sf for c in SF_TENANTS},
+}
 from backend.ingestion.ocp_scraper import (
     get_company_ocp_data,
     compare_ocp_involvement,
@@ -90,9 +106,12 @@ async def list_job_categories():
 
 @router.get("/jobs/{company}")
 async def get_company_job_postings(company: str, category: Optional[str] = None):
-    """Get job postings for a company."""
+    """Get job postings for a company. Routes to the company's ATS adapter when
+    available (Workday, SuccessFactors); falls back to web search otherwise."""
     try:
-        jobs = await search_company_jobs(_normalize_company_title(company), category)
+        normalized = _normalize_company_title(company)
+        fetcher = _ATS_DISPATCH.get(normalized, search_company_jobs)
+        jobs = await fetcher(normalized, category)
         hiring_score = get_hiring_score(jobs)
         return {
             **jobs,
