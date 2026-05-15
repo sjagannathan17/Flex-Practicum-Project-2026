@@ -176,7 +176,7 @@ This was a **4-person team, 12-week practicum** for **Flex Ltd.** at Santa Clara
 
 ### Product & strategy work I owned
 
-- **Stakeholder discovery** — Ran [N] structured interviews with the Flex CI team (analysts, strategy director, IR lead). Wrote the persona doc (CI Analyst as primary, Strategy Director as decider, IR as secondary). See *"What stakeholder interviews actually changed"* above.
+- **Stakeholder discovery** — Ran structured interviews with the Flex CI team (analysts, strategy director, IR lead). Wrote the persona doc (CI Analyst as primary, Strategy Director as decider, IR as secondary). See *"What stakeholder interviews actually changed"* above.
 - **Roadmap & prioritization** — Owned the spec, the cut list (see *"Hard decisions"* above), and the Now / Next / Later framework that kept 4 people on 12 weeks shipping a demo-able product instead of half a dozen half-finished features.
 - **The cost-coverage decision** — Pushed the team away from paid APIs (FactSet, S&P Capital IQ) toward free public sources (SEC EDGAR, USPTO PatentsView, Brave Search). This is the line that lands hardest in the client demo — *5-figure SaaS replaced by ~$30/mo* — and it was a contested call internally.
 - **Demo narrative & client presentation** — Wrote the storyboard, the executive 1-pager, and delivered the live walk-through at the client meeting.
