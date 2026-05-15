@@ -76,6 +76,31 @@ flowchart LR
 | **Three export formats** | Excel + PPTX + PDF as one-click downloads | Just web UI | The CI team's *output* is internal slides and briefs. Meeting them where they already work (PowerPoint) made the product immediately useful — no behavior change required. |
 | **Geographic dimension** | Extract facility locations from filings → Leaflet heatmap | Skip — "it's all in the text anyway" | The AI build-out is spatial: it matters *where* hyperscale data centers are getting built. The map turned a hypothesis ("Celestica is concentrating in Thailand") into a visible pattern. |
 
+
+
+---
+
+## What stakeholder interviews actually changed
+
+I ran [N] interviews with the Flex CI team — analysts, the strategy director, and the IR lead — at the start of the practicum and again at week 6. The product spec changed in three meaningful ways because of them. *(This section is intentionally specific: hiring managers want to see that "user research" isn't a checkbox in your process, it's a thing that re-shapes the build.)*
+
+### What I expected vs. what I heard
+
+| What I expected going in | What stakeholders actually said | How the product changed |
+|---|---|---|
+| **[YOUR EDIT — what was your initial assumption?]** *e.g. "Analysts would want a one-stop chat interface."* | **[YOUR EDIT — what surprised you?]** *e.g. "The senior analyst told me she'd never abandon her PowerPoint workflow — chat is for ad-hoc, but the deliverable is always a slide."* | **[YOUR EDIT — what shipped because of it?]** *e.g. "Added one-click PPTX export as a P0, not a P2. Made it feel like a feature of PowerPoint, not a separate tool."* |
+| **[YOUR EDIT]** | **[YOUR EDIT]** | **[YOUR EDIT]** |
+| **[YOUR EDIT]** | **[YOUR EDIT]** | **[YOUR EDIT]** |
+
+### The single most-cited pain
+
+> *"[YOUR EDIT — paraphrase the most-repeated pain across interviews. Keep it as a quoted line. Hiring managers love a verbatim user quote because it proves you actually listened.]"*
+> — [Role of the person — e.g. "Senior CI Analyst, Flex"]
+
+### What this changed about how I prioritize
+
+[YOUR EDIT — 2–3 sentences on a *transferable* lesson. Example: "I came in thinking the moat was the AI quality; I left believing the moat was the *hand-off* — what the analyst does in the 90 seconds after they get the AI's answer. That reshaped our roadmap toward export polish over model upgrades."]
+
 ---
 
 ## Impact & Metrics
@@ -107,23 +132,75 @@ flowchart LR
 
 **What I would NOT build next:** A general-purpose financial chatbot. The defensible moat here is *being opinionated about the contract-manufacturing industry* — not being another generic FinanceGPT.
 
+
+
+---
+
+## Hard decisions: what we cut from the roadmap (and why)
+
+> *Every "yes" on this project meant a "no" somewhere else. The cuts are the most defensible part of the design.*
+
+### Cut 1: [YOUR EDIT — the biggest thing we considered building and chose not to]
+
+- **What it was:** [YOUR EDIT — describe the feature in one sentence, e.g. "A real-time earnings-call streaming module that would auto-tag sentiment shifts as they happened on the call."]
+- **Why it was tempting:** [YOUR EDIT — what user demand or competitive pressure made this look attractive?]
+- **Why we cut it:** [YOUR EDIT — be specific. Time? Cost? Wrong user? Better alternative? Risk? E.g. "It would have eaten 4 weeks of frontend time for a feature 2 of 5 stakeholders asked for. The async 'next-day brief' workflow served the same job at 1/10 the build cost."]
+- **What we'd need to revisit it:** [YOUR EDIT — 1 line on the trigger that would put this back on the roadmap]
+
+### Cut 2: Multi-LLM model routing
+
+- **What it was:** Letting the system route different question types to different LLMs — Claude for long-context summaries, GPT-4o for structured extraction, Gemini for cheap classification.
+- **Why it was tempting:** Cost optimization (~30–40% cheaper at scale) and the chance to A/B model performance on different tasks.
+- **Why we cut it:** Three vendors meant three rate limits, three eval pipelines, three SDK abstractions, and a routing layer to maintain. For a 4-person team on a 12-week clock, the *complexity tax* exceeded the cost savings. Picking one strong general-purpose model (Claude) made the whole system shippable.
+- **What we'd need to revisit it:** Sustained monthly Claude bills above ~$500. At our $20–50/mo, the optimization is mathematically pointless.
+
+### Cut 3: [YOUR EDIT — a third cut]
+
+- **What it was:** [YOUR EDIT]
+- **Why we cut it:** [YOUR EDIT]
+
+### What this signals about how I make tradeoffs
+
+[YOUR EDIT — 1–2 sentences on the principle behind the cuts. Example: "I'd rather ship one boring feature that is fully done than three exciting features that are half-done. The *complexity tax* of additional surfaces is the most consistently underestimated cost in product work."]
+
 ---
 
 ## My Role
 
-This was a **4-person team, 12-week practicum** for **Flex Ltd.** at Santa Clara University.
+This was a **4-person team, 12-week practicum** for **Flex Ltd.** at Santa Clara University. Title: *Strategic Analytics Consultant.*
 
-**What I personally owned:**
-- Stakeholder interviews with the Flex CI team — translated their needs into the product spec
-- Owned the *CI Analyst* persona work and the prioritization framework that became the dashboard / alerts roadmap
-- Drove the cost-vs-coverage decision (free SEC scraper + Claude + free OSS stack vs. paid APIs)
-- Documentation, demo narrative, and the client-facing presentation
-- Co-built the RAG pipeline and sentiment analyzer modules
+> **A note on the language stats:** GitHub shows this repo as "99% HTML." That's because the 188 MB of HTML is **downloaded SEC filings**, not authored code. The actual codebase is **~593 KB of Python** (backend, RAG pipeline, ingestion, analytics) and **~315 KB of TypeScript** (Next.js frontend). I've added a `.gitattributes` to vendor those data files so the language bar reflects what was actually written. *(Mentioning this here so a hiring manager doesn't have to wonder.)*
 
-**What teammates owned:**
-- Frontend (Next.js, dashboard, heatmap)
-- Ingestion pipeline (SEC, USPTO, jobs, OCP scrapers)
-- Alert + export systems
+### Product & strategy work I owned
+
+- **Stakeholder discovery** — Ran [N] structured interviews with the Flex CI team (analysts, strategy director, IR lead). Wrote the persona doc (CI Analyst as primary, Strategy Director as decider, IR as secondary). See *"What stakeholder interviews actually changed"* above.
+- **Roadmap & prioritization** — Owned the spec, the cut list (see *"Hard decisions"* above), and the Now / Next / Later framework that kept 4 people on 12 weeks shipping a demo-able product instead of half a dozen half-finished features.
+- **The cost-coverage decision** — Pushed the team away from paid APIs (FactSet, S&P Capital IQ) toward free public sources (SEC EDGAR, USPTO PatentsView, Brave Search). This is the line that lands hardest in the client demo — *5-figure SaaS replaced by ~$30/mo* — and it was a contested call internally.
+- **Demo narrative & client presentation** — Wrote the storyboard, the executive 1-pager, and delivered the live walk-through at the client meeting.
+
+### Code I personally wrote (or led)
+
+The repo is a 4-person codebase. To be clear about what's mine vs. the team's:
+
+| Module | My contribution | Evidence in commit history |
+|---|---|---|
+| `Vector Database/build_chromadb.py` | **Lead author** — the embedding pipeline that turns the SEC corpus into ChromaDB collections. Integrated 4 teammates' extraction improvements. | `Integrate Person 1/2/4 extraction improvements into build_chromadb.py` (Feb 23) |
+| `backend/rag/retriever.py` (recency logic) | **Wrote** — the recency-boost and "filter to top 3 fiscal years" features that fixed the system's tendency to surface stale 2022 filings when users asked for "the latest." | `Fix recency: filter to top 3 fiscal years for recent/latest queries` and `Increase recency boost from +0.10 to +0.25 for latest/recent queries` (Feb 27) |
+| `backend/ingestion/processor.py` (chunker tuning) | **Wrote** — tuned chunk-overlap from 25 → 50 words after observing context loss across chunk boundaries on multi-paragraph capex disclosures. | `Increase chunk overlap from 25 to 50 words` (Feb 23) |
+| `backend/main.py` startup wiring | **Debugged + fixed** — caught two empty-file bugs (`pipeline.py`, `processor.py`) that were preventing backend startup after a teammate's merge. | `Fix empty pipeline.py and processor.py that prevented backend startup` (Feb 23) |
+| `backend/api/routes/chat.py` | **Co-author** with teammate — wrote the streaming response handler and session memory wiring. | `Fix empty chat page and API client` (Feb 23) |
+| `SETUP.md` + `README.md` | **Sole author** — the docs that let new teammates and the client run the system end-to-end. | `Update README to reflect actual codebase architecture`, `Fix outdated path reference in SETUP.md` |
+| Per-company rebuild script | **Wrote** — script that rebuilds ChromaDB collections one company at a time, fixing OOM crashes during full-corpus rebuilds. | `Add per-company rebuild script and fix build memory issues` (Feb 27) |
+
+### What teammates owned
+
+- **Frontend** (Next.js 16 dashboard, Leaflet heatmap, all 16 pages) — primarily one teammate.
+- **Ingestion scrapers** (`backend/ingestion/sec_downloader.py`, `patent_scraper.py`, `job_scraper.py`, `news_aggregator.py`) — primarily two teammates (referred to as "Person 1" and "Person 2" in my integration commits).
+- **Alerts + Exports** (`backend/alerts/`, `backend/exports/`) — primarily one teammate.
+
+### What this looks like in the commit log
+
+A hiring manager who clicks the [Insights tab](https://github.com/sjagannathan17/Flex-Practicum-Project-2026/graphs/contributors) will see clean attribution. My commits are tagged with my name (`sjagannathan17`); the integration commits ("Integrate Person N improvements") show I was the team's integrator and reviewer, not just a contributor.
 
 ---
 
