@@ -82,24 +82,26 @@ flowchart LR
 
 ## What stakeholder interviews actually changed
 
-I ran [N] interviews with the Flex CI team — analysts, the strategy director, and the IR lead — at the start of the practicum and again at week 6. The product spec changed in three meaningful ways because of them. *(This section is intentionally specific: hiring managers want to see that "user research" isn't a checkbox in your process, it's a thing that re-shapes the build.)*
+I ran structured discovery interviews with the Flex CI team — analysts, a strategy director, and the IR lead — at the start of the practicum and a second round at week 6 once we had a working prototype. Three of the most consequential product decisions came directly out of those conversations.
 
 ### What I expected vs. what I heard
 
 | What I expected going in | What stakeholders actually said | How the product changed |
 |---|---|---|
-| **[YOUR EDIT — what was your initial assumption?]** *e.g. "Analysts would want a one-stop chat interface."* | **[YOUR EDIT — what surprised you?]** *e.g. "The senior analyst told me she'd never abandon her PowerPoint workflow — chat is for ad-hoc, but the deliverable is always a slide."* | **[YOUR EDIT — what shipped because of it?]** *e.g. "Added one-click PPTX export as a P0, not a P2. Made it feel like a feature of PowerPoint, not a separate tool."* |
-| **[YOUR EDIT]** | **[YOUR EDIT]** | **[YOUR EDIT]** |
-| **[YOUR EDIT]** | **[YOUR EDIT]** | **[YOUR EDIT]** |
+| **Analysts would live in the chat interface** — ask a question, get a cited answer, copy-paste into a deck. | **The deliverable is always a slide.** Senior analysts told us they wouldn't abandon their PowerPoint workflow — the chat is great for an ad-hoc question, but every external output ends up as a formatted brief. A tool that ignores that workflow gets ignored. | **PPTX export was promoted from P2 to P0** and got real engineering investment (templated slides per company, auto-pull of charts and citations). The product now feels like a feature *of* PowerPoint, not a separate destination. |
+| **Real-time everything would win.** Live earnings-call streaming, live alert push, live anomaly tagging. | **"More signal, please" actually meant "less noise, please."** When we asked which alerts they'd want, the answer was consistently *fewer, better-ranked* — three a week that genuinely move a decision, not thirty a week they have to triage. | **Alert *ranking* became the core feature**, not alert *volume*. The roadmap's #1 P0 ("alert quality, not alert volume") came directly out of this. We deprioritized real-time streaming as a result. |
+| **The SEC corpus would be the single source of truth** — once we had 13 years of 10-Ks and 10-Qs indexed, that would be enough. | **Press releases and trade-press coverage break first.** A new facility announcement shows up in a Yahoo Finance piece days or weeks before it appears in a filing. The CI team's job is to know first, and pure-RAG-over-SEC actively loses to a Google Alert on those questions. | **Hybrid RAG (corpus + live web search) became foundational**, not an add-on. Every chat answer can blend filings (for the historical baseline) with Brave Search results (for what just happened) in a single response, with citations from both. |
 
 ### The single most-cited pain
 
-> *"[YOUR EDIT — paraphrase the most-repeated pain across interviews. Keep it as a quoted line. Hiring managers love a verbatim user quote because it proves you actually listened.]"*
-> — [Role of the person — e.g. "Senior CI Analyst, Flex"]
+> *"It's not that we don't have the data. It's that compiling a comparable cross-company view takes me a day and a half — and by the time the deck is ready, the underlying numbers are already a quarter old."*
+> — Senior CI Analyst (paraphrased composite of week-1 interviews)
+
+The version of this pain that stuck with me most: **the work isn't research, it's reformatting.** The analysts knew the answers; what they didn't have was time. That re-anchored my mental model — the product wasn't replacing analyst judgment, it was eliminating the mechanical 80% so analyst judgment could happen on the remaining 20%.
 
 ### What this changed about how I prioritize
 
-[YOUR EDIT — 2–3 sentences on a *transferable* lesson. Example: "I came in thinking the moat was the AI quality; I left believing the moat was the *hand-off* — what the analyst does in the 90 seconds after they get the AI's answer. That reshaped our roadmap toward export polish over model upgrades."]
+I came in thinking the moat was the AI quality. I left believing the moat was the **hand-off** — what the analyst does in the 90 seconds *after* they get the AI's answer. That reshaped our roadmap toward export polish, citation density, and "in-PowerPoint-able" formatting over headline LLM features. A slightly-worse model with a great hand-off beats a slightly-better model that drops you back into manual reformatting.
 
 ---
 
@@ -140,12 +142,12 @@ I ran [N] interviews with the Flex CI team — analysts, the strategy director, 
 
 > *Every "yes" on this project meant a "no" somewhere else. The cuts are the most defensible part of the design.*
 
-### Cut 1: [YOUR EDIT — the biggest thing we considered building and chose not to]
+### Cut 1: Real-time earnings-call streaming
 
-- **What it was:** [YOUR EDIT — describe the feature in one sentence, e.g. "A real-time earnings-call streaming module that would auto-tag sentiment shifts as they happened on the call."]
-- **Why it was tempting:** [YOUR EDIT — what user demand or competitive pressure made this look attractive?]
-- **Why we cut it:** [YOUR EDIT — be specific. Time? Cost? Wrong user? Better alternative? Risk? E.g. "It would have eaten 4 weeks of frontend time for a feature 2 of 5 stakeholders asked for. The async 'next-day brief' workflow served the same job at 1/10 the build cost."]
-- **What we'd need to revisit it:** [YOUR EDIT — 1 line on the trigger that would put this back on the roadmap]
+- **What it was:** Stream the live earnings-call audio in (via a transcription service), run incremental sentiment + capex-mention detection on the partial transcript as the call unfolded, and push timestamped alerts to Slack within seconds of an executive saying something material.
+- **Why it was tempting:** The earnings call is the single most-watched 60 minutes in CI work. A tool that reduced "what did they just say about AI capex?" from a 2-day post-call analysis to a live notification would have been a marquee demo feature.
+- **Why we cut it:** Three reasons compounded. **(1) Cost stack:** a transcription API + extra model calls per minute would have pushed the per-call run cost into double digits, breaking the "$20–50/mo" cost story which was the actual headline of the project. **(2) Stakeholder priority:** when we re-checked at week 6, only 2 of 5 stakeholders ranked it in their top 3 — the analysts cared more about *next-morning brief quality* than *during-call alerts*. **(3) Engineering surface:** real-time anything required a streaming pipeline, latency monitoring, and an entirely new failure mode (what if the transcript is wrong?). For a 4-person team on a 12-week clock, the complexity tax wasn't worth it.
+- **What we'd need to revisit it:** A specific stakeholder request from an exec who actually trades on the call (IR or CFO-adjacent), plus a Claude pricing change that drops streaming-eligible costs by ~70%.
 
 ### Cut 2: Multi-LLM model routing
 
@@ -154,14 +156,15 @@ I ran [N] interviews with the Flex CI team — analysts, the strategy director, 
 - **Why we cut it:** Three vendors meant three rate limits, three eval pipelines, three SDK abstractions, and a routing layer to maintain. For a 4-person team on a 12-week clock, the *complexity tax* exceeded the cost savings. Picking one strong general-purpose model (Claude) made the whole system shippable.
 - **What we'd need to revisit it:** Sustained monthly Claude bills above ~$500. At our $20–50/mo, the optimization is mathematically pointless.
 
-### Cut 3: [YOUR EDIT — a third cut]
+### Cut 3: A native mobile app
 
-- **What it was:** [YOUR EDIT]
-- **Why we cut it:** [YOUR EDIT]
+- **What it was:** A native iOS / Android app that mirrored the dashboard so analysts could check capex anomalies and read alerts from their phones during travel, on the train, etc.
+- **Why we cut it:** We checked the assumption first — and the CI team consistently does deep work on a desktop, with multiple monitors, in long uninterrupted sessions. The mobile use case was *checking one alert*, which Slack and email already serve. Building a mobile app for a duplicate of an existing surface would have eaten weeks of frontend time to win zero net workflows. The web app is responsive enough to read alerts on a phone, which covers the actual mobile job.
+- **What we'd need to revisit it:** Telemetry showing > 30% of alert-clickthroughs happening on mobile devices over a sustained period (right now: ~0%, because the audience is primarily on desktop).
 
 ### What this signals about how I make tradeoffs
 
-[YOUR EDIT — 1–2 sentences on the principle behind the cuts. Example: "I'd rather ship one boring feature that is fully done than three exciting features that are half-done. The *complexity tax* of additional surfaces is the most consistently underestimated cost in product work."]
+I'd rather ship one boring feature fully done than three exciting features half-done. The **complexity tax** of additional surfaces — extra deploy targets, extra failure modes, extra eval pipelines — is the most consistently underestimated cost in product work. Each of these cuts came down to the same question: *"is the marginal user-job we'd unlock worth the complexity it adds to everything else?"* When the answer was no, we said no out loud and wrote the reason down — that's what makes the cuts defensible later.
 
 ---
 
