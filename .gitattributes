@@ -1,0 +1,15 @@
+# The 188MB+ of HTML in company subfolders is downloaded SEC filings — not code.
+# Vendor those files so language stats reflect the actual project (Python + TypeScript).
+
+Flex/** linguist-vendored
+Jabil/** linguist-vendored
+Celestica/** linguist-vendored
+benchmark/** linguist-vendored
+Sanmina/** linguist-vendored
+data/** linguist-vendored
+chromadb_store/** linguist-generated
+frontend/package-lock.json linguist-vendored
+
+# All HTML files are downloaded filings, not authored code
+*.htm linguist-vendored
+*.html linguist-vendored
