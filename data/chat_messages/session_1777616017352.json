@@ -1,0 +1,59 @@
+[
+  {
+    "role": "user",
+    "content": "Compare the capital expenditures (CapEx) of Flex, Jabil, Celestica, Sanmina, Plexus, and Benchmark over the last five fiscal years (FY2020–FY2024). Present the data in a table"
+  },
+  {
+    "role": "assistant",
+    "content": "**Capital Expenditure**\n\n- FLEX FY2024 (period ending 2024-03-31): 530M\n- JBL FY2024 (period ending 2024-08-31): 784M\n- CLS FY2024 (period ending 2024-12-31): 171M\n- BHE FY2024 (period ending 2024-12-31): 31M\n- SANM FY2024 (period ending 2024-09-28): 111M\n- PLXS FY2024 (period ending 2024-09-28): 95M"
+  },
+  {
+    "role": "user",
+    "content": "Compare the capital expenditures (CapEx) of Flex, Jabil, Celestica, Sanmina, Plexus, and Benchmark over the last five fiscal years (FY2020–FY2024). Present the data in a table"
+  },
+  {
+    "role": "assistant",
+    "content": "**Capital Expenditure**\n\n- FLEX FY2024 (period ending 2024-03-31): 530M\n- JBL FY2024 (period ending 2024-08-31): 784M\n- CLS FY2024 (period ending 2024-12-31): 171M\n- BHE FY2024 (period ending 2024-12-31): 31M\n- SANM FY2024 (period ending 2024-09-28): 111M\n- PLXS FY2024 (period ending 2024-09-28): 95M",
+    "table_payload": {
+      "title": "Capital Expenditure Comparison (USD Millions)",
+      "columns": [
+        "Company",
+        "Period",
+        "Capital Expenditure (USD Millions)"
+      ],
+      "rows": [
+        [
+          "FLEX",
+          "FY2024",
+          "530M"
+        ],
+        [
+          "JBL",
+          "FY2024",
+          "784M"
+        ],
+        [
+          "CLS",
+          "FY2024",
+          "171M"
+        ],
+        [
+          "BHE",
+          "FY2024",
+          "31M"
+        ],
+        [
+          "SANM",
+          "FY2024",
+          "111M"
+        ],
+        [
+          "PLXS",
+          "FY2024",
+          "95M"
+        ]
+      ]
+    },
+    "narrative_text": "Capital Expenditure comparison across 6 companies."
+  }
+]

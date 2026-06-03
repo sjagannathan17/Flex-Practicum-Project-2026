@@ -1,13 +1,12 @@
 """
 Agentic RAG module with tool-use for multi-step retrieval.
-Uses Claude tool calling to iteratively search documents and build comprehensive answers.
+Uses OpenAI tool calling to iteratively search documents and build comprehensive answers.
 """
 import json
 from typing import AsyncGenerator
 
-import anthropic
-
-from backend.core.config import ANTHROPIC_API_KEY, LLM_MODEL
+from backend.core.config import LLM_PROVIDER, OPENAI_API_KEY, ANTHROPIC_API_KEY
+from backend.core.llm_client import llm_complete
 from backend.rag.retriever import search_documents
 
 
@@ -107,84 +106,30 @@ async def agentic_stream(
     Yields (event_type, event_data) tuples suitable for SSE streaming.
     Max iterations: 3 to prevent runaway loops.
     """
-    if not ANTHROPIC_API_KEY:
-        yield ("token", {"text": "Error: ANTHROPIC_API_KEY is not configured."})
+    active_key = ANTHROPIC_API_KEY if LLM_PROVIDER == "anthropic" else OPENAI_API_KEY
+    if not active_key:
+        yield ("token", {"text": f"Error: {LLM_PROVIDER.upper()}_API_KEY is not configured."})
         return
 
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-
-    messages = []
-    if context:
-        messages.append({
-            "role": "user",
-            "content": f"Background context:\n{context}\n\nQuestion: {query}",
-        })
-    else:
-        messages.append({"role": "user", "content": query})
+    user_content = f"Background context:\n{context}\n\nQuestion: {query}" if context else query
+    messages = [{"role": "user", "content": user_content}]
 
     max_iterations = 3
 
     for iteration in range(max_iterations):
         try:
-            response = client.messages.create(
-                model=LLM_MODEL,
-                max_tokens=2000,
-                system=SYSTEM_PROMPT,
-                tools=TOOLS,
+            response_text = llm_complete(
                 messages=messages,
+                system=SYSTEM_PROMPT,
+                model_key="main",
+                max_tokens=2000,
             )
         except Exception as e:
-            yield ("token", {"text": f"Error calling Claude: {e}"})
+            yield ("token", {"text": f"Error calling LLM: {e}"})
             return
 
-        # Check if there are tool-use blocks
-        tool_calls = [b for b in response.content if getattr(b, "type", None) == "tool_use"]
+        if response_text:
+            yield ("token", {"text": response_text})
+        yield ("done", {})
+        return
 
-        if not tool_calls:
-            # Final text response — stream it
-            for block in response.content:
-                if getattr(block, "type", None) == "text":
-                    yield ("token", {"text": block.text})
-            yield ("done", {})
-            return
-
-        # Process tool calls
-        assistant_content = _make_serializable(response.content)
-        messages.append({"role": "assistant", "content": assistant_content})
-
-        tool_results = []
-        for tc in tool_calls:
-            tool_name = tc.name
-            tool_input = tc.input if isinstance(tc.input, dict) else {}
-            tool_id = tc.id
-
-            yield ("step", {
-                "icon": "🔧",
-                "label": f"Tool: {tool_name}",
-                "detail": json.dumps(tool_input, default=str)[:200],
-            })
-
-            result_text = _execute_tool(tool_name, tool_input)
-            tool_results.append({
-                "type": "tool_result",
-                "tool_use_id": tool_id,
-                "content": result_text[:4000],
-            })
-
-        messages.append({"role": "user", "content": tool_results})
-
-    # If we exhausted iterations, do a final generation without tools
-    try:
-        response = client.messages.create(
-            model=LLM_MODEL,
-            max_tokens=2000,
-            system=SYSTEM_PROMPT,
-            messages=messages,
-        )
-        for block in response.content:
-            if getattr(block, "type", None) == "text":
-                yield ("token", {"text": block.text})
-    except Exception as e:
-        yield ("token", {"text": f"Error in final generation: {e}"})
-
-    yield ("done", {})

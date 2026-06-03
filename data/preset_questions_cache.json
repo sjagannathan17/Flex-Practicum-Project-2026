@@ -1,0 +1,45 @@
+{
+  "categories": [
+    {
+      "id": "ai-infra",
+      "label": "AI Infrastructure Leadership",
+      "questions": [
+        "Who is leading in AI server ramps?",
+        "What is the AI data center market trend?",
+        "Compare AI infrastructure growth among competitors",
+        "Analyze impact of AI on manufacturing outputs"
+      ]
+    },
+    {
+      "id": "capacity",
+      "label": "Capacity & Footprint",
+      "questions": [
+        "Which company is expanding nearshoring efforts?",
+        "Who is investing in liquid cooling technologies?",
+        "How has manufacturing expansion affected production?",
+        "What is the capacity utilization trend?"
+      ]
+    },
+    {
+      "id": "financial",
+      "label": "Financial Performance",
+      "questions": [
+        "Compare recent revenue across these EMS firms",
+        "Which company shows best margin improvement?",
+        "Who is leading in CapEx spending?",
+        "What is backlog status for major companies?"
+      ]
+    },
+    {
+      "id": "risks",
+      "label": "Risks & External Factors",
+      "questions": [
+        "Analyze tariff impact on supply chains",
+        "What geopolitical challenges are companies facing?",
+        "Compare company's supply chain vulnerabilities",
+        "Who is most exposed to global trade risks?"
+      ]
+    }
+  ],
+  "cached_at": "2026-05-26T09:11:33.306439"
+}

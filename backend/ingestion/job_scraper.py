@@ -9,26 +9,23 @@ from collections import defaultdict
 
 from backend.core.config import COMPANIES
 from backend.rag.web_search import search_web
+from backend.scraper.careers_scraper import load_cached_careers, is_cache_stale
+from backend.ingestion.job_constants import JOB_CATEGORIES, LOCATION_REGIONS
 
-
-# Job categories relevant to strategic analysis
-JOB_CATEGORIES = {
-    "ai_ml": ["machine learning", "AI engineer", "data scientist", "deep learning", "ML ops"],
-    "software": ["software engineer", "developer", "programmer", "full stack", "backend"],
-    "hardware": ["hardware engineer", "electrical engineer", "PCB design", "FPGA", "embedded"],
-    "manufacturing": ["manufacturing engineer", "process engineer", "production", "quality"],
-    "supply_chain": ["supply chain", "logistics", "procurement", "sourcing", "operations"],
-    "data_center": ["data center", "cloud engineer", "infrastructure", "DevOps", "SRE"],
-    "leadership": ["director", "VP", "manager", "head of", "chief"],
-    "sales": ["sales", "account manager", "business development", "customer success"],
+# Disambiguate company names that share a prefix with other companies
+SEARCH_NAME_OVERRIDES = {
+    "Flex": '"Flex Ltd"',
 }
 
-# Location keywords for geographic analysis
-LOCATION_REGIONS = {
-    "americas": ["USA", "United States", "Mexico", "Brazil", "Canada"],
-    "asia_pacific": ["China", "Malaysia", "Singapore", "India", "Vietnam", "Thailand", "Taiwan"],
-    "europe": ["Germany", "UK", "Poland", "Hungary", "Czech", "Ireland", "Netherlands"],
-}
+
+def _get_cached_official_jobs(company: str, category: Optional[str] = None) -> list[dict]:
+    """Read jobs for a company from the official-website JSON cache."""
+    all_jobs = load_cached_careers()
+    jobs = [j for j in all_jobs if j["company"].lower() == company.lower()]
+    if category and category in JOB_CATEGORIES:
+        keywords = [k.lower() for k in JOB_CATEGORIES[category]]
+        jobs = [j for j in jobs if any(kw in j["title"].lower() for kw in keywords)]
+    return jobs
 
 
 class JobScraper:
@@ -37,7 +34,7 @@ class JobScraper:
     def __init__(self):
         self._cache = {}
         self._cache_time = {}
-        self._cache_ttl = 1800  # 30 min cache
+        self._cache_ttl = 180  # 3 min cache — careers_cache.json is the source of truth
     
     def _get_cached(self, key: str) -> Optional[dict]:
         """Get cached data if still valid."""
@@ -61,41 +58,47 @@ class JobScraper:
             return cached
         
         # Build search query
+        search_name = SEARCH_NAME_OVERRIDES.get(company, company)
         if category and category in JOB_CATEGORIES:
             keywords = JOB_CATEGORIES[category][:3]
-            query = f'{company} jobs careers {" OR ".join(keywords)}'
+            query = f'{search_name} jobs careers {" OR ".join(keywords)}'
         else:
-            query = f'{company} jobs careers hiring'
-        
+            query = f'{search_name} jobs careers hiring'
+
         all_jobs = []
-        
+
+        # Primary path: read from official-website JSON cache
         try:
-            results = await search_web(query, count=15)
-            
-            for result in results.get('results', []):
-                job_info = self._parse_job_result(result, company)
-                if job_info:
-                    all_jobs.append(job_info)
+            all_jobs = _get_cached_official_jobs(company, category)
         except Exception as e:
-            print(f"Job search error for {company}: {e}")
+            print(f"Official careers cache read error for {company}: {e}")
+
+        # Fallback: web search if cache is empty or stale
+        if not all_jobs:
+            try:
+                results = await search_web(query, count=15)
+                for result in results:
+                    job_info = self._parse_job_result(result, company)
+                    if job_info:
+                        all_jobs.append(job_info)
+            except Exception as e:
+                print(f"Job search error for {company}: {e}")
+
+            try:
+                career_query = f'{search_name} careers site:linkedin.com OR site:indeed.com'
+                career_results = await search_web(career_query, count=10)
+                for result in career_results:
+                    job_info = self._parse_job_result(result, company)
+                    if job_info:
+                        all_jobs.append(job_info)
+            except Exception as e:
+                print(f"Career search error for {company}: {e}")
         
-        # Also search for specific career page
-        try:
-            career_query = f'{company} careers site:linkedin.com OR site:indeed.com'
-            career_results = await search_web(career_query, count=10)
-            
-            for result in career_results.get('results', []):
-                job_info = self._parse_job_result(result, company)
-                if job_info:
-                    all_jobs.append(job_info)
-        except Exception as e:
-            print(f"Career search error for {company}: {e}")
-        
-        # Deduplicate
+        # Deduplicate by title + location (same role at different sites = distinct jobs)
         seen = set()
         unique_jobs = []
         for job in all_jobs:
-            key = job.get('title', '')[:40].lower()
+            key = f"{job.get('title','')[:40].lower()}|{job.get('location','')[:30].lower()}"
             if key not in seen:
                 seen.add(key)
                 unique_jobs.append(job)
@@ -117,8 +120,8 @@ class JobScraper:
     def _parse_job_result(self, result: dict, company: str) -> Optional[dict]:
         """Parse a search result into job info."""
         title = result.get('title', '')
-        snippet = result.get('snippet', '')
-        url = result.get('url', '')
+        snippet = result.get('snippet') or result.get('description') or result.get('body', '')
+        url = result.get('url') or result.get('href', '')
         
         # Check if it's a job posting
         is_job = any(term in title.lower() or term in url.lower() 

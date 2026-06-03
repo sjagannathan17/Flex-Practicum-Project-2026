@@ -16,11 +16,11 @@ sys.path.insert(0, ".")
 
 # Import everything from build_chromadb except __main__
 import importlib.util
-spec = importlib.util.spec_from_file_location("build", "Vector Database/build_chromadb.py")
+spec = importlib.util.spec_from_file_location("build", "scripts/build_chromadb.py")
 mod = importlib.util.module_from_spec(spec)
 
 # Patch __file__ before exec
-mod.__file__ = str(Path("Vector Database/build_chromadb.py").resolve())
+mod.__file__ = str(Path("scripts/build_chromadb.py").resolve())
 spec.loader.exec_module(mod)
 
 import chromadb

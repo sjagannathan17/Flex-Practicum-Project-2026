@@ -6,8 +6,10 @@ import re
 from typing import Literal
 from collections import defaultdict
 
-from backend.rag.retriever import search_documents
 from backend.core.cache import analytics_cache, cached
+from backend.core.config import TRACKED_COMPANY_NAMES
+from backend.rag.retriever import search_documents
+from backend.analytics.sentiment import _filing_weight
 
 
 # Classification keywords
@@ -135,19 +137,26 @@ def classify_company_investments(company: str, n_docs: int = 50) -> dict:
     total_traditional_score = 0
     
     for doc in docs:
+        filing_type = doc.get("filing_type", "Unknown")
+        w = _filing_weight(filing_type)
+
         result = classify_investment_text(doc["content"])
-        
-        total_ai_score += result["ai_score"]
-        total_traditional_score += result["traditional_score"]
-        
+
+        # Earnings transcripts count more — management's own words carry more
+        # strategic signal than boilerplate 10-K disclosures.
+        total_ai_score += result["ai_score"] * w
+        total_traditional_score += result["traditional_score"] * w
+
         doc_info = {
             "source": doc.get("source", "Unknown"),
             "fiscal_year": doc.get("fiscal_year", "Unknown"),
+            "filing_type": filing_type,
+            "weight": w,
             "confidence": result["confidence"],
             "ai_percentage": result["ai_percentage"],
             "preview": doc["content"][:200] + "...",
         }
-        
+
         classifications[result["classification"]].append(doc_info)
     
     # Calculate overall breakdown
@@ -186,7 +195,7 @@ def compare_investment_focus() -> dict:
     """
     Compare investment focus across all companies.
     """
-    companies = ["Flex", "Jabil", "Celestica", "Benchmark", "Sanmina"]
+    companies = list(TRACKED_COMPANY_NAMES)
     
     results = {
         "companies": [],

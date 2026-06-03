@@ -3,9 +3,28 @@ Company API endpoints.
 """
 from fastapi import APIRouter, HTTPException
 from backend.core.config import COMPANIES, COMPANY_NAME_TO_TICKER
-from backend.core.database import get_collection_stats
+from backend.core.database import get_collection_stats, get_all_collections_stats
 
 router = APIRouter()
+
+DEFAULT_COMPANY_COLORS = {
+    "FLEX": "#3B82F6",
+    "JBL": "#10B981",
+    "CLS": "#6366F1",
+    "BHE": "#F59E0B",
+    "SANM": "#EF4444",
+    "PLXS": "#14B8A6",
+}
+
+
+def _company_metadata(ticker: str, info: dict) -> dict:
+    """Return a UI-safe company metadata block even when config fields are sparse."""
+    return {
+        "fiscal_year_end": info.get("fiscal_year_end", "Unknown"),
+        "headquarters": info.get("headquarters", "Unknown"),
+        "color": info.get("color", DEFAULT_COMPANY_COLORS.get(ticker, "#64748B")),
+        "industry": info.get("industry", info.get("sector", "Unknown")),
+    }
 
 
 @router.get("/companies")
@@ -13,9 +32,9 @@ async def list_companies():
     """
     List all tracked companies with their metadata.
     """
-    stats = get_collection_stats()
+    stats = get_all_collections_stats()
     companies_data = []
-    
+
     for ticker, info in COMPANIES.items():
         company_name = info["name"].split()[0]  # Get first word (Flex, Jabil, etc.)
         doc_count = stats.get("companies", {}).get(company_name, 0)
@@ -24,9 +43,7 @@ async def list_companies():
             "ticker": ticker,
             "name": info["name"],
             "cik": info["cik"],
-            "fiscal_year_end": info["fiscal_year_end"],
-            "headquarters": info["headquarters"],
-            "color": info["color"],
+            **_company_metadata(ticker, info),
             "document_count": doc_count,
         })
     
@@ -56,6 +73,7 @@ async def get_company(ticker: str):
     return {
         "ticker": ticker,
         **info,
+        **_company_metadata(ticker, info),
         "document_count": doc_count,
     }
 
@@ -140,9 +158,7 @@ async def compare_companies(tickers: str):
         comparison.append({
             "ticker": ticker,
             "name": info["name"],
-            "headquarters": info["headquarters"],
-            "fiscal_year_end": info["fiscal_year_end"],
-            "color": info["color"],
+            **_company_metadata(ticker, info),
             "document_count": doc_count,
         })
     

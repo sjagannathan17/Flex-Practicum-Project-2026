@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { readPersistentCache, writePersistentCache } from '@/lib/persistentCache';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Building2, 
-  TrendingUp, 
+  Building2,
+  TrendingUp,
   TrendingDown,
   Brain,
   Activity,
-  MapPin,
   FileText,
   ArrowLeft,
   RefreshCw,
@@ -20,12 +20,7 @@ import {
   BarChart3,
   Minus,
   DollarSign,
-  Newspaper,
-  Factory,
-  Briefcase,
-  Lightbulb,
-  Users,
-  Cloud
+  Users
 } from 'lucide-react';
 import {
   BarChart,
@@ -45,12 +40,29 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
+// Module-level cache keyed by company slug — survives navigation unmount/remount
+type DetailCache = {
+  overview: any;
+  financials: any;
+  capexData: any;
+  hiring: any;
+};
+const _detailCache: Record<string, DetailCache> = {};
+
+function getDetailCache(key: string): DetailCache {
+  if (!_detailCache[key]) {
+    _detailCache[key] = { overview: null, financials: null, capexData: null, hiring: null };
+  }
+  return _detailCache[key];
+}
+
 const COMPANY_COLORS: Record<string, string> = {
   'flex': '#3B82F6',
   'jabil': '#10B981',
   'celestica': '#6366F1',
   'benchmark': '#F59E0B',
   'sanmina': '#EF4444',
+  'plexus': '#14B8A6',
 };
 
 const COMPANY_NAMES: Record<string, string> = {
@@ -59,32 +71,49 @@ const COMPANY_NAMES: Record<string, string> = {
   'celestica': 'Celestica Inc.',
   'benchmark': 'Benchmark Electronics',
   'sanmina': 'Sanmina Corporation',
+  'plexus': 'Plexus Corp',
 };
 
-type TabType = 'overview' | 'filings' | 'financials' | 'ai' | 'capex' | 'geographic' | 'news' | 'patents' | 'hiring' | 'ocp';
+type TabType = 'overview' | 'financials' | 'capex' | 'hiring';
 
 export default function CompanyDetailPage() {
   const params = useParams();
   const company = (params.company as string)?.charAt(0).toUpperCase() + (params.company as string)?.slice(1);
   const companyKey = params.company as string;
-  
+
+  const cache = getDetailCache(companyKey);
+
   const [activeTab, setActiveTab] = useState<TabType>('overview');
-  const [overview, setOverview] = useState<any>(null);
-  const [filings, setFilings] = useState<any>(null);
-  const [financials, setFinancials] = useState<any>(null);
-  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
-  const [capexData, setCapexData] = useState<any>(null);
-  const [geographic, setGeographic] = useState<any>(null);
-  const [news, setNews] = useState<any>(null);
-  const [patents, setPatents] = useState<any>(null);
-  const [hiring, setHiring] = useState<any>(null);
-  const [ocp, setOcp] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [overview, setOverview] = useState<any>(cache.overview);
+  const [financials, setFinancials] = useState<any>(cache.financials);
+  const [capexData, setCapexData] = useState<any>(cache.capexData);
+  const [hiring, setHiring] = useState<any>(cache.hiring);
+  const [loading, setLoading] = useState(!cache.overview);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshMsg, setRefreshMsg] = useState<string | null>(null);
+  const [rescraping, setRescraping] = useState(false);
+  const [rescrapeMsg, setRescrapeMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    if (company) {
+    if (!company) return;
+    const c = getDetailCache(companyKey);
+    if (c.overview) return; // already in module-level cache
+    // Seed module-level cache from localStorage first
+    const persisted = readPersistentCache<DetailCache>(`cache:company-detail:${companyKey}:v1`);
+    if (persisted) {
+      c.overview    = persisted.overview    ?? null;
+      c.financials  = persisted.financials  ?? null;
+      c.capexData   = persisted.capexData   ?? null;
+      c.hiring      = persisted.hiring      ?? null;
+      setOverview(c.overview);
+      setFinancials(c.financials);
+      setCapexData(c.capexData);
+      setHiring(c.hiring);
+      setLoading(false);
+    } else {
       fetchOverview();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [company]);
 
   useEffect(() => {
@@ -98,7 +127,10 @@ export default function CompanyDetailPage() {
     try {
       const res = await fetch(`${API_URL}/api/company/${company}/overview`);
       if (res.ok) {
-        setOverview(await res.json());
+        const data = await res.json();
+        setOverview(data);
+        getDetailCache(companyKey).overview = data;
+        writePersistentCache(`cache:company-detail:${companyKey}:v1`, getDetailCache(companyKey));
       }
     } catch (err) {
       console.error('Failed to fetch overview:', err);
@@ -108,65 +140,100 @@ export default function CompanyDetailPage() {
   };
 
   const fetchTabData = async (tab: TabType) => {
+    const c = getDetailCache(companyKey);
     try {
       switch (tab) {
-        case 'filings':
-          if (!filings) {
-            const res = await fetch(`${API_URL}/api/company/${company}/filings`);
-            if (res.ok) setFilings(await res.json());
-          }
-          break;
         case 'financials':
-          if (!financials) {
+          if (!c.financials) {
             const res = await fetch(`${API_URL}/api/company/${company}/financials`);
-            if (res.ok) setFinancials(await res.json());
-          }
-          break;
-        case 'ai':
-          if (!aiAnalysis) {
-            const res = await fetch(`${API_URL}/api/company/${company}/ai-analysis`);
-            if (res.ok) setAiAnalysis(await res.json());
+            if (res.ok) { const d = await res.json(); setFinancials(d); c.financials = d; writePersistentCache(`cache:company-detail:${companyKey}:v1`, c); }
           }
           break;
         case 'capex':
-          if (!capexData) {
+          if (!c.capexData) {
             const res = await fetch(`${API_URL}/api/company/${company}/capex`);
-            if (res.ok) setCapexData(await res.json());
-          }
-          break;
-        case 'geographic':
-          if (!geographic) {
-            const res = await fetch(`${API_URL}/api/company/${company}/geographic`);
-            if (res.ok) setGeographic(await res.json());
-          }
-          break;
-        case 'news':
-          if (!news) {
-            const res = await fetch(`${API_URL}/api/company/${company}/news`);
-            if (res.ok) setNews(await res.json());
-          }
-          break;
-        case 'patents':
-          if (!patents) {
-            const res = await fetch(`${API_URL}/api/patents/${company}`);
-            if (res.ok) setPatents(await res.json());
+            if (res.ok) { const d = await res.json(); setCapexData(d); c.capexData = d; writePersistentCache(`cache:company-detail:${companyKey}:v1`, c); }
           }
           break;
         case 'hiring':
-          if (!hiring) {
+          if (!c.hiring) {
             const res = await fetch(`${API_URL}/api/jobs/${company}`);
-            if (res.ok) setHiring(await res.json());
-          }
-          break;
-        case 'ocp':
-          if (!ocp) {
-            const res = await fetch(`${API_URL}/api/ocp/${company}`);
-            if (res.ok) setOcp(await res.json());
+            if (res.ok) { const d = await res.json(); setHiring(d); c.hiring = d; writePersistentCache(`cache:company-detail:${companyKey}:v1`, c); }
           }
           break;
       }
     } catch (err) {
       console.error(`Failed to fetch ${tab} data:`, err);
+    }
+  };
+
+  const refreshData = async () => {
+    const c = getDetailCache(companyKey);
+    setRefreshing(true);
+    setRefreshMsg(null);
+    let changed = false;
+
+    // Always refresh overview
+    try {
+      const res = await fetch(`${API_URL}/api/company/${company}/overview`);
+      if (res.ok) {
+        const data = await res.json();
+        if (JSON.stringify(data) !== JSON.stringify(c.overview)) {
+          setOverview(data); c.overview = data; changed = true;
+        }
+      }
+    } catch {}
+
+    // Refresh only tabs that have been visited (cache != null)
+    const tabFetches: Array<{ key: keyof DetailCache; url: string; setter: (d: any) => void }> = [
+      { key: 'financials',url: `${API_URL}/api/company/${company}/financials`, setter: setFinancials },
+      { key: 'capexData', url: `${API_URL}/api/company/${company}/capex`,     setter: setCapexData },
+      { key: 'hiring',    url: `${API_URL}/api/jobs/${company}`,              setter: setHiring },
+    ];
+    await Promise.all(
+      tabFetches
+        .filter(({ key }) => c[key] !== null)
+        .map(async ({ key, url, setter }) => {
+          try {
+            const res = await fetch(url);
+            if (!res.ok) return;
+            const data = await res.json();
+            if (JSON.stringify(data) !== JSON.stringify(c[key])) {
+              setter(data); c[key] = data; changed = true;
+            }
+          } catch {}
+        })
+    );
+
+    if (changed) writePersistentCache(`cache:company-detail:${companyKey}:v1`, c);
+    setRefreshing(false);
+    setRefreshMsg(changed ? 'Data updated' : 'No changes — cache unchanged');
+    setTimeout(() => setRefreshMsg(null), 3000);
+  };
+
+  const handleRescrape = async () => {
+    const c = getDetailCache(companyKey);
+    setRescraping(true);
+    setRescrapeMsg(null);
+    try {
+      const res = await fetch(`${API_URL}/api/jobs/${company}/rescrape`, { method: 'POST' });
+      if (!res.ok) throw new Error('rescrape failed');
+      const data = await res.json();
+      if (data.changed) {
+        setHiring(data);
+        c.hiring = data;
+        writePersistentCache(`cache:company-detail:${companyKey}:v1`, c);
+        const addedPart = data.added > 0 ? ` · +${data.added} new` : '';
+        const removedPart = data.removed > 0 ? ` / -${data.removed} removed` : '';
+        setRescrapeMsg(`Updated from official site${addedPart}${removedPart}`);
+      } else {
+        setRescrapeMsg('No changes detected');
+      }
+    } catch {
+      setRescrapeMsg('Scrape failed, please retry');
+    } finally {
+      setRescraping(false);
+      setTimeout(() => setRescrapeMsg(null), 5000);
     }
   };
 
@@ -198,29 +265,50 @@ export default function CompanyDetailPage() {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Building2 },
-    { id: 'filings', label: 'Filings', icon: FileText },
     { id: 'financials', label: 'Financials', icon: DollarSign },
-    { id: 'ai', label: 'AI Analysis', icon: Brain },
     { id: 'capex', label: 'CapEx', icon: BarChart3 },
-    { id: 'geographic', label: 'Geographic', icon: Globe },
-    { id: 'news', label: 'News', icon: Newspaper },
-    { id: 'patents', label: 'Patents', icon: Lightbulb },
     { id: 'hiring', label: 'Hiring', icon: Users },
-    { id: 'ocp', label: 'Open Compute', icon: Cloud },
   ];
 
-  // Investment breakdown for chart
-  const investmentData = aiAnalysis?.investment_breakdown ? [
-    { name: 'AI/Data Center', value: aiAnalysis.investment_breakdown.ai_datacenter?.count || 0, fill: '#8B5CF6' },
-    { name: 'Traditional', value: aiAnalysis.investment_breakdown.traditional?.count || 0, fill: '#94A3B8' },
-    { name: 'Mixed', value: aiAnalysis.investment_breakdown.mixed?.count || 0, fill: '#F59E0B' },
-  ] : [];
+  // CapEx trend chart data
+  const capexTrendChart = (capexData?.capex_trend ?? []).map((row: any) => ({
+    year: row.fiscal_year,
+    capex: row.capex_millions,
+  }));
 
-  // CapEx breakdown for chart
-  const capexBreakdownData = capexData?.breakdown ? Object.entries(capexData.breakdown).map(([key, val]: [string, any]) => ({
-    name: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    value: val.mentions || 0,
-  })).filter(d => d.value > 0) : [];
+  // CapEx metrics table: CapEx/Revenue % + YoY growth rate (client-side derived)
+  const capexMetrics = capexTrendChart.map((row: any, idx: number) => {
+    const yearKey = row.year.replace('FY', '');
+    const rev = financials?.fiscal_years?.[yearKey]?.revenue;
+    const capexPct = rev && rev > 0 ? ((row.capex / rev) * 100).toFixed(1) : null;
+    const prev = capexTrendChart[idx - 1];
+    const yoy = prev?.capex && prev.capex > 0
+      ? (((row.capex - prev.capex) / prev.capex) * 100).toFixed(1)
+      : null;
+    return { ...row, capexPct, yoy };
+  });
+
+  // Investment Focus — breakdown with labels
+  const CATEGORY_LABELS: Record<string, string> = {
+    property_plant_equipment: 'Property, Plant & Equipment',
+    technology_infrastructure: 'Technology Infrastructure',
+    data_center: 'Data Center',
+    machinery_equipment: 'Machinery & Equipment',
+    facility_expansion: 'Facility Expansion',
+  };
+  const breakdownEntries: Array<{ key: string; label: string; mentions: number; quotes: string[] }> =
+    capexData?.breakdown
+      ? Object.entries(capexData.breakdown)
+          .map(([k, v]: [string, any]) => ({
+            key: k,
+            label: CATEGORY_LABELS[k] ?? k.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+            mentions: v.mentions ?? 0,
+            quotes: v.sample_quotes ?? [],
+          }))
+          .filter((e) => e.mentions > 0)
+          .sort((a, b) => b.mentions - a.mentions)
+      : [];
+  const maxMentions = breakdownEntries[0]?.mentions ?? 1;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6">
@@ -254,12 +342,18 @@ export default function CompanyDetailPage() {
                 {overview.trends.outlook.charAt(0).toUpperCase() + overview.trends.outlook.slice(1)} Outlook
               </Badge>
             )}
+            {refreshMsg && (
+              <span className={`text-sm font-medium ${refreshMsg.includes('No changes') ? 'text-slate-500' : 'text-green-600'}`}>
+                {refreshMsg}
+              </span>
+            )}
             <button
-              onClick={fetchOverview}
-              className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
+              onClick={refreshData}
+              disabled={refreshing}
+              className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-60"
             >
-              <RefreshCw className="h-4 w-4" />
-              Refresh
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? 'Refreshing...' : 'Refresh'}
             </button>
           </div>
         </div>
@@ -276,6 +370,7 @@ export default function CompanyDetailPage() {
             <p className="text-2xl font-bold text-slate-900">
               {overview?.investment?.ai_focus_percentage?.toFixed(0) || 0}%
             </p>
+            <p className="text-xs text-slate-400 mt-1">SEC Filings · NLP</p>
           </CardContent>
         </Card>
 
@@ -287,6 +382,9 @@ export default function CompanyDetailPage() {
             </div>
             <p className="text-2xl font-bold text-slate-900">
               {((overview?.sentiment?.score || 0) * 100).toFixed(0)}%
+            </p>
+            <p className="text-xs text-slate-400 mt-1">
+              {overview?.sentiment?.method === 'finbert' ? 'FinBERT · SEC Filings' : 'Lexicon · SEC Filings'}
             </p>
           </CardContent>
         </Card>
@@ -300,6 +398,7 @@ export default function CompanyDetailPage() {
             <p className="text-2xl font-bold text-slate-900">
               {overview?.facilities?.total || 0}
             </p>
+            <p className="text-xs text-slate-400 mt-1">SEC Filings · NLP</p>
           </CardContent>
         </Card>
 
@@ -312,6 +411,7 @@ export default function CompanyDetailPage() {
             <p className="text-2xl font-bold text-slate-900">
               {overview?.documents?.toLocaleString() || 0}
             </p>
+            <p className="text-xs text-slate-400 mt-1">ChromaDB Vector DB</p>
           </CardContent>
         </Card>
       </div>
@@ -346,10 +446,15 @@ export default function CompanyDetailPage() {
             {/* Trend Analysis */}
             <Card className="border-0 shadow-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-green-600" />
-                  Trend Analysis
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-green-600" />
+                    Trend Analysis
+                  </CardTitle>
+                  <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+                    Source: ChromaDB · SEC Filings
+                  </span>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -393,10 +498,15 @@ export default function CompanyDetailPage() {
             {/* Company Info */}
             <Card className="border-0 shadow-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-blue-600" />
-                  Company Information
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-blue-600" />
+                    Company Information
+                  </CardTitle>
+                  <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+                    Source: SEC EDGAR Config
+                  </span>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -422,327 +532,314 @@ export default function CompanyDetailPage() {
           </>
         )}
 
-        {activeTab === 'filings' && (
-          <Card className="border-0 shadow-xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-orange-600" />
-                Recent Filings
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {filings?.filings?.length > 0 ? (
-                <div className="space-y-3">
-                  {filings.filings.map((filing: any, idx: number) => (
-                    <div key={idx} className="p-4 bg-slate-50 rounded-xl">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <Badge>{filing.filing_type}</Badge>
-                          <span className="text-sm text-slate-500">{filing.fiscal_year}</span>
-                        </div>
-                        <span className="text-xs text-slate-400">{filing.chunk_count} chunks</span>
-                      </div>
-                      <p className="text-sm text-slate-600 line-clamp-2">{filing.preview}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-slate-500 text-center py-8">Loading filings...</p>
-              )}
-            </CardContent>
-          </Card>
-        )}
 
-        {activeTab === 'ai' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-purple-600" />
-                  AI Investment Focus
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center mb-4">
-                  <p className="text-4xl font-bold text-purple-600">
-                    {aiAnalysis?.ai_focus_percentage?.toFixed(1) || 0}%
-                  </p>
-                  <p className="text-slate-500">{aiAnalysis?.investment_focus || 'N/A'}</p>
-                </div>
-                {investmentData.length > 0 && (
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie data={investmentData} cx="50%" cy="50%" innerRadius={40} outerRadius={70} dataKey="value">
-                        {investmentData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                )}
-              </CardContent>
-            </Card>
+        {activeTab === 'financials' && (
+          <div className="space-y-6">
+            {/* Source badge */}
+            {financials && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs px-2 py-1 rounded-full font-medium border bg-green-50 text-green-700 border-green-200">
+                  {financials.source === 'yfinance' ? 'Live data via Yahoo Finance' : 'Extracted from SEC filings'}
+                </span>
+                {financials.ticker && <span className="text-xs text-slate-400">{financials.ticker}</span>}
+              </div>
+            )}
 
-            <Card className="border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle>AI Mentions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 max-h-80 overflow-y-auto">
-                  {aiAnalysis?.sample_ai_mentions?.map((mention: any, idx: number) => (
-                    <div key={idx} className="p-3 bg-purple-50 rounded-lg">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge variant="outline">{mention.source}</Badge>
-                        <span className="text-xs text-slate-500">{mention.fiscal_year}</span>
+            {financials?.fiscal_years && Object.keys(financials.fiscal_years).length > 0 ? (() => {
+              const years = Object.keys(financials.fiscal_years).sort();
+              const barData = years.map(yr => ({
+                year: yr,
+                'Total Revenue': financials.fiscal_years[yr].revenue ?? null,
+                'Operating Income': financials.fiscal_years[yr].operating_income ?? null,
+                'Net Income': financials.fiscal_years[yr].net_income ?? null,
+              }));
+              const marginData = years.map(yr => ({
+                year: yr,
+                'Operating Margin %': financials.fiscal_years[yr].operating_margin ?? null,
+              }));
+
+              return (
+                <>
+                  {/* Revenue / Income bar chart */}
+                  <Card className="border-0 shadow-xl">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <DollarSign className="h-5 w-5 text-blue-600" />
+                        Revenue & Income (USD millions)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={280}>
+                        <BarChart data={barData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="year" />
+                          <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}B`} />
+                          <Tooltip formatter={(v: any) => [`$${Number(v).toLocaleString()}M`, '']} />
+                          <Legend />
+                          <Bar dataKey="Total Revenue" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="Operating Income" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="Net Income" fill="#10B981" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  {/* Operating Margin line chart */}
+                  <Card className="border-0 shadow-xl">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Activity className="h-5 w-5 text-purple-600" />
+                        Operating Margin (%)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={220}>
+                        <LineChart data={marginData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="year" />
+                          <YAxis tickFormatter={(v) => `${v}%`} domain={['auto', 'auto']} />
+                          <Tooltip formatter={(v: any) => [`${Number(v).toFixed(2)}%`, 'Operating Margin']} />
+                          <Line type="monotone" dataKey="Operating Margin %" stroke="#8B5CF6" strokeWidth={2} dot={{ r: 4 }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  {/* Metrics table */}
+                  <Card className="border-0 shadow-xl">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <BarChart3 className="h-5 w-5 text-slate-600" />
+                        Key Metrics by Year
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-slate-200 bg-slate-50">
+                              <th className="text-left py-3 px-4 font-semibold text-slate-700">Metric</th>
+                              {years.map(yr => (
+                                <th key={yr} className="text-right py-3 px-4 font-semibold text-slate-700">{yr}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[
+                              { key: 'revenue', label: 'Total Revenue', format: (v: number) => `$${v.toLocaleString()}M` },
+                              { key: 'operating_income', label: 'Operating Income', format: (v: number) => `$${v.toLocaleString()}M` },
+                              { key: 'net_income', label: 'Net Income', format: (v: number) => `$${v.toLocaleString()}M` },
+                              { key: 'eps', label: 'EPS (Diluted)', format: (v: number) => `$${v.toFixed(2)}` },
+                              { key: 'operating_margin', label: 'Operating Margin', format: (v: number) => `${v.toFixed(2)}%` },
+                            ].map(({ key, label, format }) => (
+                              <tr key={key} className="border-b border-slate-100 hover:bg-slate-50">
+                                <td className="py-3 px-4 font-medium text-slate-700">{label}</td>
+                                {years.map(yr => {
+                                  const val = (financials.fiscal_years[yr] as any)[key];
+                                  return (
+                                    <td key={yr} className="py-3 px-4 text-right text-slate-600">
+                                      {val != null ? format(val) : '—'}
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
-                      <p className="text-sm text-slate-600 line-clamp-2">{mention.preview}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    </CardContent>
+                  </Card>
+                </>
+              );
+            })() : (
+              <Card className="border-0 shadow-xl">
+                <CardContent className="py-12 text-center text-slate-500">Loading financials...</CardContent>
+              </Card>
+            )}
           </div>
         )}
 
         {activeTab === 'capex' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+
+            {/* ── CapEx Trend ── */}
             <Card className="border-0 shadow-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-orange-600" />
-                  CapEx Breakdown
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-blue-600" />
+                    Historical CapEx Trend
+                  </CardTitle>
+                  <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
+                    Source: yfinance · Actual
+                  </span>
+                </div>
               </CardHeader>
               <CardContent>
-                {capexBreakdownData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={capexBreakdownData} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" />
-                      <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 11 }} />
-                      <Tooltip />
-                      <Bar dataKey="value" fill="#F59E0B" radius={[0, 4, 4, 0]} />
+                {capexTrendChart.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={260}>
+                    <BarChart data={capexTrendChart} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                      <XAxis dataKey="year" tick={{ fontSize: 12 }} />
+                      <YAxis tickFormatter={(v) => `$${v}M`} tick={{ fontSize: 11 }} width={70} />
+                      <Tooltip formatter={(value: any) => [`$${value}M`, 'CapEx']} />
+                      <Bar dataKey="capex" fill="#3B82F6" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <p className="text-slate-500 text-center py-8">Loading CapEx data...</p>
+                  <p className="text-slate-500 text-center py-8">Loading CapEx trend data...</p>
                 )}
               </CardContent>
             </Card>
 
+            {/* ── Metrics Table ── */}
+            {capexMetrics.length > 0 && (
+              <Card className="border-0 shadow-xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <DollarSign className="h-5 w-5 text-slate-600" />
+                    CapEx Metrics by Year
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-slate-200 bg-slate-50">
+                          <th className="text-left py-3 px-4 font-semibold text-slate-600">Fiscal Year</th>
+                          <th className="text-right py-3 px-4 font-semibold text-slate-600">CapEx ($M)</th>
+                          <th className="text-right py-3 px-4 font-semibold text-slate-600">CapEx / Revenue</th>
+                          <th className="text-right py-3 px-4 font-semibold text-slate-600">YoY Change</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {capexMetrics.map((row: any) => (
+                          <tr key={row.year} className="border-b border-slate-100 hover:bg-slate-50">
+                            <td className="py-3 px-4 font-medium">{row.year}</td>
+                            <td className="py-3 px-4 text-right">{row.capex != null ? `$${row.capex.toLocaleString()}M` : '—'}</td>
+                            <td className="py-3 px-4 text-right">{row.capexPct != null ? `${row.capexPct}%` : '—'}</td>
+                            <td className="py-3 px-4 text-right">
+                              {row.yoy != null ? (
+                                <span className={parseFloat(row.yoy) >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                  {parseFloat(row.yoy) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(row.yoy))}%
+                                </span>
+                              ) : '—'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {!financials && (
+                    <p className="text-xs text-slate-400 mt-3">
+                      Visit the Financials tab to load revenue data for CapEx/Revenue ratio.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* ── Anomaly Insight ── */}
             <Card className="border-0 shadow-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-red-600" />
-                  CapEx Anomalies
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <AlertTriangle className="h-5 w-5 text-orange-500" />
+                  CapEx Anomaly Insight
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {capexData?.has_anomalies ? (
-                  <div className="space-y-3">
-                    {capexData.anomalies?.map((anomaly: any, idx: number) => (
-                      <div key={idx} className={`p-4 rounded-xl border ${
-                        anomaly.severity === 'high' ? 'bg-red-50 border-red-200' : 'bg-orange-50 border-orange-200'
-                      }`}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium">{anomaly.period}</span>
-                          <Badge className={anomaly.severity === 'high' ? 'bg-red-200 text-red-800' : 'bg-orange-200 text-orange-800'}>
-                            {anomaly.direction}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-slate-600">
-                          {anomaly.pct_change_from_mean > 0 ? '+' : ''}{anomaly.pct_change_from_mean}% from mean
-                        </p>
+                {capexData?.anomaly?.has_anomaly ? (
+                  <div className={`p-4 rounded-xl border ${
+                    capexData.anomaly.severity === 'high'
+                      ? 'bg-red-50 border-red-200'
+                      : 'bg-orange-50 border-orange-200'
+                  }`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold text-slate-800">{capexData.anomaly.current_year}</span>
+                      <div className="flex items-center gap-2">
+                        <Badge className={capexData.anomaly.severity === 'high'
+                          ? 'bg-red-100 text-red-700 border border-red-300'
+                          : 'bg-orange-100 text-orange-700 border border-orange-300'}>
+                          {capexData.anomaly.direction === 'spike' ? '▲ Spike' : '▼ Drop'}
+                        </Badge>
+                        <Badge className="bg-slate-100 text-slate-600 border border-slate-200">
+                          {capexData.anomaly.severity}
+                        </Badge>
                       </div>
-                    ))}
+                    </div>
+                    <p className="text-sm text-slate-700">{capexData.anomaly.reason}</p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Historical avg: ${capexData.anomaly.historical_average_millions?.toFixed(0)}M &nbsp;·&nbsp;
+                      Δ {capexData.anomaly.pct_change_from_history > 0 ? '+' : ''}{capexData.anomaly.pct_change_from_history}%
+                    </p>
                   </div>
                 ) : (
-                  <div className="text-center py-8">
-                    <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <TrendingUp className="h-8 w-8 text-green-600" />
+                  <div className="flex items-center gap-4 p-4 bg-green-50 rounded-xl border border-green-200">
+                    <div className="bg-green-100 rounded-full p-2 shrink-0">
+                      <TrendingUp className="h-5 w-5 text-green-600" />
                     </div>
-                    <p className="text-slate-600">No anomalies detected</p>
+                    <p className="text-sm text-slate-700">
+                      {capexData?.anomaly?.reason ?? 'No abnormal CapEx movement detected based on the available trend data.'}
+                    </p>
                   </div>
                 )}
               </CardContent>
             </Card>
-          </div>
-        )}
 
-        {activeTab === 'geographic' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Globe className="h-5 w-5 text-blue-600" />
-                  Regional Distribution
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {geographic?.regional_distribution && (
-                  <div className="space-y-4">
-                    {Object.entries(geographic.regional_distribution).map(([region, count]) => (
-                      <div key={region}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium">{region}</span>
-                          <span className="text-slate-500">{count as number} facilities</span>
+            {/* ── Investment Focus ── */}
+            {breakdownEntries.length > 0 && (
+              <Card className="border-0 shadow-xl">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Brain className="h-5 w-5 text-purple-600" />
+                      Investment Focus
+                    </CardTitle>
+                    <span className="text-xs px-2 py-1 rounded-full bg-purple-50 text-purple-600 border border-purple-200">
+                      SEC Filings · Keyword Frequency
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {breakdownEntries.map((entry) => (
+                      <div key={entry.key} className="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-semibold text-slate-800 text-sm">{entry.label}</span>
+                          <Badge className="bg-blue-100 text-blue-700 border border-blue-200">
+                            {entry.mentions} mentions
+                          </Badge>
                         </div>
-                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-blue-500 rounded-full"
-                            style={{ width: `${(geographic.regional_percentages?.[region] || 0)}%` }}
+                        <div className="h-1.5 bg-slate-200 rounded-full mb-3">
+                          <div
+                            className="h-1.5 bg-blue-400 rounded-full"
+                            style={{ width: `${(entry.mentions / maxMentions) * 100}%` }}
                           />
                         </div>
+                        {entry.quotes.length > 0 && (
+                          <details className="text-sm">
+                            <summary className="cursor-pointer text-blue-500 hover:underline text-xs">
+                              View quotes from filings ({entry.quotes.length})
+                            </summary>
+                            <ul className="mt-2 space-y-1.5">
+                              {entry.quotes.map((q, i) => (
+                                <li key={i} className="pl-3 border-l-2 border-blue-200 text-slate-600 italic text-xs">
+                                  "{q}"
+                                </li>
+                              ))}
+                            </ul>
+                          </details>
+                        )}
                       </div>
                     ))}
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                  <p className="text-xs text-slate-400 mt-4">
+                    Investment Focus reflects how often each topic is discussed in CapEx-related contexts in SEC filings — not actual dollar allocation.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
 
-            <Card className="border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Factory className="h-5 w-5 text-green-600" />
-                  Facilities
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {geographic?.headquarters && (
-                  <div className="mb-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Briefcase className="h-4 w-4 text-amber-600" />
-                      <span className="font-medium text-amber-900">Headquarters</span>
-                    </div>
-                    <p className="text-amber-800">{geographic.headquarters.city}, {geographic.headquarters.country}</p>
-                  </div>
-                )}
-                <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
-                  {geographic?.facilities?.map((facility: any, idx: number) => (
-                    <div key={idx} className="p-3 bg-slate-50 rounded-lg">
-                      <p className="font-medium text-sm">{facility.city}</p>
-                      <p className="text-xs text-slate-500">{facility.country}</p>
-                      <Badge variant="outline" className="mt-1 text-xs">{facility.type}</Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {activeTab === 'news' && (
-          <Card className="border-0 shadow-xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Newspaper className="h-5 w-5 text-blue-600" />
-                Recent News & Press Releases
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {news?.news?.length > 0 ? (
-                <div className="space-y-4">
-                  {news.news.map((item: any, idx: number) => (
-                    <div key={idx} className="p-4 bg-slate-50 rounded-xl">
-                      <div className="flex items-center gap-3 mb-2">
-                        <Badge>{item.filing_type}</Badge>
-                        <span className="text-sm text-slate-500">{item.fiscal_year}</span>
-                      </div>
-                      <p className="text-sm text-slate-600">{item.preview}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-slate-500 text-center py-8">Loading news...</p>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {activeTab === 'patents' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-yellow-500" />
-                  Patent Activity
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {patents ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl">
-                      <div>
-                        <p className="text-sm text-slate-500">Total Patents Found</p>
-                        <p className="text-3xl font-bold text-yellow-600">{patents.total_patents || 0}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-slate-500">Innovation Score</p>
-                        <p className="text-3xl font-bold text-amber-600">{patents.innovation_score?.innovation_score || 0}</p>
-                      </div>
-                    </div>
-                    {patents.innovation_score?.focus_areas?.length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium text-slate-700 mb-2">Focus Areas</p>
-                        <div className="flex flex-wrap gap-2">
-                          {patents.innovation_score.focus_areas.map((area: string, idx: number) => (
-                            <Badge key={idx} className="bg-purple-100 text-purple-700">{area}</Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    <div className="border-t pt-4">
-                      <p className="text-sm font-medium text-slate-700 mb-2">By Category</p>
-                      <div className="space-y-2">
-                        {patents.by_category && Object.entries(patents.by_category).map(([cat, data]: [string, any]) => (
-                          <div key={cat} className="flex justify-between items-center p-2 bg-slate-50 rounded">
-                            <span className="text-sm capitalize">{cat.replace(/_/g, ' ')}</span>
-                            <Badge variant="outline">{data.count} patents</Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-slate-500 text-center py-8">Loading patents...</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle>Recent Patent Filings</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {patents?.patents?.length > 0 ? (
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {patents.patents.slice(0, 10).map((patent: any, idx: number) => (
-                      <a
-                        key={idx}
-                        href={patent.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1">
-                            <p className="font-medium text-sm text-blue-600 hover:underline line-clamp-2">{patent.title}</p>
-                            <p className="text-xs text-slate-500 mt-1 line-clamp-2">{patent.snippet}</p>
-                          </div>
-                          <Badge variant="outline" className="text-xs shrink-0 capitalize">
-                            {patent.category?.replace(/_/g, ' ')}
-                          </Badge>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-slate-500 text-center py-8">No recent patents found</p>
-                )}
-              </CardContent>
-            </Card>
           </div>
         )}
 
@@ -750,10 +847,27 @@ export default function CompanyDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="border-0 shadow-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-green-500" />
-                  Hiring Activity
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-green-500" />
+                    Hiring Activity
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    {rescrapeMsg && (
+                      <span className={`text-xs font-medium ${rescrapeMsg.includes('失败') ? 'text-red-500' : rescrapeMsg.includes('无变化') ? 'text-slate-400' : 'text-green-600'}`}>
+                        {rescrapeMsg}
+                      </span>
+                    )}
+                    <button
+                      onClick={handleRescrape}
+                      disabled={rescraping}
+                      className="flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition-colors disabled:opacity-50"
+                    >
+                      <RefreshCw className={`h-3 w-3 ${rescraping ? 'animate-spin' : ''}`} />
+                      {rescraping ? 'Scraping...' : 'Fetch from Official Site'}
+                    </button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 {hiring ? (
@@ -802,7 +916,12 @@ export default function CompanyDetailPage() {
 
             <Card className="border-0 shadow-xl">
               <CardHeader>
-                <CardTitle>Current Job Openings</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Current Job Openings</CardTitle>
+                  <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-600 border border-green-200">
+                    Source: Official Careers Pages
+                  </span>
+                </div>
               </CardHeader>
               <CardContent>
                 {hiring?.jobs?.length > 0 ? (
@@ -818,7 +937,7 @@ export default function CompanyDetailPage() {
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
                             <p className="font-medium text-sm text-blue-600 hover:underline line-clamp-2">{job.title}</p>
-                            <p className="text-xs text-slate-500 mt-1 line-clamp-2">{job.snippet}</p>
+                            <p className="text-xs text-slate-500 mt-1">{job.location || job.snippet}</p>
                           </div>
                           <div className="flex flex-col gap-1">
                             <Badge variant="outline" className="text-xs capitalize">
@@ -840,121 +959,6 @@ export default function CompanyDetailPage() {
           </div>
         )}
 
-        {activeTab === 'ocp' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Cloud className="h-5 w-5 text-sky-500" />
-                  Open Compute Project Involvement
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {ocp ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-sky-50 to-blue-50 rounded-xl">
-                      <div>
-                        <p className="text-sm text-slate-500">Member Status</p>
-                        <p className="text-xl font-bold text-sky-600">{ocp.member_status || 'Unknown'}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-slate-500">Engagement Score</p>
-                        <p className="text-3xl font-bold text-blue-600">{ocp.engagement_score?.score || 0}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="p-3 bg-slate-50 rounded-xl">
-                      <p className="text-sm font-medium text-slate-700 mb-2">Engagement Level</p>
-                      <Badge className={`${
-                        ocp.engagement_score?.level === 'High' ? 'bg-green-100 text-green-700' :
-                        ocp.engagement_score?.level === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-slate-100 text-slate-700'
-                      }`}>
-                        {ocp.engagement_score?.level || 'Unknown'}
-                      </Badge>
-                    </div>
-
-                    {ocp.focus_areas?.length > 0 && (
-                      <div className="border-t pt-4">
-                        <p className="text-sm font-medium text-slate-700 mb-2">Focus Areas</p>
-                        <div className="flex flex-wrap gap-2">
-                          {ocp.focus_areas.map((area: string, idx: number) => (
-                            <Badge key={idx} variant="outline" className="bg-sky-50 text-sky-700">
-                              {area}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {ocp.ocp_categories?.length > 0 && (
-                      <div className="border-t pt-4">
-                        <p className="text-sm font-medium text-slate-700 mb-2">Active Categories</p>
-                        <div className="space-y-2">
-                          {ocp.ocp_categories.map((cat: any, idx: number) => (
-                            <div key={idx} className="flex justify-between items-center p-2 bg-slate-50 rounded">
-                              <span className="text-sm">{cat.name}</span>
-                              <Badge className={`${
-                                cat.relevance === 'high' ? 'bg-green-100 text-green-700' :
-                                'bg-blue-100 text-blue-700'
-                              }`}>
-                                {cat.relevance}
-                              </Badge>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-slate-500 text-center py-8">Loading OCP data...</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle>Known Contributions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {ocp?.known_contributions?.length > 0 ? (
-                  <div className="space-y-3">
-                    {ocp.known_contributions.map((contribution: string, idx: number) => (
-                      <div key={idx} className="p-3 bg-gradient-to-r from-sky-50 to-blue-50 rounded-xl flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 text-xs font-bold">
-                          {idx + 1}
-                        </div>
-                        <p className="text-sm text-slate-700">{contribution}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-slate-500 text-center py-8">No specific contributions documented</p>
-                )}
-
-                {ocp?.recent_news?.length > 0 && (
-                  <div className="mt-6 border-t pt-4">
-                    <p className="text-sm font-medium text-slate-700 mb-3">Recent OCP News</p>
-                    <div className="space-y-2 max-h-64 overflow-y-auto">
-                      {ocp.recent_news.slice(0, 5).map((news: any, idx: number) => (
-                        <a
-                          key={idx}
-                          href={news.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block p-2 bg-slate-50 rounded hover:bg-slate-100 transition-colors"
-                        >
-                          <p className="text-sm text-blue-600 hover:underline line-clamp-2">{news.title}</p>
-                          <p className="text-xs text-slate-500 mt-1 line-clamp-1">{news.description}</p>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </div>
     </div>
   );

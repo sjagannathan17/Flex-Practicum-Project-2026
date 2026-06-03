@@ -12,14 +12,49 @@ load_dotenv(BASE_DIR / "backend" / ".env")
 # ---------------------------------------------------------------------------
 # API KEYS
 # ---------------------------------------------------------------------------
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 BRAVE_API_KEY = os.getenv("BRAVE_API_KEY", "")
 SEC_USER_AGENT = os.getenv("SEC_USER_AGENT", "CapExIntel/1.0 (team@example.com)")
 
 # ---------------------------------------------------------------------------
+# LLM PROVIDER  ("openai" or "anthropic" or "gemini")
+# Auto-detected from available API keys if not explicitly set.
+# ---------------------------------------------------------------------------
+def _default_provider() -> str:
+    explicit = os.getenv("LLM_PROVIDER", "")
+    if explicit:
+        return explicit
+    if os.getenv("ANTHROPIC_API_KEY", ""):
+        return "anthropic"
+    return "openai"
+
+LLM_PROVIDER = _default_provider()
+
+
+def _env_bool(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+# ---------------------------------------------------------------------------
 # MODEL CONFIG
 # ---------------------------------------------------------------------------
-LLM_MODEL = "claude-sonnet-4-20250514"
+# OpenAI models
+LLM_MODEL = "gpt-4o"
+RERANK_MODEL = "gpt-4o-mini"
+
+# Anthropic models (used when LLM_PROVIDER="anthropic")
+ANTHROPIC_MODEL = "claude-sonnet-4-6"
+ANTHROPIC_RERANK_MODEL = "claude-haiku-4-5-20251001"
+
+# Gemini models (used when LLM_PROVIDER="gemini" or answer_provider="gemini")
+GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_RERANK_MODEL = "gemini-2.0-flash"
+
+# Embedding model (local, free)
 EMBEDDING_MODEL = "all-mpnet-base-v2"
 
 # ---------------------------------------------------------------------------
@@ -33,6 +68,7 @@ DATA_DIR = BASE_DIR / "data"
 # ---------------------------------------------------------------------------
 BRAVE_SEARCH_URL = "https://api.search.brave.com/res/v1/web/search"
 WEB_SEARCH_RESULTS = 5
+ANALYST_VIEW_BRAVE_ENABLED = _env_bool("ANALYST_VIEW_BRAVE_ENABLED", default=False)
 
 # ---------------------------------------------------------------------------
 # ANALYTICS THRESHOLDS
@@ -53,33 +89,53 @@ COMPANIES = {
         "name": "Flex Ltd",
         "cik": "0000866374",
         "sector": "EMS",
+        "headquarters": "Austin, Texas, US",
+        "fiscal_year_end": "March",
         "description": "Global electronics manufacturing services provider",
     },
     "JBL": {
         "name": "Jabil Inc",
         "cik": "0000898293",
         "sector": "EMS",
+        "headquarters": "St. Petersburg, Florida, US",
+        "fiscal_year_end": "August",
         "description": "Worldwide manufacturing services and solutions provider",
     },
     "CLS": {
         "name": "Celestica Inc",
         "cik": "0001030894",
         "sector": "EMS",
+        "headquarters": "Toronto, Canada",
+        "fiscal_year_end": "December",
         "description": "Global provider of electronics manufacturing services",
     },
     "BHE": {
         "name": "Benchmark Electronics",
         "cik": "0001080020",
         "sector": "EMS",
+        "headquarters": "Tempe, Arizona, US",
+        "fiscal_year_end": "December",
         "description": "Provider of integrated electronics manufacturing services",
     },
     "SANM": {
         "name": "Sanmina Corporation",
         "cik": "0000897723",
         "sector": "EMS",
+        "headquarters": "San Jose, California, US",
+        "fiscal_year_end": "September",
         "description": "Global electronics manufacturing services company",
     },
+    "PLXS": {
+        "name": "Plexus Corp",
+        "cik": "0000785786",
+        "sector": "EMS",
+        "headquarters": "Neenah, Wisconsin, US",
+        "fiscal_year_end": "September",
+        "description": "Global product design, manufacturing, and aftermarket services provider",
+    },
 }
+
+TRACKED_COMPANY_NAMES = [company["name"].split()[0] for company in COMPANIES.values()]
 
 COMPANY_NAME_TO_TICKER = {
     "Flex": "FLEX",
@@ -87,4 +143,5 @@ COMPANY_NAME_TO_TICKER = {
     "Celestica": "CLS",
     "Benchmark": "BHE",
     "Sanmina": "SANM",
+    "Plexus": "PLXS",
 }
