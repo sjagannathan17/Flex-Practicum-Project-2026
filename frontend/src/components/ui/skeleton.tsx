@@ -31,16 +31,19 @@ export function CardSkeleton() {
   );
 }
 
+// Fixed, varied heights so server and client render identically (no hydration mismatch).
+const CHART_SKELETON_HEIGHTS = ['65%', '80%', '50%', '90%', '60%', '75%'];
+
 export function ChartSkeleton() {
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6">
       <Skeleton className="h-6 w-40 mb-6" />
       <div className="flex items-end gap-2 h-48">
-        {[...Array(6)].map((_, i) => (
+        {CHART_SKELETON_HEIGHTS.map((height, i) => (
           <Skeleton
             key={i}
             className="flex-1"
-            style={{ height: `${Math.random() * 60 + 40}%` }}
+            style={{ height }}
           />
         ))}
       </div>
