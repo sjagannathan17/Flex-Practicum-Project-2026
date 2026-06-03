@@ -23,11 +23,11 @@ async def get_big5_capex_summary():
 @router.delete("/hyperscaler/guidance/cache")
 async def refresh_guidance():
     try:
-        result = await service.refresh_from_gemini()
+        result = await service.refresh_guidance()
         return result
     except Exception as exc:
         logger.error("Guidance refresh failed: %s", exc)
-        raise HTTPException(status_code=502, detail=f"Gemini refresh failed: {exc}")
+        raise HTTPException(status_code=502, detail=f"Guidance refresh failed: {exc}")
 
 
 @router.get("/hyperscaler/all/financials")

@@ -43,8 +43,11 @@ def _extract_json(text: str) -> str:
     if match:
         candidate = match.group(1).strip()
     else:
+        # Slice from the first "{" to the last "}" so trailing prose/citations
+        # (which Claude's web search may append) don't break json.loads.
         start = text.find("{")
-        candidate = text[start:] if start != -1 else text
+        end = text.rfind("}")
+        candidate = text[start:end + 1] if start != -1 and end > start else text
 
     # Strip "sources" array before parsing — it can be large and cause truncation
     candidate = re.sub(r',\s*"sources"\s*:\s*\[[\s\S]*?\]', '', candidate)
@@ -120,10 +123,10 @@ def _normalize(raw: dict, yfinance_2025: Optional[dict] = None) -> Big5CapexResp
         # 2025: always use yfinance — it is the authoritative source for historical actuals
         capex_2025 = yfinance_2025.get(ticker)
 
-        # 2026: use Gemini, but discard if it looks like a 2025 figure (≤ yfinance 2025 actual)
+        # 2026: use the LLM outlook, but discard if it looks like a 2025 figure (≤ yfinance 2025 actual)
         capex_2026_raw = _parse_capex(item.get("capex_2026_billions"))
         if capex_2026_raw is not None and capex_2025 is not None and capex_2026_raw <= capex_2025:
-            logger.warning("Discarding Gemini 2026 CapEx for %s ($%sB) — not greater than yfinance 2025 ($%sB)", ticker, capex_2026_raw, capex_2025)
+            logger.warning("Discarding LLM 2026 CapEx for %s ($%sB) — not greater than yfinance 2025 ($%sB)", ticker, capex_2026_raw, capex_2025)
             capex_2026 = None
         else:
             capex_2026 = capex_2026_raw
@@ -161,25 +164,25 @@ def _normalize(raw: dict, yfinance_2025: Optional[dict] = None) -> Big5CapexResp
     return Big5CapexResponse(
         companies=companies,
         last_updated=raw.get("last_updated", ""),
-        source=raw.get("source", "Gemini API"),
-        source_status=raw.get("source_status", "gemini_cached"),
+        source=raw.get("source", "Claude API"),
+        source_status=raw.get("source_status", "claude_cached"),
         total_2026_capex_billions=total,
         stargate_project=stargate,
     )
 
 
-async def refresh_from_gemini() -> Big5CapexResponse:
-    from backend.hyperscaler.gemini_client import ask_gemini_with_search
+async def refresh_guidance() -> Big5CapexResponse:
+    from backend.hyperscaler.claude_client import ask_claude_with_search
 
-    raw_text = await ask_gemini_with_search(BIG5_CAPEX_QUESTION)
+    raw_text = await ask_claude_with_search(BIG5_CAPEX_QUESTION)
 
     try:
         parsed = json.loads(_extract_json(raw_text))
         parsed.pop("sources", None)
     except Exception as exc:
-        logger.error("Failed to parse Gemini response as JSON: %s", exc)
-        logger.debug("Gemini raw response: %s", raw_text[:500])
-        raise ValueError(f"Gemini returned non-JSON response: {exc}") from exc
+        logger.error("Failed to parse Claude response as JSON: %s", exc)
+        logger.debug("Claude raw response: %s", raw_text[:500])
+        raise ValueError(f"Claude returned non-JSON response: {exc}") from exc
 
     cache_mod.write_raw({"raw_text": raw_text, "parsed": parsed, "fetched_at": datetime.now(timezone.utc).isoformat()})
 
@@ -208,8 +211,8 @@ async def refresh_from_gemini() -> Big5CapexResponse:
     now = datetime.now()
     payload = {
         "last_updated": now.strftime("%Y-%m-%d"),
-        "source": "Gemini API",
-        "source_status": "gemini_cached",
+        "source": "Claude API",
+        "source_status": "claude_cached",
         "companies": parsed.get("companies", []),
         "stargate_project": parsed.get("stargate_project", {}),
     }
