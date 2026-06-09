@@ -10,7 +10,7 @@
 
 ## The Problem
 
-Flex Ltd. is a top-3 global contract manufacturer (~$26 B revenue). Its competitors — Jabil, Celestica, Benchmark, Sanmina — are racing to win share of the **AI data-center build-out**, the largest capex cycle in the industry's history.
+Flex Ltd. is a top-3 global contract manufacturer (~$26 B revenue). Its competitors - Jabil, Celestica, Benchmark, Sanmina - are racing to win share of the **AI data-center build-out**, the largest capex cycle in the industry's history.
 
 Flex's competitive intelligence team had three real pains:
 
