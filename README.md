@@ -197,10 +197,6 @@ The repo is a 4-person codebase. To be clear about what's mine vs. the team's:
 - **Ingestion scrapers** (`backend/ingestion/sec_downloader.py`, `patent_scraper.py`, `job_scraper.py`, `news_aggregator.py`) — primarily two teammates (referred to as "Person 1" and "Person 2" in my integration commits).
 - **Alerts + Exports** (`backend/alerts/`, `backend/exports/`) — primarily one teammate.
 
-### What this looks like in the commit log
-
-A hiring manager who clicks the [Insights tab](https://github.com/sjagannathan17/Flex-Practicum-Project-2026/graphs/contributors) will see clean attribution. My commits are tagged with my name (`sjagannathan17`); the integration commits ("Integrate Person N improvements") show I was the team's integrator and reviewer, not just a contributor.
-
 ---
 
 ## What I Learned
