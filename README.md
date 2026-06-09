@@ -116,10 +116,6 @@ I came in thinking the moat was the AI quality. I left believing the moat was th
 | Operating cost | ~$20–50/mo (Claude API only; everything else free) | Anthropic billing |
 | Demo readiness | Demoed end-to-end at Flex client meeting | — |
 
-**Qualitative wins:**
-- Project sponsored by Flex Ltd. as part of the SCU Practicum program — real client, real feedback.
-- The *cost story* (5-figure SaaS replaced by ~$30/mo) is the line that lands hardest with executives.
-
 ---
 
 ## What I'd Build Next
