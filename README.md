@@ -24,7 +24,7 @@ Flex's competitive intelligence team had three real pains:
 
 ## Users & Jobs-to-be-Done
 
-| User | Job-to-be-Done | Today's Workaround | Why it sucks |
+| User | Job-to-be-Done | Today's Workaround | Why it is bad |
 |------|----------------|--------------------|--------------|
 | **CI Analyst (primary)** | When a competitor reports earnings, I want a one-page sentiment + capex delta brief in my inbox the same day. | Read 4 transcripts, copy numbers into Excel, color-code in PowerPoint | 2-day turnaround, error-prone, no historical baseline |
 | **Strategy Director** | When my CEO asks "what's Celestica doing in AI?", I want to answer in one screen with citations. | Slack the analyst team and wait | Slow, no audit trail |
