@@ -168,7 +168,7 @@ I'd rather ship one boring feature fully done than three exciting features half-
 
 This was a **4-person team, 12-week practicum** for **Flex Ltd.** at Santa Clara University. Title: *Strategic Analytics Consultant.*
 
-> **A note on the language stats:** GitHub shows this repo as "99% HTML." That's because the 188 MB of HTML is **downloaded SEC filings**, not authored code. The actual codebase is **~593 KB of Python** (backend, RAG pipeline, ingestion, analytics) and **~315 KB of TypeScript** (Next.js frontend). I've added a `.gitattributes` to vendor those data files so the language bar reflects what was actually written. *(Mentioning this here so a hiring manager doesn't have to wonder.)*
+> **A note on the language stats:** GitHub shows this repo as "99% HTML." That's because the 188 MB of HTML is **downloaded SEC filings**, not authored code. The actual codebase is **~593 KB of Python** (backend, RAG pipeline, ingestion, analytics) and **~315 KB of TypeScript** (Next.js frontend). I've added a `.gitattributes` to vendor those data files so the language bar reflects what was actually written.
 
 ### Product & strategy work I owned
 
