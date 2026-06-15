@@ -18,8 +18,8 @@
 
 ```bash
 # 1. Clone and enter the repo
-git clone https://github.com/sjagannathan17/Flex-Practicum-Project-2026.git
-cd Flex-Practicum-Project-2026
+git clone https://github.com/sjagannathan17/flex-competitive-intelligence.git
+cd flex-competitive-intelligence
 
 # 2. Set up API keys
 cp backend/.env.example backend/.env

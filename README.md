@@ -303,8 +303,8 @@ flowchart TB
 ## Quick Start
 
 ```bash
-git clone https://github.com/sjagannathan17/Flex-Practicum-Project-2026.git
-cd Flex-Practicum-Project-2026
+git clone https://github.com/sjagannathan17/flex-competitive-intelligence.git
+cd flex-competitive-intelligence
 
 # API keys
 cp backend/.env.example backend/.env
