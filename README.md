@@ -49,7 +49,7 @@ flowchart LR
     subgraph Pipeline[ Hybrid RAG]
       ChromaDB[(ChromaDB)]
       Claude[Claude API]
-      Pipeline[RAG + Web + Memory]
+      RAGCore[RAG + Web + Memory]
     end
 
     subgraph Surfaces[ Surfaces]
@@ -59,8 +59,8 @@ flowchart LR
       Exports[PPTX / Excel / PDF]
     end
 
-    Sources --> ChromaDB --> Pipeline --> Claude --> Surfaces
-    WEB --> Pipeline
+    Sources --> ChromaDB --> RAGCore --> Claude --> Surfaces
+    WEB --> RAGCore
 ```
 
 > Full system, data flow, and tech-stack diagrams live further down — the engineering depth is preserved.
