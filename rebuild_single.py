@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+asdjhfgiashkfhaskdfhkjs#!/usr/bin/env python3
 """Rebuild ChromaDB for a single company. Uses PyPDF2 for extraction to avoid memory issues."""
 import sys
 import os
